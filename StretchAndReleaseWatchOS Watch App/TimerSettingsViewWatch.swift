@@ -15,14 +15,18 @@ struct TimerSettingsViewWatch: View {
     @Binding var totalStretch: Int
     @Binding var totalRest: Int
     @Binding var totalReps: Int
-
     
     var body: some View {
-        NavigationStack {
-            List {
+        GeometryReader { proxy in
+            let firstColumnWidth = proxy.size.width * (2/5)
+            let secondColumnWidth = proxy.size.width * (1.5/5)
+            let thirdColumnWidth = proxy.size.width * (2/5)
+            
+            NavigationStack {
                 HStack {
                     Text("Stretch")
                         .font(.caption2)
+                        .frame(width: firstColumnWidth)
                     
                     Spacer()
                     
@@ -34,16 +38,20 @@ struct TimerSettingsViewWatch: View {
                     .pickerStyle(.wheel)
                     .labelsHidden()
                     .frame(width: 50, height: 20)
+                    .frame(width: secondColumnWidth)
                     
                     Spacer()
                     
                     Text("sec.")
                         .font(.caption2)
+                        .frame(width: thirdColumnWidth)
                 }
+                .padding(.trailing)
                 
                 HStack {
                     Text("Rest")
                         .font(.caption2)
+                        .frame(width: firstColumnWidth)
                     
                     Spacer()
                     
@@ -53,35 +61,42 @@ struct TimerSettingsViewWatch: View {
                         }
                     }
                     .pickerStyle(.wheel)
-                    .frame(width: 50, height: 20)
                     .labelsHidden()
+                    .frame(width: 50, height: 20)
+                    .frame(width: secondColumnWidth)
                     
                     Spacer()
                     
                     Text("sec.")
                         .font(.caption2)
+                        .frame(width: thirdColumnWidth)
                 }
+                .padding(.trailing)
                 
                 HStack {
                     Text("Reps")
                         .font(.caption2)
+                        .frame(width: firstColumnWidth)
                     
                     Spacer()
                     
-                    Picker("Number of Repetitions", selection: $totalStretch) {
+                    Picker("Number of Repetitions", selection: $totalReps) {
                         ForEach(1...30, id:\.self) {
                             Text("\($0)")
                         }
                     }
                     .pickerStyle(.wheel)
-                    .frame(width: 50, height: 20)
                     .labelsHidden()
+                    .frame(width: 50, height: 20)
+                    .frame(width: secondColumnWidth)
                     
                     Spacer()
                     
                     Text("sec.")
                         .font(.caption2)
+                        .frame(width: thirdColumnWidth)
                 }
+                .padding(.trailing)
                 
                 HStack(alignment: .center) {
                     Spacer()
@@ -98,17 +113,19 @@ struct TimerSettingsViewWatch: View {
                             .frame(width: 40, height: 40)
                             .background(Color.green)
                             .clipShape(Circle())
+                            .frame(alignment: .bottom)
                     }
                     
                     Spacer()
                 }
+                .navigationBarTitle("Settings")
+                .navigationBarTitleDisplayMode(.inline)
             }
-            .navigationBarTitle("Settings")
-            .navigationBarTitleDisplayMode(.inline)
+            .frame(width: proxy.size.width, height: proxy.size.height)
+            .padding(.horizontal)
+            
         }
-        .onAppear {
-            print("SETTINGS VARIABLES: \(totalStretch), \(totalRest), \(totalReps)")
-        }
+
     }
 }
 

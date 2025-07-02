@@ -26,34 +26,54 @@ struct TimerMainViewWatch: View {
     //local variable
     @State private var isResetToggled = false
     
+    //Connectivity class for communication with phone
+    @State private var connectivity = Connectivity()
+    
+    
     var body: some View {
-        NavigationStack {
-            VStack {
+        GeometryReader { proxy in
+            let totalHeight = proxy.size.height
+            let topHeight = totalHeight * 0.7
+            let bottomHeight = totalHeight * 0.2
+            
+            VStack(spacing: 30) {
                 TimerActionViewWatch(isTimerActive: $isTimerActive, isTimerPaused: $isTimerPaused, isResetToggled: $isResetToggled, stretchPhase: $stretchPhase, timeRemaining: $timeRemaining, repsCompleted: $repsCompleted, totalStretch: $totalStretch, totalRest: $totalRest, totalReps: $totalReps)
-                    .containerRelativeFrame(.vertical) { size, axis in
-                        size * 0.9
-                    }
-//                    .padding(.top, 5)
-//                    .padding(.bottom, 5)
-                
+                    .frame(height: topHeight)
+                    .padding(.horizontal)
                 
                 HStack {
                     Button {
-                        
+                        withAnimation {
+                            if stretchPhase == .stop {
+                                isTimerActive = true
+                                isTimerPaused = false
+                                stretchPhase = .stretch
+                            } else if !isTimerPaused {
+                                isTimerPaused = true
+                                isTimerActive = false
+                            } else {
+                                isTimerPaused = false
+                                isTimerActive = true
+                            }
+                        }
                     } label: {
                         Image(systemName: "playpause.fill")
                             .frame(width: 40, height: 40)
                             .background(Color.green)
                             .clipShape(Circle())
+                            .scaleEffect(0.85)
                     }
                     
                     Button {
+                        isTimerActive = false
+                        isTimerPaused = false
                         isResetToggled.toggle()
                     } label: {
                         Image(systemName: "arrow.counterclockwise")
                             .frame(width: 40, height: 40)
                             .background(Color.red)
                             .clipShape(Circle())
+                            .scaleEffect(0.85)
                     }
                     
                     Button {
@@ -63,17 +83,20 @@ struct TimerMainViewWatch: View {
                             .frame(width: 40, height: 40)
                             .background(Color.blue)
                             .clipShape(Circle())
+                            .scaleEffect(0.85)
                     }
                 }
+                .frame(height: bottomHeight)
             }
-            .padding()
-            .ignoresSafeArea()
-            .containerRelativeFrame(.vertical) { size, axis in
-                size * 0.33
-            }
-            .sheet(isPresented: $isShowingSettings) {
-                TimerSettingsViewWatch(totalStretch: $totalStretch, totalRest: $totalRest, totalReps: $totalReps)
+            .frame(width: proxy.size.width, height: proxy.size.height)
+            
+
         }
+        .sheet(isPresented: $isShowingSettings) {
+            TimerSettingsViewWatch(totalStretch: $totalStretch, totalRest: $totalRest, totalReps: $totalReps)
+        }
+        .onAppear {
+            timeRemaining = totalStretch
         }
     }
 }
@@ -81,3 +104,4 @@ struct TimerMainViewWatch: View {
 #Preview {
     TimerMainViewWatch()
 }
+

@@ -26,6 +26,9 @@ struct TimerMainView: View {
     //local variable
     @State private var isResetToggled = false
     
+    // Connectivity class for communication with Apple Watch
+    @State private var connectivity = Connectivity()
+    
     var body: some View {
         NavigationStack {
             GeometryReader { proxy in

@@ -46,6 +46,7 @@
 				Assets/beep.mp3,
 				Assets/chime.mp3,
 				Assets/short_beep.mp3,
+				"Models and Settings/Connectivity.swift",
 				"Models and Settings/SoundManager.swift",
 				"Models and Settings/StretchPhase.swift",
 				"Models and Settings/TimerSettings.swift",

@@ -49,7 +49,7 @@ struct TimerActionView: View {
     var body: some View {
         ZStack {
             Arc(endAngle: endAngle)
-                .stroke(stretchPhase.phaseColor, style: StrokeStyle(lineWidth: 15, lineCap: .round))
+                .stroke(stretchPhase.phaseColor, style: StrokeStyle(lineWidth: 25, lineCap: .round))
                 .rotationEffect(Angle(degrees: 90))
             VStack {
                 Text("\(String(format: "%02d", Int(timeRemaining)))")
@@ -59,11 +59,11 @@ struct TimerActionView: View {
                     .scaleEffect(0.75)
                 Text("Reps Completed: \(repsCompleted)/\(totalReps)")
             }
-            .font(.title)
+            .font(.largeTitle)
             .fontWeight(.bold)
             .foregroundStyle(!isTimerPaused ? stretchPhase.phaseColor : .gray)
-            .padding(.top, 390)
-            .sensoryFeedback(.impact, trigger: endAngle)
+            .padding(.top, 425)
+            .sensoryFeedback(.impact(intensity: 1.0), trigger: endAngle)
         }
         
         // this modifier activates when the values are changed in the settings
@@ -109,7 +109,7 @@ struct TimerActionView: View {
                                 SoundManager.instance.playSound(sound: .chime)
                                 stretchPhase = .stretch
                                 timeRemaining = totalStretch
-                                withAnimation(.linear(duration: 0.5)){
+                                withAnimation(.linear(duration: 1.0 )){
                                     endAngle = Angle(degrees: 340)
                                 }
                                 timer = Timer.publish(every: 1.0, on: .main, in: .common).autoconnect()
