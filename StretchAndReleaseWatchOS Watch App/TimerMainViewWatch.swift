@@ -22,6 +22,7 @@ struct TimerMainViewWatch: View {
     
     // state variables only used on main view
     @State private var isShowingSettings = false
+    @State private var didSettingsChange = false
     
     //local variable
     @State private var isResetToggled = false
@@ -33,8 +34,12 @@ struct TimerMainViewWatch: View {
     var body: some View {
         GeometryReader { proxy in
             let totalHeight = proxy.size.height
-            let topHeight = totalHeight * 0.7
+            let topHeight = totalHeight * 0.8
             let bottomHeight = totalHeight * 0.2
+            
+            Text("\(connectivity.statusText)")
+                .font(.headline)
+                .fontWeight(.bold)
             
             VStack(spacing: 30) {
                 TimerActionViewWatch(isTimerActive: $isTimerActive, isTimerPaused: $isTimerPaused, isResetToggled: $isResetToggled, stretchPhase: $stretchPhase, timeRemaining: $timeRemaining, repsCompleted: $repsCompleted, totalStretch: $totalStretch, totalRest: $totalRest, totalReps: $totalReps)
@@ -63,6 +68,8 @@ struct TimerMainViewWatch: View {
                             .clipShape(Circle())
                             .scaleEffect(0.85)
                     }
+                    .buttonStyle(.plain)
+                    .padding(.trailing)
                     
                     Button {
                         isTimerActive = false
@@ -75,6 +82,8 @@ struct TimerMainViewWatch: View {
                             .clipShape(Circle())
                             .scaleEffect(0.85)
                     }
+                    .buttonStyle(.plain)
+                    .padding(.trailing)
                     
                     Button {
                         isShowingSettings.toggle()
@@ -85,19 +94,29 @@ struct TimerMainViewWatch: View {
                             .clipShape(Circle())
                             .scaleEffect(0.85)
                     }
+                    .buttonStyle(.plain)
                 }
                 .frame(height: bottomHeight)
             }
             .frame(width: proxy.size.width, height: proxy.size.height)
-            
-
         }
         .sheet(isPresented: $isShowingSettings) {
-            TimerSettingsViewWatch(totalStretch: $totalStretch, totalRest: $totalRest, totalReps: $totalReps)
+            TimerSettingsViewWatch(totalStretch: $totalStretch, totalRest: $totalRest, totalReps: $totalReps, didSettingsChange: $didSettingsChange)
         }
         .onAppear {
             timeRemaining = totalStretch
         }
+        .onChange(of: connectivity.didStatusChange) {
+            totalStretch = connectivity.statusContext["stretch"] as? Int ?? 10
+            totalRest = connectivity.statusContext["rest"] as? Int ?? 5
+            totalReps = connectivity.statusContext["reps"] as? Int ?? 5
+            connectivity.didStatusChange = false
+        }
+    }
+    
+    func sendContext() {
+        let data = ["stretch" : $totalStretch, "rest" : $totalRest, "reps" : $totalReps]
+        connectivity.setContext(to: data)
     }
 }
 

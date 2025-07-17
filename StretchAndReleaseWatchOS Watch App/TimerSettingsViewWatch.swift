@@ -15,12 +15,13 @@ struct TimerSettingsViewWatch: View {
     @Binding var totalStretch: Int
     @Binding var totalRest: Int
     @Binding var totalReps: Int
+    @Binding var didSettingsChange: Bool
     
     var body: some View {
         GeometryReader { proxy in
             let firstColumnWidth = proxy.size.width * (2/5)
             let secondColumnWidth = proxy.size.width * (1.5/5)
-            let thirdColumnWidth = proxy.size.width * (2/5)
+//            let thirdColumnWidth = proxy.size.width * (2/5)
             
             NavigationStack {
                 HStack {
@@ -37,16 +38,11 @@ struct TimerSettingsViewWatch: View {
                     }
                     .pickerStyle(.wheel)
                     .labelsHidden()
-                    .frame(width: 50, height: 20)
+                    .frame(width: 50, height: 30)
                     .frame(width: secondColumnWidth)
-                    
-                    Spacer()
-                    
-                    Text("sec.")
-                        .font(.caption2)
-                        .frame(width: thirdColumnWidth)
                 }
-                .padding(.trailing)
+                .padding(.horizontal)
+                .padding(.top, 10)
                 
                 HStack {
                     Text("Rest")
@@ -62,16 +58,10 @@ struct TimerSettingsViewWatch: View {
                     }
                     .pickerStyle(.wheel)
                     .labelsHidden()
-                    .frame(width: 50, height: 20)
+                    .frame(width: 50, height: 30)
                     .frame(width: secondColumnWidth)
-                    
-                    Spacer()
-                    
-                    Text("sec.")
-                        .font(.caption2)
-                        .frame(width: thirdColumnWidth)
                 }
-                .padding(.trailing)
+                .padding(.horizontal)
                 
                 HStack {
                     Text("Reps")
@@ -87,16 +77,11 @@ struct TimerSettingsViewWatch: View {
                     }
                     .pickerStyle(.wheel)
                     .labelsHidden()
-                    .frame(width: 50, height: 20)
+                    .frame(width: 50, height: 30
+                    )
                     .frame(width: secondColumnWidth)
-                    
-                    Spacer()
-                    
-                    Text("sec.")
-                        .font(.caption2)
-                        .frame(width: thirdColumnWidth)
                 }
-                .padding(.trailing)
+                .padding(.horizontal)
                 
                 HStack(alignment: .center) {
                     Spacer()
@@ -105,7 +90,7 @@ struct TimerSettingsViewWatch: View {
                         UserDefaults.standard.set(totalStretch, forKey: "totalStretch")
                         UserDefaults.standard.set(totalRest, forKey: "totalRest")
                         UserDefaults.standard.set(totalReps, forKey: "totalReps")
-                        print("SETTINGS SAVED: \(totalStretch), \(totalRest), \(totalReps)")
+                        didSettingsChange = true
                         dismiss()
                     } label: {
                         Image(systemName: "square.and.arrow.up.circle")
@@ -115,6 +100,7 @@ struct TimerSettingsViewWatch: View {
                             .clipShape(Circle())
                             .frame(alignment: .bottom)
                     }
+                    .buttonStyle(.plain)
                     
                     Spacer()
                 }
@@ -133,5 +119,6 @@ struct TimerSettingsViewWatch: View {
     @Previewable @State var totalStretch: Int = 0
     @Previewable @State var totalRest: Int = 0
     @Previewable @State var totalReps: Int = 0
-    TimerSettingsViewWatch(totalStretch: $totalStretch, totalRest: $totalRest, totalReps: $totalReps)
+    @Previewable @State var didSettingsChange: Bool = false
+    TimerSettingsViewWatch(totalStretch: $totalStretch, totalRest: $totalRest, totalReps: $totalReps, didSettingsChange: $didSettingsChange)
 }

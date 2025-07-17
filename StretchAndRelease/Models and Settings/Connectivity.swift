@@ -11,6 +11,8 @@ import WatchConnectivity
 @Observable
 class Connectivity: NSObject, WCSessionDelegate {
     var statusText = ""
+    var didStatusChange = false
+    var statusContext: [String: Any] = ["stretch" : 0, "rest" : 0, "reps" : 0]
     
     override init() {
         super.init()
@@ -26,7 +28,7 @@ class Connectivity: NSObject, WCSessionDelegate {
         Task { @MainActor in
             if activationState == .activated {
                 if session.isWatchAppInstalled {
-                    statusText = "Connection Established"
+                    self.statusText = "CONNECTED"
                 }
             }
         }
@@ -47,5 +49,23 @@ class Connectivity: NSObject, WCSessionDelegate {
     }
     
     #endif
+    
+    func setContext(to data: [String : Any]) {
+        let session = WCSession.default
+        if session.activationState == .activated {
+            do {
+                try session.updateApplicationContext(data)
+            } catch {
+                statusText = "PING FAILED"
+            }
+        }
+    }
+    
+    func session(_ session: WCSession, didReceiveApplicationContext applicationContext: [String : Any]) {
+        Task { @MainActor in
+            self.statusText = "PING SUCCESSFUL"
+            self.didStatusChange = true
+        }
+    }
     
 }

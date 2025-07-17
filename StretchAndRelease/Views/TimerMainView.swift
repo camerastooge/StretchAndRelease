@@ -22,6 +22,7 @@ struct TimerMainView: View {
     
     // state variables only used on main view
     @State private var isShowingSettings = false
+    @State private var didSettingsChange = false
     
     //local variable
     @State private var isResetToggled = false
@@ -48,6 +49,10 @@ struct TimerMainView: View {
                                 TimerActionView(isTimerActive: $isTimerActive, isTimerPaused: $isTimerPaused, isResetToggled: $isResetToggled, stretchPhase: $stretchPhase, timeRemaining: $timeRemaining, repsCompleted: $repsCompleted, totalStretch: $totalStretch, totalRest: $totalRest, totalReps: $totalReps)
                             }
                             .padding(.vertical)
+                            
+                            Text("\(connectivity.statusText)")
+                                .fontWeight(.bold)
+                                .font(.title)
                         }
                         .padding(.horizontal)
                     }
@@ -99,22 +104,38 @@ struct TimerMainView: View {
                 }
             }
             .navigationTitle("Stretch & Release")
-            .toolbar {
-                ToolbarItem {
-                    Button {
-                        isShowingSettings.toggle()
-                    } label: {
-                        Image(systemName: "gear")
-                    }
-                }
-            }
+//            .toolbar {
+//                ToolbarItem {
+//                    Button {
+//                        isShowingSettings.toggle()
+//                    } label: {
+//                        Image(systemName: "gear")
+//                    }
+//                }
+//            }
         }
         .sheet(isPresented: $isShowingSettings) {
-            SettingsView(totalStretch: $totalStretch, totalRest: $totalRest, totalReps: $totalReps)
+            SettingsView(totalStretch: $totalStretch, totalRest: $totalRest, totalReps: $totalReps, didSettingsChange: $didSettingsChange)
         }
         .onAppear {
             timeRemaining = totalStretch
         }
+        .onChange(of: didSettingsChange) {
+            sendContext(stretch: totalStretch, rest: totalRest, reps: totalReps)
+            didSettingsChange = false
+        }
+        .onChange(of: connectivity.didStatusChange) {
+            totalStretch = connectivity.statusContext["stretch"] as? Int ?? 10
+            totalRest = connectivity.statusContext["rest"] as? Int ?? 5
+            totalReps = connectivity.statusContext["reps"] as? Int ?? 5
+            connectivity.didStatusChange = false
+        }
+            
+    }
+    
+    func sendContext(stretch: Int, rest: Int, reps: Int) {
+        let settingsUpdate = ["stretch" : stretch, "rest" : rest, "reps" : reps]
+        connectivity.setContext(to: settingsUpdate)
     }
 }
 

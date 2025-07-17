@@ -15,6 +15,7 @@ struct SettingsView: View {
     @Binding var totalStretch: Int
     @Binding var totalRest: Int
     @Binding var totalReps: Int
+    @Binding var didSettingsChange: Bool
 
     var body: some View {
         NavigationStack {
@@ -84,7 +85,7 @@ struct SettingsView: View {
                     UserDefaults.standard.set(totalStretch, forKey: "totalStretch")
                     UserDefaults.standard.set(totalRest, forKey: "totalRest")
                     UserDefaults.standard.set(totalReps, forKey: "totalReps")
-                    print("SETTINGS SAVED: \(totalStretch), \(totalRest), \(totalReps)")
+                    didSettingsChange = true
                     dismiss()
                 } label: {
                     Text("SAVE")
@@ -107,5 +108,6 @@ struct SettingsView: View {
     @Previewable @State var totalStretch: Int = 0
     @Previewable @State var totalRest: Int = 0
     @Previewable @State var totalReps: Int = 0
-    SettingsView(totalStretch: $totalStretch, totalRest: $totalRest, totalReps: $totalReps)
+    @Previewable @State var didSettingsChange: Bool = false
+    SettingsView(totalStretch: $totalStretch, totalRest: $totalRest, totalReps: $totalReps, didSettingsChange: $didSettingsChange)
 }
