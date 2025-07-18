@@ -48,22 +48,30 @@ struct TimerActionView: View {
     
     var body: some View {
         ZStack {
-            Arc(endAngle: endAngle)
-                .stroke(stretchPhase.phaseColor, style: StrokeStyle(lineWidth: 25, lineCap: .round))
-                .rotationEffect(Angle(degrees: 90))
-            VStack {
-                Text("\(String(format: "%02d", Int(timeRemaining)))")
-                    .kerning(2)
-                    .contentTransition(.numericText(countsDown: true))
-                Text(!isTimerPaused ? stretchPhase.phaseText : "PAUSED")
-                    .scaleEffect(0.75)
-                Text("Reps Completed: \(repsCompleted)/\(totalReps)")
+            ZStack {
+                Arc(endAngle: endAngle)
+                    .stroke(stretchPhase.phaseColor, style: StrokeStyle(lineWidth: 25, lineCap: .round))
+                    .rotationEffect(Angle(degrees: 90))
+                    VStack {
+                        Text("\(String(format: "%02d", Int(timeRemaining)))")
+                            .kerning(2)
+                            .contentTransition(.numericText(countsDown: true))
+                        Text(!isTimerPaused ? stretchPhase.phaseText : "PAUSED")
+                            .scaleEffect(0.75)
+                        Text("Reps Completed: \(repsCompleted)/\(totalReps)")
+                    }
+                .font(.largeTitle)
+                .fontWeight(.bold)
+                .foregroundStyle(!isTimerPaused ? stretchPhase.phaseColor : .gray)
+                .sensoryFeedback(.impact(intensity: 1.0), trigger: endAngle)
+                .containerRelativeFrame(.vertical, alignment: .bottom) { length, _ in
+                    length / 1.2
+                }
+
             }
-            .font(.largeTitle)
-            .fontWeight(.bold)
-            .foregroundStyle(!isTimerPaused ? stretchPhase.phaseColor : .gray)
-            .padding(.top, 425)
-            .sensoryFeedback(.impact(intensity: 1.0), trigger: endAngle)
+        }
+        .containerRelativeFrame(.horizontal, alignment: .center) { length, _ in
+            length * 0.9
         }
         
         // this modifier activates when the values are changed in the settings
@@ -85,7 +93,6 @@ struct TimerActionView: View {
                 withAnimation(.linear(duration: 1.0)){
                     updateEndAngle()
                 }
-                print("End Angle: \(endAngle.degrees)")
                 
                 if timeRemaining == 0 {
                     //stop timer
