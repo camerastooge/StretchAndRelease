@@ -28,7 +28,7 @@ class Connectivity: NSObject, WCSessionDelegate {
         Task { @MainActor in
             if activationState == .activated {
                 if session.isWatchAppInstalled {
-                    self.statusText = "CONNECTED"
+                    self.statusText = Date.now.formatted(date: .omitted, time: .shortened)
                 }
             }
         }
@@ -45,7 +45,13 @@ class Connectivity: NSObject, WCSessionDelegate {
     
     #else
     func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
-        
+        Task { @MainActor in
+            if activationState == .activated {
+                if session.isReachable {
+                    self.statusText = Date.now.formatted(date: .omitted, time: .shortened)
+                }
+            }
+        }
     }
     
     #endif
@@ -56,7 +62,7 @@ class Connectivity: NSObject, WCSessionDelegate {
             do {
                 try session.updateApplicationContext(data)
             } catch {
-                statusText = "PING FAILED"
+                self.statusText = "PING FAILED"
             }
         }
     }

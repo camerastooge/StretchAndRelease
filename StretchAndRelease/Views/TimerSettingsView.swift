@@ -9,6 +9,7 @@ import SwiftUI
 
 struct SettingsView: View {
     // Environment variables
+    @Environment(\.colorScheme) var colorScheme
     @Environment(\.dismiss) var dismiss
     
     // Binding settings passed from Timer Main view
@@ -95,6 +96,8 @@ struct SettingsView: View {
                         .foregroundStyle(.white)
                         .background(.green)
                         .clipShape(.capsule)
+                        .shadow(color: colorScheme == .light ? .black.opacity(0.25) : .white.opacity(0.5), radius: 0.8, x: 2, y: 2)
+                        .padding(.bottom, 5)
                 }
             }
         }

@@ -47,10 +47,14 @@ struct TimerActionViewWatch: View {
     }
     
     var body: some View {
+        ZStack {
+            Color.gray.opacity(0)
+                
             ZStack {
                 Arc(endAngle: endAngle)
-                    .stroke(stretchPhase.phaseColor, style: StrokeStyle(lineWidth: 15, lineCap: .round))
+                    .stroke(stretchPhase.phaseColor, style: StrokeStyle(lineWidth: 10, lineCap: .round))
                     .rotationEffect(Angle(degrees: 90))
+                
                 VStack {
                     Text("\(String(format: "%02d", Int(timeRemaining)))")
                         .font(.largeTitle)
@@ -64,9 +68,12 @@ struct TimerActionViewWatch: View {
                 .fontWeight(.bold)
                 .foregroundStyle(!isTimerPaused ? stretchPhase.phaseColor : .gray)
                 .sensoryFeedback(.impact(intensity: 1.0), trigger: endAngle)
-            .padding()
             }
-        
+        }
+        .containerRelativeFrame(.horizontal, alignment: .center) { length, _ in
+            length * 0.9
+        }
+
         // this modifier activates when the values are changed in the settings
         .onChange(of: [totalStretch, totalRest, totalReps]) {
             withAnimation(.linear(duration: 0.5)) {

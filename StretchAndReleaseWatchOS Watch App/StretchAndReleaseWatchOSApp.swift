@@ -11,7 +11,7 @@ import SwiftUI
 struct StretchAndReleaseWatchOS_Watch_AppApp: App {
     var body: some Scene {
         WindowGroup {
-            TimerMainViewWatch()
+            ContentView()
         }
     }
 }

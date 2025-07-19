@@ -8,6 +8,9 @@
 import SwiftUI
 
 struct ContentView: View {
+    //Environment properties
+    @Environment(\.colorScheme) var colorScheme
+    
     // State properties for settings
     @State private var totalStretch = UserDefaults.standard.integer(forKey: "totalStretch")
     @State private var totalRest = UserDefaults.standard.integer(forKey: "totalRest")
@@ -33,91 +36,94 @@ struct ContentView: View {
     var body: some View {
         NavigationStack {
             GeometryReader { proxy in
-                //space for TimerActionView
-                VStack(spacing: 0) {
-                    ZStack {
-                        Color.green
-                        TimerActionView(isTimerActive: $isTimerActive, isTimerPaused: $isTimerPaused, isResetToggled: $isResetToggled, stretchPhase: $stretchPhase, timeRemaining: $timeRemaining, repsCompleted: $repsCompleted, totalStretch: $totalStretch, totalRest: $totalRest, totalReps: $totalReps)
-                    }
-                    .frame(minHeight: 0, maxHeight: .infinity)
-                    .layoutPriority(1)
-                    
-                    ZStack {
-                        Color.gray
-                        HStack {
-                            Button {
-                                withAnimation {
-                                    if stretchPhase == .stop {
-                                        isTimerActive = true
-                                        isTimerPaused = false
-                                        stretchPhase = .stretch
-                                    } else if !isTimerPaused {
-                                        isTimerPaused = true
-                                        isTimerActive = false
-                                    } else {
-                                        isTimerPaused = false
-                                        isTimerActive = true
-                                    }
-                                }
-                            } label: {
-                                Text(!isTimerActive ? "START" : "PAUSE")
-                                    .frame(width: 100, height: 50)
-                                    .foregroundStyle(.white)
-                                    .background(!isTimerActive ? .green : .yellow)
-                                    .clipShape(.capsule)
-                            }
-                            
-                            Button {
-                                isTimerActive = false
-                                isTimerPaused = false
-                                isResetToggled.toggle()
-                            } label: {
-                                Text("RESET")
-                                    .frame(width: 100, height: 50)
-                                    .foregroundStyle(.white)
-                                    .background(.red)
-                                    .clipShape(.capsule)
-                            }
+                    //space for TimerActionView
+                    VStack(spacing: 0) {
+                        ZStack {
+                            Color.green.opacity(0)
+                            TimerActionView(isTimerActive: $isTimerActive, isTimerPaused: $isTimerPaused, isResetToggled: $isResetToggled, stretchPhase: $stretchPhase, timeRemaining: $timeRemaining, repsCompleted: $repsCompleted, totalStretch: $totalStretch, totalRest: $totalRest, totalReps: $totalReps)
                         }
-                        .padding(.vertical)
+                        .frame(minHeight: 0, maxHeight: .infinity)
+                        .layoutPriority(1)
+                        
+                        ZStack {
+                            Color.gray.opacity(0.15)
+                            HStack {
+                                Button {
+                                    withAnimation {
+                                        if stretchPhase == .stop {
+                                            isTimerActive = true
+                                            isTimerPaused = false
+                                            stretchPhase = .stretch
+                                        } else if !isTimerPaused {
+                                            isTimerPaused = true
+                                            isTimerActive = false
+                                        } else {
+                                            isTimerPaused = false
+                                            isTimerActive = true
+                                        }
+                                    }
+                                } label: {
+                                    Text(!isTimerActive ? "START" : "PAUSE")
+                                        .frame(width: 100, height: 50)
+                                        .foregroundStyle(.white)
+                                        .background(!isTimerActive ? .green : .yellow)
+                                        .clipShape(.capsule)
+                                        .shadow(color: colorScheme == .light ? .black.opacity(0.25) : .white.opacity(0.5), radius: 0.8, x: 2, y: 2)
+                                }
+                                
+                                Button {
+                                    isTimerActive = false
+                                    isTimerPaused = false
+                                    isResetToggled.toggle()
+                                } label: {
+                                    Text("RESET")
+                                        .frame(width: 100, height: 50)
+                                        .foregroundStyle(.white)
+                                        .background(.red)
+                                        .clipShape(.capsule)
+                                        .shadow(color: colorScheme == .light ? .black.opacity(0.25) : .white.opacity(0.5), radius: 0.8, x: 2, y: 2)
+                                }
+                            }
+                            .padding(.vertical)
+                        }
+                    }
+                Text(connectivity.statusText)
+                }
+                .navigationTitle("Stretch & Release")
+                .toolbar {
+                    ToolbarItem {
+                        Button {
+                            isShowingSettings.toggle()
+                        } label: {
+                            Image(systemName: "gear")
+                        }
                     }
                 }
             }
-            .navigationTitle("Stretch & Release")
-            .toolbar {
-                ToolbarItem {
-                    Button {
-                        isShowingSettings.toggle()
-                    } label: {
-                        Image(systemName: "gear")
-                    }
-                }
+            .sheet(isPresented: $isShowingSettings) {
+                SettingsView(totalStretch: $totalStretch, totalRest: $totalRest, totalReps: $totalReps, didSettingsChange: $didSettingsChange)
+            }
+            .onAppear {
+                timeRemaining = totalStretch
+            }
+            .onChange(of: didSettingsChange) {
+                sendContext(stretch: totalStretch, rest: totalRest, reps: totalReps)
+                didSettingsChange = false
+            }
+            .onChange(of: connectivity.didStatusChange) {
+                totalStretch = connectivity.statusContext["stretch"] as? Int ?? 10
+                totalRest = connectivity.statusContext["rest"] as? Int ?? 5
+                totalReps = connectivity.statusContext["reps"] as? Int ?? 5
+                connectivity.didStatusChange = false
             }
         }
-        .sheet(isPresented: $isShowingSettings) {
-            SettingsView(totalStretch: $totalStretch, totalRest: $totalRest, totalReps: $totalReps, didSettingsChange: $didSettingsChange)
-        }
-        .onAppear {
-            timeRemaining = totalStretch
-        }
-        .onChange(of: didSettingsChange) {
-            sendContext(stretch: totalStretch, rest: totalRest, reps: totalReps)
-            didSettingsChange = false
-        }
-        .onChange(of: connectivity.didStatusChange) {
-            totalStretch = connectivity.statusContext["stretch"] as? Int ?? 10
-            totalRest = connectivity.statusContext["rest"] as? Int ?? 5
-            totalReps = connectivity.statusContext["reps"] as? Int ?? 5
-            connectivity.didStatusChange = false
-        }
-    }
         
-    func sendContext(stretch: Int, rest: Int, reps: Int) {
-        let settingsUpdate = ["stretch" : stretch, "rest" : rest, "reps" : reps]
-        connectivity.setContext(to: settingsUpdate)
+        func sendContext(stretch: Int, rest: Int, reps: Int) {
+            let settingsUpdate = ["stretch" : stretch, "rest" : rest, "reps" : reps]
+            connectivity.setContext(to: settingsUpdate)
+        }
     }
-}
-
-#Preview {
-    ContentView()
-}
+    
+    #Preview {
+        ContentView()
+    }
