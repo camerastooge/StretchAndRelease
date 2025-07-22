@@ -28,7 +28,7 @@ class Connectivity: NSObject, WCSessionDelegate {
         Task { @MainActor in
             if activationState == .activated {
                 if session.isWatchAppInstalled {
-                    self.statusText = Date.now.formatted(date: .omitted, time: .shortened)
+                    self.statusText = "CE \(Date.now.formatted(date: .omitted, time: .shortened))"
                 }
             }
         }
@@ -48,7 +48,7 @@ class Connectivity: NSObject, WCSessionDelegate {
         Task { @MainActor in
             if activationState == .activated {
                 if session.isReachable {
-                    self.statusText = Date.now.formatted(date: .omitted, time: .shortened)
+                    self.statusText = "CE \(Date.now.formatted(date: .omitted, time: .shortened))"
                 }
             }
         }
@@ -61,15 +61,19 @@ class Connectivity: NSObject, WCSessionDelegate {
         if session.activationState == .activated {
             do {
                 try session.updateApplicationContext(data)
+                self.statusText = "PS \(Date.now.formatted(date: .omitted, time: .shortened))"
+                print(data)
             } catch {
-                self.statusText = "PING FAILED"
+                self.statusText = "PF \(Date.now.formatted(date: .omitted, time: .shortened))"
             }
         }
     }
     
     func session(_ session: WCSession, didReceiveApplicationContext applicationContext: [String : Any]) {
         Task { @MainActor in
-            self.statusText = "PING SUCCESSFUL"
+            self.statusText = "CS \(Date.now.formatted(date: .omitted, time: .shortened))"
+            self.statusContext = applicationContext
+            print("Context Received: \(statusContext)")
             self.didStatusChange = true
         }
     }

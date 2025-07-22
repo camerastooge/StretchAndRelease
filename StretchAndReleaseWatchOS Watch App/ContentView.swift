@@ -36,10 +36,6 @@ struct ContentView: View {
     
     var body: some View {
                 ZStack {
-                    Text("\(connectivity.statusText)")
-                        .font(.headline)
-                        .fontWeight(.bold)
-        
                     //Screen area for TimerActionViewWatch
                     VStack {
                         ZStack {
@@ -108,6 +104,10 @@ struct ContentView: View {
                             }
                         }
                     }
+                    
+                    Text("\(connectivity.statusText)")
+                        .font(.headline)
+                        .fontWeight(.bold)
         
                 }
                 .sheet(isPresented: $isShowingSettings) {
@@ -122,13 +122,17 @@ struct ContentView: View {
                     totalReps = connectivity.statusContext["reps"] as? Int ?? 5
                     connectivity.didStatusChange = false
                 }
+                .onChange(of: didSettingsChange) {
+                    sendContext(stretch: totalStretch, rest: totalRest, reps: totalReps)
+                    didSettingsChange = false
+                }
             }
         
-            func sendContext() {
-                let data = ["stretch" : $totalStretch, "rest" : $totalRest, "reps" : $totalReps]
-                connectivity.setContext(to: data)
-            }
+    func sendContext(stretch: Int, rest: Int, reps: Int) {
+        let settingsUpdate = ["stretch" : stretch, "rest" : rest, "reps" : reps]
+        connectivity.setContext(to: settingsUpdate)
     }
+}
 
 #Preview {
     ContentView()

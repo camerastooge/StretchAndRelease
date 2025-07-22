@@ -101,9 +101,6 @@ struct SettingsView: View {
                 }
             }
         }
-        .onAppear {
-            print("SETTINGS VARIABLES: \(totalStretch), \(totalRest), \(totalReps)")
-        }
     }
 }
 
