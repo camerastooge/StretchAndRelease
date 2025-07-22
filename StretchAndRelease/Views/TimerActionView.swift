@@ -63,7 +63,7 @@ struct TimerActionView: View {
                 .font(.largeTitle)
                 .fontWeight(.bold)
                 .foregroundStyle(!isTimerPaused ? stretchPhase.phaseColor : .gray)
-                .sensoryFeedback(.impact(intensity: 1.0), trigger: endAngle)
+                .sensoryFeedback(.impact(intensity: stretchPhase.phaseIntensity), trigger: endAngle)
                 .containerRelativeFrame(.vertical, alignment: .bottom) { length, _ in
                     length / 1.2
                 }
@@ -87,54 +87,54 @@ struct TimerActionView: View {
         }
         
         //this modifier runs when the timer publishes
+        
         .onReceive(timer) { _ in
             if isTimerActive && !isTimerPaused {
-                timeRemaining -= 1
-                withAnimation(.linear(duration: 1.0)){
-                    updateEndAngle()
-                }
-                
+                //if timeRemaining == 0, then change timer phase
                 if timeRemaining == 0 {
-                    //stop timer
-                    timer.upstream.connect().cancel()
-                    
-                    //delay 1.0 seconds then perform phase change and reset end angle
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
                         switch stretchPhase {
                         case .stretch: return {
                             SoundManager.instance.playSound(sound: .chime)
                             stretchPhase = .rest
                             timeRemaining = totalRest
-                            withAnimation(.linear(duration: 0.5)){
-                                endAngle = Angle(degrees: 340)
+                            withAnimation(.smooth(duration: 1.0)) {
+                                updateEndAngle()
                             }
-                            timer = Timer.publish(every: 1.0, on: .main, in: .common).autoconnect()
                         }()
+                            
                         case .rest: return {
                             repsCompleted += 1
                             if repsCompleted != totalReps {
                                 SoundManager.instance.playSound(sound: .chime)
                                 stretchPhase = .stretch
                                 timeRemaining = totalStretch
-                                withAnimation(.linear(duration: 1.0 )){
-                                    endAngle = Angle(degrees: 340)
+                                withAnimation(.smooth(duration: 1.0)) {
+                                    updateEndAngle()
                                 }
-                                timer = Timer.publish(every: 1.0, on: .main, in: .common).autoconnect()
                             } else {
-                                withAnimation(.linear(duration: 0.5)) {
-                                    stretchPhase = .stop
-                                    endAngle = Angle(degrees: 340)
-                                }
+                                stretchPhase = .stop
                                 SoundManager.instance.playSound(sound: .beep)
+                                withAnimation(.smooth(duration: 1.0)) {
+                                    updateEndAngle()
+                                }
                             }
                         }()
-                        case .stop: return { }()
+                            
+                        case .stop: return {
+                            isTimerActive = false
+                            timeRemaining = totalStretch
+                            repsCompleted = 0
+                        }()
                         }
+                }
+                else {
+                    timeRemaining -= 1
+                    withAnimation(.easeOut(duration: 1.0)) {
+                        updateEndAngle()
                     }
                 }
             }
         }
-        
         .onChange(of: isResetToggled) {
             stretchPhase = .stop
             timeRemaining = totalStretch

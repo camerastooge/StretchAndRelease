@@ -66,7 +66,7 @@ struct ContentView: View {
                                     } label: {
                                         Image(systemName: "playpause.fill")
                                             .frame(width: 40, height: 40)
-                                            .background(Color.green)
+                                            .background(!isTimerActive ? .green : .yellow)
                                             .clipShape(Circle())
                                             .scaleEffect(0.85)
                                     }

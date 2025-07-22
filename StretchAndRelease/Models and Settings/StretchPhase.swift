@@ -26,4 +26,12 @@ import SwiftUI
             case .stop: return "STOP"
             }
         }
+        
+        var phaseIntensity: Double {
+            switch self {
+            case .stretch: return 0.5
+            case .rest: return 0.25
+            case .stop: return 1.0
+            }
+        }
     }

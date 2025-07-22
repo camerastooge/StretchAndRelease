@@ -106,15 +106,15 @@ struct ContentView: View {
             .onAppear {
                 timeRemaining = totalStretch
             }
-            .onChange(of: didSettingsChange) {
-                sendContext(stretch: totalStretch, rest: totalRest, reps: totalReps)
-                didSettingsChange = false
-            }
             .onChange(of: connectivity.didStatusChange) {
                 totalStretch = connectivity.statusContext["stretch"] as? Int ?? 10
                 totalRest = connectivity.statusContext["rest"] as? Int ?? 5
                 totalReps = connectivity.statusContext["reps"] as? Int ?? 5
                 connectivity.didStatusChange = false
+            }
+            .onChange(of: didSettingsChange) {
+                sendContext(stretch: totalStretch, rest: totalRest, reps: totalReps)
+                didSettingsChange = false
             }
         }
         
