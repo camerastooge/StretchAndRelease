@@ -17,7 +17,7 @@ struct ContentView: View {
     @State private var totalReps = UserDefaults.standard.integer(forKey: "totalReps")
     
     // state variables used across views
-    @State private var timeRemaining: Int = 0
+    @State private var timeRemaining: Int = 1
     @State private var repsCompleted: Int = 0
     @State private var isTimerActive = false
     @State private var isTimerPaused = false
@@ -54,6 +54,7 @@ struct ContentView: View {
                                             isTimerActive = true
                                             isTimerPaused = false
                                             stretchPhase = .stretch
+                                            repsCompleted = 0
                                         } else if !isTimerPaused {
                                             isTimerPaused = true
                                             isTimerActive = false
@@ -74,6 +75,7 @@ struct ContentView: View {
                                 Button {
                                     isTimerActive = false
                                     isTimerPaused = false
+                                    repsCompleted = 0
                                     isResetToggled.toggle()
                                 } label: {
                                     Text("RESET")
@@ -87,7 +89,6 @@ struct ContentView: View {
                             .padding(.vertical)
                         }
                     }
-                Text(connectivity.statusText)
                 }
                 .navigationTitle("Stretch & Release")
                 .toolbar {
@@ -104,6 +105,9 @@ struct ContentView: View {
                 SettingsView(totalStretch: $totalStretch, totalRest: $totalRest, totalReps: $totalReps, didSettingsChange: $didSettingsChange)
             }
             .onAppear {
+                if totalStretch == 0 { totalStretch = 10 }
+                if totalRest == 0 { totalRest = 4 }
+                if totalReps == 0 { totalReps = 4 }
                 timeRemaining = totalStretch
             }
             .onChange(of: connectivity.didStatusChange) {

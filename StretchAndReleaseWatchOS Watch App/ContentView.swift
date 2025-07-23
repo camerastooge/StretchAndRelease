@@ -55,6 +55,7 @@ struct ContentView: View {
                                                 isTimerActive = true
                                                 isTimerPaused = false
                                                 stretchPhase = .stretch
+                                                repsCompleted = 0
                                             } else if !isTimerPaused {
                                                 isTimerPaused = true
                                                 isTimerActive = false
@@ -104,11 +105,6 @@ struct ContentView: View {
                             }
                         }
                     }
-                    
-                    Text("\(connectivity.statusText)")
-                        .font(.headline)
-                        .fontWeight(.bold)
-        
                 }
                 .sheet(isPresented: $isShowingSettings) {
                     TimerSettingsViewWatch(totalStretch: $totalStretch, totalRest: $totalRest, totalReps: $totalReps, didSettingsChange: $didSettingsChange)

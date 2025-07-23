@@ -86,66 +86,64 @@ struct TimerActionViewWatch: View {
             }
         }
         
-        //this modifier runs when the timer publishes
-        .onReceive(timer) { _ in
-            if isTimerActive && !isTimerPaused {
-                //if timeRemaining == 0, then change timer phase
-                if timeRemaining == 0 {
-                        switch stretchPhase {
-                        case .stretch: return {
-                            SoundManager.instance.playSound(sound: .chime)
-                            stretchPhase = .rest
-                            timeRemaining = totalRest
-                            withAnimation(.smooth(duration: 1.0)) {
-                                updateEndAngle()
-                            }
-                        }()
-                            
-                        case .rest: return {
-                            repsCompleted += 1
-                            if repsCompleted != totalReps {
-                                SoundManager.instance.playSound(sound: .chime)
-                                stretchPhase = .stretch
-                                timeRemaining = totalStretch
-                                withAnimation(.smooth(duration: 1.0)) {
-                                    updateEndAngle()
-                                }
-                            } else {
-                                stretchPhase = .stop
-                                SoundManager.instance.playSound(sound: .beep)
-                                withAnimation(.smooth(duration: 1.0)) {
-                                    updateEndAngle()
-                                }
-                            }
-                        }()
-                            
-                        case .stop: return {
-                            isTimerActive = false
-                            timeRemaining = totalStretch
-                            repsCompleted = 0
-                        }()
-                        }
-                }
-                else {
-                    timeRemaining -= 1
-                    withAnimation(.easeOut(duration: 1.0)) {
-                        updateEndAngle()
-                    }
-                }
-            }
-        }
-        
+        //reset button behavior
         .onChange(of: isResetToggled) {
             stretchPhase = .stop
             timeRemaining = totalStretch
             repsCompleted = 0
-            withAnimation(.linear(duration: 0.5)){
+            withAnimation(.linear(duration: 0.5)) {
                 updateEndAngle()
             }
         }
         
         .onAppear {
             timeRemaining = totalStretch
+        }
+        
+        //this modifier runs when the timer publishes
+        .onReceive(timer) { _ in
+            if isTimerActive && !isTimerPaused {
+                switch stretchPhase {
+                case .stretch: return {
+                    if timeRemaining > 0 {
+                        timeRemaining -= 1
+                        withAnimation(.linear(duration: 1.0)) {
+                            updateEndAngle()
+                        }
+                    } else {
+                        repsCompleted += 1
+                        if repsCompleted < totalReps {
+                            stretchPhase = .rest
+                            SoundManager.instance.playSound(sound: .chime)
+                        } else {
+                            stretchPhase = .stop
+                            timeRemaining = totalStretch
+                            withAnimation(.linear(duration: 1.0)) {
+                                updateEndAngle()
+                            }
+                            SoundManager.instance.playSound(sound: .beep)
+                        }
+                    }
+                }()
+                    
+                case .rest: return {
+                    if timeRemaining < totalRest {
+                        timeRemaining += 1
+                        withAnimation(.linear(duration: 1.0)) {
+                            updateEndAngle()
+                        }
+                    } else {
+                        stretchPhase = .stretch
+                        timeRemaining = totalStretch
+                        SoundManager.instance.playSound(sound: .chime)
+                    }
+                }()
+                    
+                case .stop: return {
+                    isTimerActive = false
+                }()
+                }
+            }
         }
     }
     
