@@ -26,6 +26,7 @@ struct ContentView: View {
     // state variables only used on main view
     @State private var isShowingSettings = false
     @State private var didSettingsChange = false
+    @State private var isButtonPressed = false
     
     //local variable
     @State private var isResetToggled = false
@@ -50,6 +51,7 @@ struct ContentView: View {
                                 //Button Row
                                 HStack {
                                     Button {
+                                        isButtonPressed = true
                                         withAnimation {
                                             if stretchPhase == .stop {
                                                 isTimerActive = true
@@ -64,32 +66,39 @@ struct ContentView: View {
                                                 isTimerActive = true
                                             }
                                         }
+                                        isButtonPressed = false
                                     } label: {
                                         Image(systemName: "playpause.fill")
                                             .frame(width: 40, height: 40)
                                             .background(!isTimerActive ? .green : .yellow)
                                             .clipShape(Circle())
                                             .scaleEffect(0.85)
+                                            .sensoryFeedback(.impact, trigger: isButtonPressed)
                                     }
                                     .buttonStyle(.plain)
                                     .padding(.trailing)
                                     
                                     Button {
+                                        isButtonPressed = true
                                         isTimerActive = false
                                         isTimerPaused = false
                                         isResetToggled.toggle()
+                                        isButtonPressed = false
                                     } label: {
                                         Image(systemName: "arrow.counterclockwise")
                                             .frame(width: 40, height: 40)
                                             .background(Color.red)
                                             .clipShape(Circle())
                                             .scaleEffect(0.85)
+                                            .sensoryFeedback(.impact, trigger: isButtonPressed)
                                     }
                                     .buttonStyle(.plain)
                                     .padding(.trailing)
                                     
                                     Button {
+                                        isButtonPressed = true
                                         isShowingSettings.toggle()
+                                        isButtonPressed = false
                                     } label: {
                                         Image(systemName: "gear")
                                             .frame(width: 40, height: 40)

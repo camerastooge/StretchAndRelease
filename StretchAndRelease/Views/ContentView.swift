@@ -26,6 +26,7 @@ struct ContentView: View {
     // state variables only used on main view
     @State private var isShowingSettings = false
     @State private var didSettingsChange = false
+    @State private var isButtonPressed = false
     
     //local variable
     @State private var isResetToggled = false
@@ -50,6 +51,7 @@ struct ContentView: View {
                             HStack {
                                 Button {
                                     withAnimation {
+                                        isButtonPressed = true
                                         if stretchPhase == .stop {
                                             isTimerActive = true
                                             isTimerPaused = false
@@ -63,6 +65,7 @@ struct ContentView: View {
                                             isTimerActive = true
                                         }
                                     }
+                                    isButtonPressed = false
                                 } label: {
                                     Text(!isTimerActive ? "START" : "PAUSE")
                                         .frame(width: 100, height: 50)
@@ -70,13 +73,16 @@ struct ContentView: View {
                                         .background(!isTimerActive ? .green : .yellow)
                                         .clipShape(.capsule)
                                         .shadow(color: colorScheme == .light ? .black.opacity(0.25) : .white.opacity(0.5), radius: 0.8, x: 2, y: 2)
+                                        .sensoryFeedback(.impact, trigger: isButtonPressed)
                                 }
                                 
                                 Button {
+                                    isButtonPressed = true
                                     isTimerActive = false
                                     isTimerPaused = false
                                     repsCompleted = 0
                                     isResetToggled.toggle()
+                                    isButtonPressed = false
                                 } label: {
                                     Text("RESET")
                                         .frame(width: 100, height: 50)
@@ -84,6 +90,7 @@ struct ContentView: View {
                                         .background(.red)
                                         .clipShape(.capsule)
                                         .shadow(color: colorScheme == .light ? .black.opacity(0.25) : .white.opacity(0.5), radius: 0.8, x: 2, y: 2)
+                                        .sensoryFeedback(.impact, trigger: isButtonPressed)
                                 }
                             }
                             .padding(.vertical)
