@@ -43,9 +43,10 @@
 		E4F1C1AD2DFE0B3700114B7C /* Exceptions for "StretchAndRelease" folder in "StretchAndReleaseWatchOS Watch App" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				Assets/beep.mp3,
-				Assets/chime.mp3,
-				Assets/short_beep.mp3,
+				Assets/SFX/and_relax.mp3,
+				Assets/SFX/and_rest.mp3,
+				Assets/SFX/and_stretch.mp3,
+				Assets/SFX/tick.mp3,
 				"Models and Settings/Connectivity.swift",
 				"Models and Settings/SoundManager.swift",
 				"Models and Settings/StretchPhase.swift",

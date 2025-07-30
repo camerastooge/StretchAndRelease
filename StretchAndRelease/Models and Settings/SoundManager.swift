@@ -15,9 +15,10 @@ class SoundManager {
     var player: AVAudioPlayer?
     
     enum SoundOption: String {
-        case beep
-        case chime
-        case shortBeep = "short_beep"
+        case relax = "and_relax"
+        case rest = "and_rest"
+        case stretch = "and_stretch"
+        case tick
     }
     
     private init() {

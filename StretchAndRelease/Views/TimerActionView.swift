@@ -106,18 +106,19 @@ struct TimerActionView: View {
                         withAnimation(.linear(duration: 1.0)) {
                             updateEndAngle()
                         }
+                        SoundManager.instance.playSound(sound: .tick)
                     } else {
                         repsCompleted += 1
                         if repsCompleted < totalReps {
                             stretchPhase = .rest
-                            SoundManager.instance.playSound(sound: .chime)
+                            SoundManager.instance.playSound(sound: .rest)
                         } else {
                             stretchPhase = .stop
                             timeRemaining = totalStretch
                             withAnimation(.linear(duration: 1.0)) {
                                 updateEndAngle()
                             }
-                            SoundManager.instance.playSound(sound: .beep)
+                            SoundManager.instance.playSound(sound: .relax)
                         }
                     }
                 }()
@@ -131,7 +132,7 @@ struct TimerActionView: View {
                     } else {
                         stretchPhase = .stretch
                         timeRemaining = totalStretch
-                        SoundManager.instance.playSound(sound: .chime)
+                        SoundManager.instance.playSound(sound: .stretch)
                     }
                 }()
                     
