@@ -52,6 +52,7 @@ struct TimerActionView: View {
                 Arc(endAngle: endAngle)
                     .stroke(stretchPhase.phaseColor, style: StrokeStyle(lineWidth: 25, lineCap: .round))
                     .rotationEffect(Angle(degrees: 90))
+                    .padding(.bottom)
                 VStack {
                     Text("\(String(format: "%02d", Int(timeRemaining)))")
                         .kerning(2)
@@ -59,13 +60,14 @@ struct TimerActionView: View {
                     Text(!isTimerPaused ? stretchPhase.phaseText : "PAUSED")
                         .scaleEffect(0.75)
                     Text("Reps Completed: \(repsCompleted)/\(totalReps)")
+                        .accessibilityLabel("Repetitions Completed")
                 }
                 .font(.largeTitle)
                 .fontWeight(.bold)
                 .foregroundStyle(!isTimerPaused ? stretchPhase.phaseColor : .gray)
                 .sensoryFeedback(.impact(intensity: stretchPhase.phaseIntensity), trigger: endAngle)
                 .containerRelativeFrame(.vertical, alignment: .bottom) { length, _ in
-                    length / 1.2
+                    length / 1.15
                 }
                 
             }
@@ -73,6 +75,7 @@ struct TimerActionView: View {
         .containerRelativeFrame(.horizontal, alignment: .center) { length, _ in
             length * 0.9
         }
+        .padding(.bottom, 40)
         
         // this modifier activates when the values are changed in the settings
         .onChange(of: [totalStretch, totalRest, totalReps]) {
@@ -91,7 +94,7 @@ struct TimerActionView: View {
             stretchPhase = .stop
             timeRemaining = totalStretch
             repsCompleted = 0
-            withAnimation(.linear(duration: 0.5)) {
+            withAnimation(.easeInOut(duration: 0.5)) {
                 updateEndAngle()
             }
         }

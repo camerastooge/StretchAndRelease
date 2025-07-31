@@ -23,7 +23,8 @@ struct SettingsView: View {
             List {
                 Section {
                     HStack {
-                        Text("Stretch Duration")
+                        Text("Stretch")
+                            .accessibilityLabel("Stretch Duration")
                         Picker("Stretch Duration", selection: $totalStretch) {
                             ForEach(1...30, id:\.self) {
                                 Text("\($0)")
@@ -32,15 +33,27 @@ struct SettingsView: View {
                         .pickerStyle(.wheel)
                         Text("sec.")
                             .font(.caption)
+                            .accessibilityLabel("seconds")
                     }
                     .frame(height: 100)
                     .padding(.horizontal)
                 }
+                .accessibilityHint("Adjust how long you want to hold each stretch")
+                .accessibilityValue(String(totalStretch))
+                .accessibilityAdjustableAction { direction in
+                    switch direction {
+                    case .increment: totalStretch += 1
+                    case .decrement: totalStretch -= 1
+                    @unknown default:
+                        print("not handled")
+                    }
+                 }
 
                 
                 Section {
                     HStack {
-                        Text("Rest Duration")
+                        Text("Rest")
+                            .accessibilityLabel("Rest Duration")
                         Picker("Rest Duration", selection: $totalRest) {
                             ForEach(1...10, id:\.self) {
                                 Text("\($0)")
@@ -49,14 +62,26 @@ struct SettingsView: View {
                         .pickerStyle(.wheel)
                         Text("sec.")
                             .font(.caption)
+                            .accessibilityLabel("seconds")
                     }
                 }
+                .accessibilityElement(children: .combine)
+                .accessibilityHint("Adjust how long you want to rest between stretches")
+                .accessibilityValue(String(totalRest))
+                .accessibilityAdjustableAction { direction in
+                    switch direction {
+                    case .increment: totalRest += 1
+                    case .decrement: totalRest -= 1
+                    default: print("not handled")
+                    }
+                 }
                 .frame(height: 100)
                 .padding(.horizontal)
                 
                 Section {
                     HStack {
-                        Text("Number of Reps")
+                        Text("Repetitions")
+                            .accessibilityLabel("Number of Repetitiions")
                         Picker("Number of Repetitions to Complete", selection: $totalReps) {
                             ForEach(1...10, id:\.self) {
                                 Text("\($0)")
@@ -65,10 +90,21 @@ struct SettingsView: View {
                         .pickerStyle(.wheel)
                         Text("reps")
                             .font(.caption)
+                            .accessibilityLabel("repetitions")
                     }
                 }
                 .frame(height: 100)
                 .padding(.horizontal)
+                .accessibilityElement(children: .combine)
+                .accessibilityHint("Set the number of times you want to perform this stretch")
+                .accessibilityValue(String(totalReps))
+                .accessibilityAdjustableAction { direction in
+                    switch direction {
+                    case .increment: totalReps += 1
+                    case .decrement: totalReps -= 1
+                    default: print("not handled")
+                    }
+                 }
             }
             .toolbar {
                 ToolbarItem {
@@ -77,6 +113,7 @@ struct SettingsView: View {
                     } label: {
                         Image(systemName: "x.circle.fill")
                     }
+                    .accessibilityLabel("Return to main screen")
                 }
             }
             .navigationTitle("Settings")
@@ -99,6 +136,7 @@ struct SettingsView: View {
                         .shadow(color: colorScheme == .light ? .black.opacity(0.25) : .white.opacity(0.5), radius: 0.8, x: 2, y: 2)
                         .padding(.bottom, 5)
                 }
+                .accessibilityHint("Save your settings and return to the main screen")
             }
         }
     }

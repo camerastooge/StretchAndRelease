@@ -42,6 +42,8 @@ struct ContentView: View {
                         ZStack {
                             Color.green.opacity(0)
                             TimerActionView(isTimerActive: $isTimerActive, isTimerPaused: $isTimerPaused, isResetToggled: $isResetToggled, stretchPhase: $stretchPhase, timeRemaining: $timeRemaining, repsCompleted: $repsCompleted, totalStretch: $totalStretch, totalRest: $totalRest, totalReps: $totalReps)
+                                .padding(.bottom, 50
+                                )
                         }
                         .frame(minHeight: 0, maxHeight: .infinity)
                         .layoutPriority(1)
@@ -57,6 +59,7 @@ struct ContentView: View {
                                             isTimerPaused = false
                                             stretchPhase = .stretch
                                             repsCompleted = 0
+                                            SoundManager.instance.playSound(sound: .stretch)
                                         } else if !isTimerPaused {
                                             isTimerPaused = true
                                             isTimerActive = false
@@ -75,6 +78,8 @@ struct ContentView: View {
                                         .shadow(color: colorScheme == .light ? .black.opacity(0.25) : .white.opacity(0.5), radius: 0.8, x: 2, y: 2)
                                         .sensoryFeedback(.impact, trigger: isButtonPressed)
                                 }
+                                .accessibilityInputLabels(["Start", "Pause", "Start Timer", "Pause Timer"])
+                                .accessibilityLabel("Start or Pause Timer")
                                 
                                 Button {
                                     isButtonPressed = true
@@ -92,6 +97,8 @@ struct ContentView: View {
                                         .shadow(color: colorScheme == .light ? .black.opacity(0.25) : .white.opacity(0.5), radius: 0.8, x: 2, y: 2)
                                         .sensoryFeedback(.impact, trigger: isButtonPressed)
                                 }
+                                .accessibilityInputLabels(["Reset", "Reset Timer"])
+                                .accessibilityLabel("Reset Timer")
                             }
                             .padding(.vertical)
                         }
@@ -105,6 +112,7 @@ struct ContentView: View {
                         } label: {
                             Image(systemName: "gear")
                         }
+                        .accessibilityInputLabels(["Settings"])
                     }
                 }
             }
