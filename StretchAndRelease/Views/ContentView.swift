@@ -59,7 +59,6 @@ struct ContentView: View {
                                             isTimerPaused = false
                                             stretchPhase = .stretch
                                             repsCompleted = 0
-                                            SoundManager.instance.playSound(sound: .stretch)
                                         } else if !isTimerPaused {
                                             isTimerPaused = true
                                             isTimerActive = false

@@ -57,10 +57,12 @@ struct TimerActionView: View {
                     Text("\(String(format: "%02d", Int(timeRemaining)))")
                         .kerning(2)
                         .contentTransition(.numericText(countsDown: true))
+                        .accessibilityLabel("\(timeRemaining) seconds remaining")
                     Text(!isTimerPaused ? stretchPhase.phaseText : "PAUSED")
                         .scaleEffect(0.75)
+                        .accessibilityLabel(!isTimerPaused ? stretchPhase.phaseText : "WORKOUT PAUSED")
                     Text("Reps Completed: \(repsCompleted)/\(totalReps)")
-                        .accessibilityLabel("Repetitions Completed")
+                        .accessibilityLabel("Repetitions Completed \(repsCompleted) of \(totalReps)")
                 }
                 .font(.largeTitle)
                 .fontWeight(.bold)
