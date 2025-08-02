@@ -25,14 +25,6 @@ class Connectivity: NSObject, WCSessionDelegate {
     
     #if os(iOS)
     func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
-        Task { @MainActor in
-            if activationState == .activated {
-                if session.isWatchAppInstalled {
-                    self.statusText = "CE \(Date.now.formatted(date: .omitted, time: .shortened))"
-                }
-            }
-        }
-        
     }
     
     func sessionDidBecomeInactive(_ session: WCSession) {
@@ -45,13 +37,6 @@ class Connectivity: NSObject, WCSessionDelegate {
     
     #else
     func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
-        Task { @MainActor in
-            if activationState == .activated {
-                if session.isReachable {
-                    self.statusText = "CE \(Date.now.formatted(date: .omitted, time: .shortened))"
-                }
-            }
-        }
     }
     
     #endif
@@ -61,10 +46,8 @@ class Connectivity: NSObject, WCSessionDelegate {
         if session.activationState == .activated {
             do {
                 try session.updateApplicationContext(data)
-                self.statusText = "PS \(Date.now.formatted(date: .omitted, time: .shortened))"
-                print(data)
             } catch {
-                self.statusText = "PF \(Date.now.formatted(date: .omitted, time: .shortened))"
+                print("Error: \(error.localizedDescription)")
             }
         }
     }
@@ -73,7 +56,6 @@ class Connectivity: NSObject, WCSessionDelegate {
         Task { @MainActor in
             self.statusText = "CS \(Date.now.formatted(date: .omitted, time: .shortened))"
             self.statusContext = applicationContext
-            print("Context Received: \(statusContext)")
             self.didStatusChange = true
         }
     }

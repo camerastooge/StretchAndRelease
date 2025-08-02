@@ -12,16 +12,13 @@ struct TimerSettingsViewWatch: View {
     @Environment(\.dismiss) var dismiss
     
     // Binding settings passed from Timer Main view
-    @Binding var totalStretch: Int
-    @Binding var totalRest: Int
-    @Binding var totalReps: Int
+    @StateObject var timerSettings = TimerSettings()
     @Binding var didSettingsChange: Bool
     
     var body: some View {
         GeometryReader { proxy in
             let firstColumnWidth = proxy.size.width * (2/5)
             let secondColumnWidth = proxy.size.width * (1.5/5)
-//            let thirdColumnWidth = proxy.size.width * (2/5)
             
             NavigationStack {
                 HStack {
@@ -31,7 +28,7 @@ struct TimerSettingsViewWatch: View {
                     
                     Spacer()
                     
-                    Picker("Stretch Duration", selection: $totalStretch) {
+                    Picker("Stretch Duration", selection: $timerSettings.totalStretch) {
                         ForEach(1...30, id:\.self) {
                             Text("\($0)")
                         }
@@ -51,7 +48,7 @@ struct TimerSettingsViewWatch: View {
                     
                     Spacer()
                     
-                    Picker("Rest Duration", selection: $totalRest) {
+                    Picker("Rest Duration", selection: $timerSettings.totalRest) {
                         ForEach(1...30, id:\.self) {
                             Text("\($0)")
                         }
@@ -70,7 +67,7 @@ struct TimerSettingsViewWatch: View {
                     
                     Spacer()
                     
-                    Picker("Number of Repetitions", selection: $totalReps) {
+                    Picker("Number of Repetitions", selection: $timerSettings.totalReps) {
                         ForEach(1...30, id:\.self) {
                             Text("\($0)")
                         }
@@ -87,9 +84,6 @@ struct TimerSettingsViewWatch: View {
                     Spacer()
                     
                     Button {
-                        UserDefaults.standard.set(totalStretch, forKey: "totalStretch")
-                        UserDefaults.standard.set(totalRest, forKey: "totalRest")
-                        UserDefaults.standard.set(totalReps, forKey: "totalReps")
                         didSettingsChange = true
                         dismiss()
                     } label: {
@@ -116,9 +110,6 @@ struct TimerSettingsViewWatch: View {
 }
 
 #Preview {
-    @Previewable @State var totalStretch: Int = 0
-    @Previewable @State var totalRest: Int = 0
-    @Previewable @State var totalReps: Int = 0
     @Previewable @State var didSettingsChange: Bool = false
-    TimerSettingsViewWatch(totalStretch: $totalStretch, totalRest: $totalRest, totalReps: $totalReps, didSettingsChange: $didSettingsChange)
+    TimerSettingsViewWatch(didSettingsChange: $didSettingsChange)
 }

@@ -13,14 +13,12 @@ struct TimerActionView: View {
     @Binding var isTimerActive: Bool
     @Binding var isTimerPaused: Bool
     @Binding var isResetToggled: Bool
-    @Binding var stretchPhase: StretchPhase
     @Binding var timeRemaining: Int
     @Binding var repsCompleted: Int
+    @Binding var stretchPhase: StretchPhase
     
     //binding settings
-    @Binding var totalStretch: Int
-    @Binding var totalRest: Int
-    @Binding var totalReps: Int
+    @StateObject var timerSettings = TimerSettings()
     
     //variables local to this view
     @State private var endAngle = Angle(degrees: 340)
@@ -61,8 +59,8 @@ struct TimerActionView: View {
                     Text(!isTimerPaused ? stretchPhase.phaseText : "PAUSED")
                         .scaleEffect(0.75)
                         .accessibilityLabel(!isTimerPaused ? stretchPhase.phaseText : "WORKOUT PAUSED")
-                    Text("Reps Completed: \(repsCompleted)/\(totalReps)")
-                        .accessibilityLabel("Repetitions Completed \(repsCompleted) of \(totalReps)")
+                    Text("Reps Completed: \(repsCompleted)/\(timerSettings.totalReps)")
+                        .accessibilityLabel("Repetitions Completed \(repsCompleted) of \(timerSettings.totalReps)")
                 }
                 .font(.largeTitle)
                 .fontWeight(.bold)
@@ -80,9 +78,9 @@ struct TimerActionView: View {
         .padding(.bottom, 40)
         
         // this modifier activates when the values are changed in the settings
-        .onChange(of: [totalStretch, totalRest, totalReps]) {
+        .onChange(of: [timerSettings.totalStretch, timerSettings.totalRest, timerSettings.totalReps]) {
             withAnimation(.linear(duration: 0.5)) {
-                timeRemaining = totalStretch
+                timeRemaining = timerSettings.totalStretch
                 isTimerPaused = false
                 isTimerActive = false
                 withAnimation(.linear(duration: 0.5)) {
@@ -94,7 +92,7 @@ struct TimerActionView: View {
         //reset button behavior
         .onChange(of: isResetToggled) {
             stretchPhase = .stop
-            timeRemaining = totalStretch
+            timeRemaining = timerSettings.totalStretch
             repsCompleted = 0
             withAnimation(.easeInOut(duration: 0.5)) {
                 updateEndAngle()
@@ -114,12 +112,12 @@ struct TimerActionView: View {
                         SoundManager.instance.playSound(sound: .tick)
                     } else {
                         repsCompleted += 1
-                        if repsCompleted < totalReps {
+                        if repsCompleted < timerSettings.totalReps {
                             stretchPhase = .rest
                             SoundManager.instance.playSound(sound: .rest)
                         } else {
                             stretchPhase = .stop
-                            timeRemaining = totalStretch
+                            timeRemaining = timerSettings.totalStretch
                             withAnimation(.linear(duration: 1.0)) {
                                 updateEndAngle()
                             }
@@ -129,14 +127,14 @@ struct TimerActionView: View {
                 }()
                     
                 case .rest: return {
-                    if timeRemaining < totalRest {
+                    if timeRemaining < timerSettings.totalRest {
                         timeRemaining += 1
                         withAnimation(.linear(duration: 1.0)) {
                             updateEndAngle()
                         }
                     } else {
                         stretchPhase = .stretch
-                        timeRemaining = totalStretch
+                        timeRemaining = timerSettings.totalStretch
                         SoundManager.instance.playSound(sound: .stretch)
                     }
                 }()
@@ -153,9 +151,9 @@ struct TimerActionView: View {
     func updateEndAngle() {
         switch stretchPhase {
         case .stretch:
-            endAngle = Angle(degrees: Double(timeRemaining) / Double(totalStretch) * 320 + 20)
+            endAngle = Angle(degrees: Double(timeRemaining) / Double(timerSettings.totalStretch) * 320 + 20)
         case .rest:
-            endAngle = Angle(degrees: Double(timeRemaining) / Double(totalRest) * 320 + 20)
+            endAngle = Angle(degrees: Double(timeRemaining) / Double(timerSettings.totalRest) * 320 + 20)
         case .stop:
             endAngle = Angle(degrees: 340)
         }
@@ -172,6 +170,6 @@ struct TimerActionView: View {
     @Previewable @State var totalReps = 3
     
     VStack {
-        TimerActionView(isTimerActive: $isTimerActive, isTimerPaused: $isTimerPaused, isResetToggled: $isResetToggled, stretchPhase: $stretchPhase, timeRemaining: $totalStretch, repsCompleted: $totalReps, totalStretch: $totalStretch, totalRest: $totalRest, totalReps: $totalReps)
+        TimerActionView(isTimerActive: $isTimerActive, isTimerPaused: $isTimerPaused, isResetToggled: $isResetToggled, timeRemaining: $totalStretch, repsCompleted: $totalReps, stretchPhase: $stretchPhase)
     }
 }

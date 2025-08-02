@@ -12,12 +12,10 @@ struct ContentView: View {
     @Environment(\.colorScheme) var colorScheme
     
     // State properties for settings
-    @State private var totalStretch = UserDefaults.standard.integer(forKey: "totalStretch")
-    @State private var totalRest = UserDefaults.standard.integer(forKey: "totalRest")
-    @State private var totalReps = UserDefaults.standard.integer(forKey: "totalReps")
+    @StateObject var timerSettings = TimerSettings()
     
     // state variables used across views
-    @State private var timeRemaining: Int = 1
+    @State private var timeRemaining: Int = 0
     @State private var repsCompleted: Int = 0
     @State private var isTimerActive = false
     @State private var isTimerPaused = false
@@ -30,6 +28,7 @@ struct ContentView: View {
     
     //local variable
     @State private var isResetToggled = false
+    @State private var didStretchStart = false
     
     // Connectivity class for communication with Apple Watch
     @State private var connectivity = Connectivity()
@@ -41,9 +40,8 @@ struct ContentView: View {
                     VStack(spacing: 0) {
                         ZStack {
                             Color.green.opacity(0)
-                            TimerActionView(isTimerActive: $isTimerActive, isTimerPaused: $isTimerPaused, isResetToggled: $isResetToggled, stretchPhase: $stretchPhase, timeRemaining: $timeRemaining, repsCompleted: $repsCompleted, totalStretch: $totalStretch, totalRest: $totalRest, totalReps: $totalReps)
-                                .padding(.bottom, 50
-                                )
+                            TimerActionView(isTimerActive: $isTimerActive, isTimerPaused: $isTimerPaused, isResetToggled: $isResetToggled, timeRemaining: $timeRemaining, repsCompleted: $repsCompleted, stretchPhase: $stretchPhase)
+                                .padding(.bottom, 50)
                         }
                         .frame(minHeight: 0, maxHeight: .infinity)
                         .layoutPriority(1)
@@ -59,6 +57,7 @@ struct ContentView: View {
                                             isTimerPaused = false
                                             stretchPhase = .stretch
                                             repsCompleted = 0
+                                            didStretchStart = true
                                         } else if !isTimerPaused {
                                             isTimerPaused = true
                                             isTimerActive = false
@@ -86,7 +85,15 @@ struct ContentView: View {
                                     isTimerPaused = false
                                     repsCompleted = 0
                                     isResetToggled.toggle()
+<<<<<<< HEAD
+<<<<<<< HEAD
+                                    stretchPhase = .stop
+=======
                                     isButtonPressed = false
+>>>>>>> parent of 4a371c6 (removed haptics from button presses)
+=======
+                                    isButtonPressed = false
+>>>>>>> parent of 4a371c6 (removed haptics from button presses)
                                 } label: {
                                     Text("RESET")
                                         .frame(width: 100, height: 50)
@@ -116,23 +123,21 @@ struct ContentView: View {
                 }
             }
             .sheet(isPresented: $isShowingSettings) {
-                SettingsView(totalStretch: $totalStretch, totalRest: $totalRest, totalReps: $totalReps, didSettingsChange: $didSettingsChange)
-            }
-            .onAppear {
-                if totalStretch == 0 { totalStretch = 10 }
-                if totalRest == 0 { totalRest = 4 }
-                if totalReps == 0 { totalReps = 4 }
-                timeRemaining = totalStretch
+                SettingsView(didSettingsChange: $didSettingsChange)
             }
             .onChange(of: connectivity.didStatusChange) {
-                totalStretch = connectivity.statusContext["stretch"] as? Int ?? 10
-                totalRest = connectivity.statusContext["rest"] as? Int ?? 5
-                totalReps = connectivity.statusContext["reps"] as? Int ?? 5
+                timerSettings.totalStretch = connectivity.statusContext["stretch"] as? Int ?? 10
+                timerSettings.totalRest = connectivity.statusContext["rest"] as? Int ?? 5
+                timerSettings.totalReps = connectivity.statusContext["reps"] as? Int ?? 5
                 connectivity.didStatusChange = false
             }
             .onChange(of: didSettingsChange) {
-                sendContext(stretch: totalStretch, rest: totalRest, reps: totalReps)
+                sendContext(stretch: timerSettings.totalStretch, rest: timerSettings.totalRest, reps: timerSettings.totalReps)
                 didSettingsChange = false
+            }
+        //sets timeRemaining to totalStretch on appearance
+            .onAppear {
+                timeRemaining = timerSettings.totalStretch
             }
         }
         

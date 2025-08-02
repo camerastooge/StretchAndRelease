@@ -13,9 +13,7 @@ struct SettingsView: View {
     @Environment(\.dismiss) var dismiss
     
     // Binding settings passed from Timer Main view
-    @Binding var totalStretch: Int
-    @Binding var totalRest: Int
-    @Binding var totalReps: Int
+    @StateObject var timerSettings = TimerSettings()
     @Binding var didSettingsChange: Bool
 
     var body: some View {
@@ -25,7 +23,7 @@ struct SettingsView: View {
                     HStack {
                         Text("Stretch")
                             .accessibilityLabel("Stretch Duration")
-                        Picker("Stretch Duration", selection: $totalStretch) {
+                        Picker("Stretch Duration", selection: $timerSettings.totalStretch) {
                             ForEach(1...30, id:\.self) {
                                 Text("\($0)")
                             }
@@ -39,11 +37,11 @@ struct SettingsView: View {
                     .padding(.horizontal)
                 }
                 .accessibilityHint("Adjust how long you want to hold each stretch")
-                .accessibilityValue(String(totalStretch))
+                .accessibilityValue(String(timerSettings.totalStretch))
                 .accessibilityAdjustableAction { direction in
                     switch direction {
-                    case .increment: totalStretch += 1
-                    case .decrement: totalStretch -= 1
+                    case .increment: timerSettings.totalStretch += 1
+                    case .decrement: timerSettings.totalStretch -= 1
                     @unknown default:
                         print("not handled")
                     }
@@ -54,7 +52,7 @@ struct SettingsView: View {
                     HStack {
                         Text("Rest")
                             .accessibilityLabel("Rest Duration")
-                        Picker("Rest Duration", selection: $totalRest) {
+                        Picker("Rest Duration", selection: $timerSettings.totalRest) {
                             ForEach(1...10, id:\.self) {
                                 Text("\($0)")
                             }
@@ -67,11 +65,11 @@ struct SettingsView: View {
                 }
                 .accessibilityElement(children: .combine)
                 .accessibilityHint("Adjust how long you want to rest between stretches")
-                .accessibilityValue(String(totalRest))
+                .accessibilityValue(String(timerSettings.totalRest))
                 .accessibilityAdjustableAction { direction in
                     switch direction {
-                    case .increment: totalRest += 1
-                    case .decrement: totalRest -= 1
+                    case .increment: timerSettings.totalRest += 1
+                    case .decrement: timerSettings.totalRest -= 1
                     default: print("not handled")
                     }
                  }
@@ -82,7 +80,7 @@ struct SettingsView: View {
                     HStack {
                         Text("Repetitions")
                             .accessibilityLabel("Number of Repetitiions")
-                        Picker("Number of Repetitions to Complete", selection: $totalReps) {
+                        Picker("Number of Repetitions to Complete", selection: $timerSettings.totalReps) {
                             ForEach(1...10, id:\.self) {
                                 Text("\($0)")
                             }
@@ -97,11 +95,11 @@ struct SettingsView: View {
                 .padding(.horizontal)
                 .accessibilityElement(children: .combine)
                 .accessibilityHint("Set the number of times you want to perform this stretch")
-                .accessibilityValue(String(totalReps))
+                .accessibilityValue(String(timerSettings.totalReps))
                 .accessibilityAdjustableAction { direction in
                     switch direction {
-                    case .increment: totalReps += 1
-                    case .decrement: totalReps -= 1
+                    case .increment: timerSettings.totalReps += 1
+                    case .decrement: timerSettings.totalReps -= 1
                     default: print("not handled")
                     }
                  }
@@ -120,9 +118,6 @@ struct SettingsView: View {
             .navigationBarTitleDisplayMode(.inline)
             VStack {
                 Button {
-                    UserDefaults.standard.set(totalStretch, forKey: "totalStretch")
-                    UserDefaults.standard.set(totalRest, forKey: "totalRest")
-                    UserDefaults.standard.set(totalReps, forKey: "totalReps")
                     didSettingsChange = true
                     dismiss()
                 } label: {
@@ -143,9 +138,6 @@ struct SettingsView: View {
 }
 
 #Preview {
-    @Previewable @State var totalStretch: Int = 0
-    @Previewable @State var totalRest: Int = 0
-    @Previewable @State var totalReps: Int = 0
-    @Previewable @State var didSettingsChange: Bool = false
-    SettingsView(totalStretch: $totalStretch, totalRest: $totalRest, totalReps: $totalReps, didSettingsChange: $didSettingsChange)
+    @Previewable @State var didSettingsChange = false
+    SettingsView(didSettingsChange: $didSettingsChange)
 }
