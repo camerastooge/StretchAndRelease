@@ -80,20 +80,11 @@ struct ContentView: View {
                                 .accessibilityLabel("Start or Pause Timer")
                                 
                                 Button {
-                                    isButtonPressed = true
                                     isTimerActive = false
                                     isTimerPaused = false
                                     repsCompleted = 0
                                     isResetToggled.toggle()
-<<<<<<< HEAD
-<<<<<<< HEAD
                                     stretchPhase = .stop
-=======
-                                    isButtonPressed = false
->>>>>>> parent of 4a371c6 (removed haptics from button presses)
-=======
-                                    isButtonPressed = false
->>>>>>> parent of 4a371c6 (removed haptics from button presses)
                                 } label: {
                                     Text("RESET")
                                         .frame(width: 100, height: 50)
@@ -125,16 +116,19 @@ struct ContentView: View {
             .sheet(isPresented: $isShowingSettings) {
                 SettingsView(didSettingsChange: $didSettingsChange)
             }
+        //receives changed settings from Apple Watch app
             .onChange(of: connectivity.didStatusChange) {
                 timerSettings.totalStretch = connectivity.statusContext["stretch"] as? Int ?? 10
                 timerSettings.totalRest = connectivity.statusContext["rest"] as? Int ?? 5
                 timerSettings.totalReps = connectivity.statusContext["reps"] as? Int ?? 5
                 connectivity.didStatusChange = false
             }
+        //sends updated settings to Apple Watch app
             .onChange(of: didSettingsChange) {
                 sendContext(stretch: timerSettings.totalStretch, rest: timerSettings.totalRest, reps: timerSettings.totalReps)
                 didSettingsChange = false
             }
+        
         //sets timeRemaining to totalStretch on appearance
             .onAppear {
                 timeRemaining = timerSettings.totalStretch
