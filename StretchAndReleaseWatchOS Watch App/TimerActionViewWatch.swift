@@ -18,7 +18,7 @@ struct TimerActionViewWatch: View {
     @Binding var stretchPhase: StretchPhase
     
     // State properties for settings
-    @StateObject var timerSettings = TimerSettings()
+    @EnvironmentObject var timerSettings: TimerSettings
     
     //variables local to this view
     @State private var endAngle = Angle(degrees: 340)

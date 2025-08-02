@@ -12,7 +12,7 @@ struct TimerSettingsViewWatch: View {
     @Environment(\.dismiss) var dismiss
     
     // Binding settings passed from Timer Main view
-    @StateObject var timerSettings = TimerSettings()
+    @EnvironmentObject var timerSettings: TimerSettings
     @Binding var didSettingsChange: Bool
     
     var body: some View {
