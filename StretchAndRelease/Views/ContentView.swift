@@ -41,6 +41,7 @@ struct ContentView: View {
                         ZStack {
                             Color.green.opacity(0)
                             TimerActionView(isTimerActive: $isTimerActive, isTimerPaused: $isTimerPaused, isResetToggled: $isResetToggled, timeRemaining: $timeRemaining, repsCompleted: $repsCompleted, stretchPhase: $stretchPhase)
+                                .environmentObject(timerSettings)
                                 .padding(.bottom, 50)
                         }
                         .frame(minHeight: 0, maxHeight: .infinity)
@@ -115,6 +116,7 @@ struct ContentView: View {
             }
             .sheet(isPresented: $isShowingSettings) {
                 SettingsView(didSettingsChange: $didSettingsChange)
+                    .environmentObject(timerSettings)
             }
         //receives changed settings from Apple Watch app
             .onChange(of: connectivity.didStatusChange) {
