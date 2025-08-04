@@ -20,11 +20,12 @@ struct ContentView: View {
     @State private var isTimerActive = false
     @State private var isTimerPaused = false
     @State private var stretchPhase: StretchPhase = .stop
+    @State private var endAngle = Angle(degrees: 340)
+    @State private var timer = Timer.publish(every: 1.0, on: .main, in: .common).autoconnect()
     
     // state variables only used on main view
     @State private var isShowingSettings = false
     @State private var didSettingsChange = false
-    @State private var isButtonPressed = false
     
     //local variable
     @State private var isResetToggled = false
@@ -36,112 +37,223 @@ struct ContentView: View {
     var body: some View {
         NavigationStack {
             GeometryReader { proxy in
-                    //space for TimerActionView
-                    VStack(spacing: 0) {
-                        ZStack {
-                            Color.green.opacity(0)
-                            TimerActionView(isTimerActive: $isTimerActive, isTimerPaused: $isTimerPaused, isResetToggled: $isResetToggled, timeRemaining: $timeRemaining, repsCompleted: $repsCompleted, stretchPhase: $stretchPhase)
-                                .environmentObject(timerSettings)
-                                .padding(.bottom, 50)
-                        }
-                        .frame(minHeight: 0, maxHeight: .infinity)
-                        .layoutPriority(1)
+                VStack(spacing: 0) {
+                    ZStack {
+                        Color.green.opacity(0)
+                        Arc(endAngle: endAngle)
+                            .stroke(stretchPhase.phaseColor, style: StrokeStyle(lineWidth: 25, lineCap: .round))
+                            .rotationEffect(Angle(degrees: 90))
+                            .padding(.bottom)
                         
-                        ZStack {
-                            Color.gray.opacity(0.15)
-                            HStack {
-                                Button {
-                                    withAnimation {
-                                        isButtonPressed = true
-                                        if stretchPhase == .stop {
+                        VStack {
+                            Text("\(String(format: "%02d", Int(timeRemaining)))")
+                                .kerning(2)
+                                .contentTransition(.numericText(countsDown: true))
+                                .accessibilityLabel("\(timeRemaining) seconds remaining")
+                            Text(!isTimerPaused ? stretchPhase.phaseText : "PAUSED")
+                                .scaleEffect(0.75)
+                                .accessibilityLabel(!isTimerPaused ? stretchPhase.phaseText : "WORKOUT PAUSED")
+                            Text("Reps Completed: \(repsCompleted)/\(timerSettings.totalReps)")
+                                .accessibilityLabel("Repetitions Completed \(repsCompleted) of \(timerSettings.totalReps)")
+                        }
+                        .font(.largeTitle)
+                        .fontWeight(.bold)
+                        .foregroundStyle(!isTimerPaused ? stretchPhase.phaseColor : .gray)
+                        .sensoryFeedback(.impact(intensity: stretchPhase.phaseIntensity), trigger: endAngle)
+                        .containerRelativeFrame(.vertical, alignment: .bottom) { length, _ in
+                            length / 1.15
+                        }
+                    }
+                    .containerRelativeFrame(.horizontal, alignment: .center) { length, _ in
+                        length * 0.9
+                    }
+                    .frame(minHeight: 0, maxHeight: .infinity)
+                    .layoutPriority(1)
+                    
+                    ZStack {
+                        Color.gray.opacity(0.15)
+                        HStack {
+                            Button {
+                                withAnimation {
+                                    if stretchPhase == .stop {
+                                        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
                                             isTimerActive = true
                                             isTimerPaused = false
                                             stretchPhase = .stretch
                                             repsCompleted = 0
-                                            didStretchStart = true
-                                        } else if !isTimerPaused {
-                                            isTimerPaused = true
-                                            isTimerActive = false
-                                        } else {
+                                        }
+                                    } else if !isTimerPaused {
+                                        isTimerPaused = true
+                                        isTimerActive = false
+                                    } else {
+                                        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
                                             isTimerPaused = false
                                             isTimerActive = true
                                         }
                                     }
-                                    isButtonPressed = false
-                                } label: {
-                                    Text(!isTimerActive ? "START" : "PAUSE")
-                                        .frame(width: 100, height: 50)
-                                        .foregroundStyle(.white)
-                                        .background(!isTimerActive ? .green : .yellow)
-                                        .clipShape(.capsule)
-                                        .shadow(color: colorScheme == .light ? .black.opacity(0.25) : .white.opacity(0.5), radius: 0.8, x: 2, y: 2)
-                                        .sensoryFeedback(.impact, trigger: isButtonPressed)
                                 }
-                                .accessibilityInputLabels(["Start", "Pause", "Start Timer", "Pause Timer"])
-                                .accessibilityLabel("Start or Pause Timer")
-                                
-                                Button {
-                                    isTimerActive = false
-                                    isTimerPaused = false
-                                    repsCompleted = 0
-                                    isResetToggled.toggle()
-                                    stretchPhase = .stop
-                                } label: {
-                                    Text("RESET")
-                                        .frame(width: 100, height: 50)
-                                        .foregroundStyle(.white)
-                                        .background(.red)
-                                        .clipShape(.capsule)
-                                        .shadow(color: colorScheme == .light ? .black.opacity(0.25) : .white.opacity(0.5), radius: 0.8, x: 2, y: 2)
-                                        .sensoryFeedback(.impact, trigger: isButtonPressed)
-                                }
-                                .accessibilityInputLabels(["Reset", "Reset Timer"])
-                                .accessibilityLabel("Reset Timer")
+                            } label: {
+                                Text(!isTimerActive ? "START" : "PAUSE")
+                                    .frame(width: 100, height: 50)
+                                    .foregroundStyle(.white)
+                                    .background(!isTimerActive ? .green : .yellow)
+                                    .clipShape(.capsule)
+                                    .shadow(color: colorScheme == .light ? .black.opacity(0.25) : .white.opacity(0.5), radius: 0.8, x: 2, y: 2)
                             }
-                            .padding(.vertical)
+                            .accessibilityInputLabels(["Start", "Pause", "Start Timer", "Pause Timer"])
+                            .accessibilityLabel("Start or Pause Timer")
+                            
+                            Button {
+                                isTimerActive = false
+                                isTimerPaused = false
+                                repsCompleted = 0
+                                isResetToggled.toggle()
+                                stretchPhase = .stop
+                            } label: {
+                                Text("RESET")
+                                    .frame(width: 100, height: 50)
+                                    .foregroundStyle(.white)
+                                    .background(.red)
+                                    .clipShape(.capsule)
+                                    .shadow(color: colorScheme == .light ? .black.opacity(0.25) : .white.opacity(0.5), radius: 0.8, x: 2, y: 2)                    }
+                                    .accessibilityInputLabels(["Reset", "Reset Timer"])
+                                    .accessibilityLabel("Reset Timer")
                         }
-                    }
-                }
-                .navigationTitle("Stretch & Release")
-                .toolbar {
-                    ToolbarItem {
-                        Button {
-                            isShowingSettings.toggle()
-                        } label: {
-                            Image(systemName: "gear")
-                        }
-                        .accessibilityInputLabels(["Settings"])
+                        .padding(.vertical)
                     }
                 }
             }
-            .sheet(isPresented: $isShowingSettings) {
-                SettingsView(didSettingsChange: $didSettingsChange)
-                    .environmentObject(timerSettings)
+            .navigationTitle("Stretch & Release")
+            .toolbar {
+                ToolbarItem {
+                    Button {
+                        isShowingSettings.toggle()
+                    } label: {
+                        Image(systemName: "gear")
+                    }
+                    .accessibilityInputLabels(["Settings"])
+                }
             }
+        }
+        .sheet(isPresented: $isShowingSettings) {
+            SettingsView(didSettingsChange: $didSettingsChange)
+                .environmentObject(timerSettings)
+        }
+        
         //receives changed settings from Apple Watch app
-            .onChange(of: connectivity.didStatusChange) {
-                timerSettings.totalStretch = connectivity.statusContext["stretch"] as? Int ?? 10
-                timerSettings.totalRest = connectivity.statusContext["rest"] as? Int ?? 5
-                timerSettings.totalReps = connectivity.statusContext["reps"] as? Int ?? 5
-                connectivity.didStatusChange = false
-            }
+        .onChange(of: connectivity.didStatusChange) {
+            timerSettings.totalStretch = connectivity.statusContext["stretch"] as? Int ?? 10
+            timerSettings.totalRest = connectivity.statusContext["rest"] as? Int ?? 5
+            timerSettings.totalReps = connectivity.statusContext["reps"] as? Int ?? 5
+            connectivity.didStatusChange = false
+        }
+        
         //sends updated settings to Apple Watch app
-            .onChange(of: didSettingsChange) {
-                sendContext(stretch: timerSettings.totalStretch, rest: timerSettings.totalRest, reps: timerSettings.totalReps)
-                didSettingsChange = false
-            }
+        .onChange(of: didSettingsChange) {
+            sendContext(stretch: timerSettings.totalStretch, rest: timerSettings.totalRest, reps: timerSettings.totalReps)
+            didSettingsChange = false
+        }
         
         //sets timeRemaining to totalStretch on appearance
-            .onAppear {
+        .onAppear {
+            timeRemaining = timerSettings.totalStretch
+        }
+        
+        // this modifier activates when the values are changed in the settings
+        .onChange(of: [timerSettings.totalStretch, timerSettings.totalRest, timerSettings.totalReps]) {
+            withAnimation(.linear(duration: 0.5)) {
                 timeRemaining = timerSettings.totalStretch
+                isTimerPaused = false
+                isTimerActive = false
+                withAnimation(.linear(duration: 0.5)) {
+                    endAngle = Angle(degrees: 340)
+                }
             }
         }
         
-        func sendContext(stretch: Int, rest: Int, reps: Int) {
-            let settingsUpdate = ["stretch" : stretch, "rest" : rest, "reps" : reps]
-            connectivity.setContext(to: settingsUpdate)
+        //reset button behavior
+        .onChange(of: isResetToggled) {
+            stretchPhase = .stop
+            timeRemaining = timerSettings.totalStretch
+            repsCompleted = 0
+            withAnimation(.easeInOut(duration: 0.5)) {
+                updateEndAngle()
+            }
+        }
+        
+        //this modifier runs when the timer publishes
+        .onReceive(timer) { _ in
+            if isTimerActive && !isTimerPaused {
+                switch stretchPhase {
+                case .stretch: return {
+                    if timeRemaining > 0 {
+                        timeRemaining -= 1
+                        withAnimation(.linear(duration: 1.0)) {
+                            updateEndAngle()
+                        }
+                        SoundManager.instance.playSound(sound: .tick)
+                    } else {
+                        repsCompleted += 1
+                        if repsCompleted < timerSettings.totalReps {
+                            stretchPhase = .rest
+                            SoundManager.instance.playSound(sound: .rest)
+                        } else {
+                            stretchPhase = .stop
+                            timeRemaining = timerSettings.totalStretch
+                            withAnimation(.linear(duration: 1.0)) {
+                                updateEndAngle()
+                            }
+                            SoundManager.instance.playSound(sound: .relax)
+                        }
+                    }
+                }()
+                    
+                case .rest: return {
+                    if timeRemaining < timerSettings.totalRest {
+                        timeRemaining += 1
+                        withAnimation(.linear(duration: 1.0)) {
+                            updateEndAngle()
+                        }
+                    } else {
+                        stretchPhase = .stretch
+                        timeRemaining = timerSettings.totalStretch
+                        SoundManager.instance.playSound(sound: .stretch)
+                    }
+                }()
+                    
+                case .stop: return {
+                    isTimerActive = false
+                }()
+                }
+            }
         }
     }
+    
+    //function to set end angle of arc
+    func updateEndAngle() {
+        switch stretchPhase {
+        case .stretch:
+            endAngle = Angle(degrees: Double(timeRemaining) / Double(timerSettings.totalStretch) * 320 + 20)
+        case .rest:
+            endAngle = Angle(degrees: Double(timeRemaining) / Double(timerSettings.totalRest) * 320 + 20)
+        case .stop:
+            endAngle = Angle(degrees: 340)
+        }
+    }
+    
+    //function sends updated settings to Apple Watch
+    func sendContext(stretch: Int, rest: Int, reps: Int) {
+        let settingsUpdate = ["stretch" : stretch, "rest" : rest, "reps" : reps]
+        connectivity.setContext(to: settingsUpdate)
+    }
+    
+    //func to trigger timer?
+    func timerStart() {
+        
+    }
+}
+        
+
     
     #Preview {
         ContentView()
