@@ -113,17 +113,22 @@ struct ContentView: View {
                                 isTimerActive = false
                                 isTimerPaused = false
                                 repsCompleted = 0
-                                isResetToggled.toggle()
                                 stretchPhase = .stop
+                                timeRemaining = timerSettings.totalStretch
+                                withAnimation(.easeInOut(duration: 0.5)) {
+                                    updateEndAngle()
+                                }
                             } label: {
                                 Text("RESET")
                                     .frame(width: 100, height: 50)
                                     .foregroundStyle(.white)
                                     .background(.red)
                                     .clipShape(.capsule)
-                                    .shadow(color: colorScheme == .light ? .black.opacity(0.25) : .white.opacity(0.5), radius: 0.8, x: 2, y: 2)                    }
+                                    .shadow(color: colorScheme == .light ? .black.opacity(0.25) : .white.opacity(0.5), radius: 0.8, x: 2, y: 2)
                                     .accessibilityInputLabels(["Reset", "Reset Timer"])
                                     .accessibilityLabel("Reset Timer")
+                            }
+
                         }
                         .padding(.vertical)
                     }
@@ -179,12 +184,7 @@ struct ContentView: View {
         
         //reset button behavior
         .onChange(of: isResetToggled) {
-            stretchPhase = .stop
-            timeRemaining = timerSettings.totalStretch
-            repsCompleted = 0
-            withAnimation(.easeInOut(duration: 0.5)) {
-                updateEndAngle()
-            }
+
         }
         
         //this modifier runs when the timer publishes

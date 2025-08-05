@@ -26,7 +26,6 @@ struct ContentView: View {
     // state variables only used on main view
     @State private var isShowingSettings = false
     @State private var didSettingsChange = false
-    @State private var isButtonPressed = false
     
     //local variable
     @State private var isResetToggled = false
@@ -115,11 +114,9 @@ struct ContentView: View {
                                 .padding(.trailing)
                                 
                                 Button {
-                                    isButtonPressed = true
                                     isTimerActive = false
                                     isTimerPaused = false
                                     isResetToggled.toggle()
-                                    isButtonPressed = false
                                 } label: {
                                     Image(systemName: "arrow.counterclockwise")
                                         .frame(width: 40, height: 40)
