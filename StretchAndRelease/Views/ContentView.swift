@@ -76,19 +76,25 @@ struct ContentView: View {
                             Button {
                                 withAnimation {
                                     if stretchPhase == .stop {
+                                        SoundManager.instance.playSound(sound: .countdownExpanded)
                                         DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-                                            isTimerActive = true
-                                            isTimerPaused = false
-                                            stretchPhase = .stretch
-                                            repsCompleted = 0
+                                            withAnimation(.linear(duration: 0.25)) {
+                                                isTimerActive = true
+                                                isTimerPaused = false
+                                                stretchPhase = .stretch
+                                                repsCompleted = 0
+                                            }
                                         }
                                     } else if !isTimerPaused {
                                         isTimerPaused = true
                                         isTimerActive = false
                                     } else {
+                                        SoundManager.instance.playSound(sound: .countdownExpanded)
                                         DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-                                            isTimerPaused = false
-                                            isTimerActive = true
+                                            withAnimation(.linear(duration: 0.25)) {
+                                                isTimerPaused = false
+                                                isTimerActive = true
+                                            }
                                         }
                                     }
                                 }

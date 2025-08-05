@@ -19,6 +19,8 @@ class SoundManager {
         case rest = "and_rest"
         case stretch = "and_stretch"
         case tick
+        case countdown = "321"
+        case countdownExpanded = "321_stretch"
     }
     
     private init() {
