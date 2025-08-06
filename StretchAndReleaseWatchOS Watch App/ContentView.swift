@@ -27,9 +27,6 @@ struct ContentView: View {
     @State private var isShowingSettings = false
     @State private var didSettingsChange = false
     
-    //local variable
-    @State private var isResetToggled = false
-    
     //Connectivity class for communication with phone
     @State private var connectivity = Connectivity()
     
@@ -71,13 +68,12 @@ struct ContentView: View {
                                     length * 0.9
                                 }
                                 .containerRelativeFrame(.vertical, alignment: .center) { length, _ in
-                                    length * 0.9
+                                    length * 1
                                 }
                             
                             //Button Row
                         HStack {
                                 Button {
-                                    isButtonPressed = true
                                     withAnimation {
                                         if stretchPhase == .stop {
                                             SoundManager.instance.playSound(sound: .countdownExpanded)
@@ -102,7 +98,6 @@ struct ContentView: View {
                                             }
                                         }
                                     }
-                                    isButtonPressed = false
                                 } label: {
                                     Image(systemName: "playpause.fill")
                                         .frame(width: 40, height: 40)
@@ -116,7 +111,12 @@ struct ContentView: View {
                                 Button {
                                     isTimerActive = false
                                     isTimerPaused = false
-                                    isResetToggled.toggle()
+                                    repsCompleted = 0
+                                    stretchPhase = .stop
+                                    timeRemaining = timerSettings.totalStretch
+                                    withAnimation(.easeInOut(duration: 0.5)) {
+                                        updateEndAngle()
+                                    }
                                 } label: {
                                     Image(systemName: "arrow.counterclockwise")
                                         .frame(width: 40, height: 40)
@@ -128,9 +128,7 @@ struct ContentView: View {
                                 .padding(.trailing)
                                 
                                 Button {
-                                    isButtonPressed = true
                                     isShowingSettings.toggle()
-                                    isButtonPressed = false
                                 } label: {
                                     Image(systemName: "gear")
                                         .frame(width: 40, height: 40)
