@@ -10,6 +10,7 @@ import SwiftUI
 struct ContentView: View {
     //Environment properties
     @Environment(\.colorScheme) var colorScheme
+    @Environment(\.accessibilityDifferentiateWithoutColor) var differentiateWithoutColor
     
     // State properties for settings
     @StateObject var timerSettings = TimerSettings()
@@ -41,7 +42,7 @@ struct ContentView: View {
                     ZStack {
                         Color.green.opacity(0)
                         Arc(endAngle: endAngle)
-                            .stroke(stretchPhase.phaseColor, style: StrokeStyle(lineWidth: 25, lineCap: .round))
+                            .stroke(differentiateWithoutColor ? .black : stretchPhase.phaseColor, style: StrokeStyle(lineWidth: 25, lineCap: .round))
                             .rotationEffect(Angle(degrees: 90))
                             .padding(.bottom)
                         
@@ -57,8 +58,8 @@ struct ContentView: View {
                                 .accessibilityLabel("Repetitions Completed \(repsCompleted) of \(timerSettings.totalReps)")
                         }
                         .font(.largeTitle)
+                        .foregroundStyle(!isTimerPaused ? differentiateWithoutColor ? .black : stretchPhase.phaseColor : .gray)
                         .fontWeight(.bold)
-                        .foregroundStyle(!isTimerPaused ? stretchPhase.phaseColor : .gray)
                         .sensoryFeedback(.impact(intensity: stretchPhase.phaseIntensity), trigger: endAngle)
                         .containerRelativeFrame(.vertical, alignment: .bottom) { length, _ in
                             length / 1.15
@@ -70,8 +71,9 @@ struct ContentView: View {
                     .frame(minHeight: 0, maxHeight: .infinity)
                     .layoutPriority(1)
                     
+                    //Button Row
                     ZStack {
-                        Color.gray.opacity(0.15)
+                        Color.gray.opacity(differentiateWithoutColor ? 0.0 : 0.25)
                         HStack {
                             Button {
                                 withAnimation {
@@ -99,12 +101,20 @@ struct ContentView: View {
                                     }
                                 }
                             } label: {
-                                Text(!isTimerActive ? "START" : "PAUSE")
-                                    .frame(width: 100, height: 50)
-                                    .foregroundStyle(.white)
-                                    .background(!isTimerActive ? .green : .yellow)
-                                    .clipShape(.capsule)
-                                    .shadow(color: colorScheme == .light ? .black.opacity(0.25) : .white.opacity(0.5), radius: 0.8, x: 2, y: 2)
+                                if !differentiateWithoutColor {
+                                    Text(!isTimerActive ? "START" : "PAUSE")
+                                        .frame(width: 100, height: 50)
+                                        .foregroundStyle(.white)
+                                        .background(!isTimerActive ? .green : .yellow)
+                                        .clipShape(.capsule)
+                                        .shadow(color: colorScheme == .light ? .black.opacity(0.25) : .white.opacity(0.5), radius: 0.8, x: 2, y: 2)
+                                } else {
+                                    Text(!isTimerActive ? "START" : "PAUSE")
+                                        .frame(width: 100, height: 50)
+                                        .font(.title)
+                                        .fontWeight(.bold)
+                                        .foregroundStyle(.black)
+                                }
                             }
                             .accessibilityInputLabels(["Start", "Pause", "Start Timer", "Pause Timer"])
                             .accessibilityLabel("Start or Pause Timer")
@@ -119,14 +129,20 @@ struct ContentView: View {
                                     updateEndAngle()
                                 }
                             } label: {
-                                Text("RESET")
-                                    .frame(width: 100, height: 50)
-                                    .foregroundStyle(.white)
-                                    .background(.red)
-                                    .clipShape(.capsule)
-                                    .shadow(color: colorScheme == .light ? .black.opacity(0.25) : .white.opacity(0.5), radius: 0.8, x: 2, y: 2)
-                                    .accessibilityInputLabels(["Reset", "Reset Timer"])
-                                    .accessibilityLabel("Reset Timer")
+                                if !differentiateWithoutColor {
+                                    Text("RESET")
+                                        .frame(width: 100, height: 50)
+                                        .foregroundStyle(.white)
+                                        .background(.red)
+                                        .clipShape(.capsule)
+                                        .shadow(color: colorScheme == .light ? .black.opacity(0.25) : .white.opacity(0.5), radius: 0.8, x: 2, y: 2)
+                                } else {
+                                    Text("RESET")
+                                        .frame(width: 100, height: 50)
+                                        .font(.title)
+                                        .fontWeight(.bold)
+                                        .foregroundStyle(.black)
+                                }
                             }
 
                         }

@@ -10,6 +10,7 @@ import SwiftUI
 struct ContentView: View {
     //Environment properties
     @Environment(\.colorScheme) var colorScheme
+    @Environment(\.accessibilityDifferentiateWithoutColor) var differentiateWithoutColor
     
     // State properties for settings
     @StateObject var timerSettings = TimerSettings()
@@ -54,8 +55,10 @@ struct ContentView: View {
                                                 .font(.largeTitle)
                                                 .kerning(2)
                                                 .contentTransition(.numericText(countsDown: true))
+                                                .accessibilityLabel("\(timeRemaining) seconds remaining")
                                             Text(!isTimerPaused ? stretchPhase.phaseText : "PAUSED")
                                                 .scaleEffect(0.75)
+                                                .accessibilityLabel(!isTimerPaused ? stretchPhase.phaseText : "WORKOUT PAUSED")
                                             Text("Reps: \(repsCompleted)/\(timerSettings.totalReps)")
                                         }
                                         .font(.caption)
