@@ -60,6 +60,7 @@ struct ContentView: View {
                                                 .scaleEffect(0.75)
                                                 .accessibilityLabel(!isTimerPaused ? stretchPhase.phaseText : "WORKOUT PAUSED")
                                             Text("Reps: \(repsCompleted)/\(timerSettings.totalReps)")
+                                                .accessibilityLabel("Repetitions Completed \(repsCompleted) of \(timerSettings.totalReps)")
                                         }
                                         .font(.caption)
                                         .fontWeight(.bold)
@@ -102,14 +103,26 @@ struct ContentView: View {
                                         }
                                     }
                                 } label: {
-                                    Image(systemName: "playpause.fill")
-                                        .frame(width: 40, height: 40)
-                                        .background(!isTimerActive ? .green : .yellow)
-                                        .clipShape(Circle())
-                                        .scaleEffect(0.85)
+                                    if !differentiateWithoutColor {
+                                        Image(systemName: "playpause.fill")
+                                            .frame(width: 40, height: 40)
+                                            .background(!isTimerActive ? .green : .yellow)
+                                            .clipShape(Circle())
+                                            .scaleEffect(0.85)
+                                    } else {
+                                        Image(systemName: isTimerPaused || !isTimerActive ? "play.fill" : "pause.fill")
+                                            .frame(width: 40, height: 40)
+                                            .background(.black)
+                                            .foregroundStyle(.white)
+                                            .clipShape(Circle())
+                                            .scaleEffect(0.85)
+                                    }
+                                    
                                 }
                                 .buttonStyle(.plain)
                                 .padding(.trailing)
+                                .accessibilityInputLabels(["Start", "Pause", "Start Timer", "Pause Timer"])
+                                .accessibilityLabel("Start or Pause Timer")
                                 
                                 Button {
                                     isTimerActive = false
@@ -121,25 +134,46 @@ struct ContentView: View {
                                         updateEndAngle()
                                     }
                                 } label: {
-                                    Image(systemName: "arrow.counterclockwise")
-                                        .frame(width: 40, height: 40)
-                                        .background(Color.red)
-                                        .clipShape(Circle())
-                                        .scaleEffect(0.85)
+                                    if !differentiateWithoutColor {
+                                        Image(systemName: "arrow.counterclockwise")
+                                            .frame(width: 40, height: 40)
+                                            .background(Color.red)
+                                            .clipShape(Circle())
+                                            .scaleEffect(0.85)
+                                    } else {
+                                        Image(systemName: "arrow.counterclockwise")
+                                            .frame(width: 40, height: 40)
+                                            .background(.black)
+                                            .foregroundStyle(.white)
+                                            .clipShape(Circle())
+                                            .scaleEffect(0.85)
+                                    }
                                 }
                                 .buttonStyle(.plain)
                                 .padding(.trailing)
+                                .accessibilityInputLabels(["Reset", "Reset Timer"])
+                                .accessibilityLabel("Reset Timer")
                                 
                                 Button {
                                     isShowingSettings.toggle()
                                 } label: {
-                                    Image(systemName: "gear")
-                                        .frame(width: 40, height: 40)
-                                        .background(Color.blue)
-                                        .clipShape(Circle())
-                                        .scaleEffect(0.85)
+                                    if !differentiateWithoutColor {
+                                        Image(systemName: "gear")
+                                            .frame(width: 40, height: 40)
+                                            .background(Color.blue)
+                                            .clipShape(Circle())
+                                            .scaleEffect(0.85)
+                                    } else {
+                                        Image(systemName: "gear")
+                                            .frame(width: 40, height: 40)
+                                            .background(.black)
+                                            .foregroundStyle(.white)
+                                            .clipShape(Circle())
+                                            .scaleEffect(0.85)
+                                    }
                                 }
                                 .buttonStyle(.plain)
+                                .accessibilityInputLabels(["Settings"])
                             }
                             .containerRelativeFrame(.vertical) { length, _ in
                                 length * 0.35

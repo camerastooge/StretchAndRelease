@@ -144,7 +144,8 @@ struct ContentView: View {
                                         .foregroundStyle(.black)
                                 }
                             }
-
+                            .accessibilityInputLabels(["Reset", "Reset Timer"])
+                            .accessibilityLabel("Reset Timer")
                         }
                         .padding(.vertical)
                     }
