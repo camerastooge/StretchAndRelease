@@ -36,6 +36,7 @@ struct SettingsView: View {
                     .frame(height: 100)
                     .padding(.horizontal)
                 }
+                .accessibilityElement(children: .combine)
                 .accessibilityHint("Adjust how long you want to hold each stretch")
                 .accessibilityValue(String(timerSettings.totalStretch))
                 .accessibilityAdjustableAction { direction in

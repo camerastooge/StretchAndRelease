@@ -160,6 +160,7 @@ struct ContentView: View {
                         Image(systemName: "gear")
                     }
                     .accessibilityInputLabels(["Settings"])
+                    .accessibilityLabel("Show Settings")
                 }
             }
         }
@@ -176,8 +177,13 @@ struct ContentView: View {
             connectivity.didStatusChange = false
         }
         
-        //sends updated settings to Apple Watch app
+        //when settings change, updates main display and sends updated settings to Apple Watch app
         .onChange(of: didSettingsChange) {
+            stretchPhase = .stop
+            isTimerActive = false
+            isTimerPaused = false
+            endAngle = Angle(degrees: 340)
+            timeRemaining = timerSettings.totalStretch
             sendContext(stretch: timerSettings.totalStretch, rest: timerSettings.totalRest, reps: timerSettings.totalReps)
             didSettingsChange = false
         }
@@ -185,23 +191,6 @@ struct ContentView: View {
         //sets timeRemaining to totalStretch on appearance
         .onAppear {
             timeRemaining = timerSettings.totalStretch
-        }
-        
-        // this modifier activates when the values are changed in the settings
-        .onChange(of: [timerSettings.totalStretch, timerSettings.totalRest, timerSettings.totalReps]) {
-            withAnimation(.linear(duration: 0.5)) {
-                timeRemaining = timerSettings.totalStretch
-                isTimerPaused = false
-                isTimerActive = false
-                withAnimation(.linear(duration: 0.5)) {
-                    endAngle = Angle(degrees: 340)
-                }
-            }
-        }
-        
-        //reset button behavior
-        .onChange(of: isResetToggled) {
-
         }
         
         //this modifier runs when the timer publishes

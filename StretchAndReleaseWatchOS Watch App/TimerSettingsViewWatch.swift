@@ -38,6 +38,17 @@ struct TimerSettingsViewWatch: View {
                     .frame(width: 50, height: 30)
                     .frame(width: secondColumnWidth)
                 }
+                .accessibilityElement(children: .combine)
+                .accessibilityHint("Adjust how long you want to hold each stretch")
+                .accessibilityValue(String(timerSettings.totalStretch))
+                .accessibilityAdjustableAction { direction in
+                    switch direction {
+                    case .increment: timerSettings.totalStretch += 1
+                    case .decrement: timerSettings.totalStretch -= 1
+                    @unknown default:
+                        print("not handled")
+                    }
+                 }
                 .padding(.horizontal)
                 .padding(.top, 10)
                 
@@ -58,6 +69,16 @@ struct TimerSettingsViewWatch: View {
                     .frame(width: 50, height: 30)
                     .frame(width: secondColumnWidth)
                 }
+                .accessibilityElement(children: .combine)
+                .accessibilityHint("Adjust how long you want to rest between stretches")
+                .accessibilityValue(String(timerSettings.totalRest))
+                .accessibilityAdjustableAction { direction in
+                    switch direction {
+                    case .increment: timerSettings.totalRest += 1
+                    case .decrement: timerSettings.totalRest -= 1
+                    default: print("not handled")
+                    }
+                 }
                 .padding(.horizontal)
                 
                 HStack {
@@ -78,6 +99,16 @@ struct TimerSettingsViewWatch: View {
                     )
                     .frame(width: secondColumnWidth)
                 }
+                .accessibilityElement(children: .combine)
+                .accessibilityHint("Set the number of times you want to perform this stretch")
+                .accessibilityValue(String(timerSettings.totalReps))
+                .accessibilityAdjustableAction { direction in
+                    switch direction {
+                    case .increment: timerSettings.totalReps += 1
+                    case .decrement: timerSettings.totalReps -= 1
+                    default: print("not handled")
+                    }
+                 }
                 .padding(.horizontal)
                 
                 HStack(alignment: .center) {
@@ -94,6 +125,7 @@ struct TimerSettingsViewWatch: View {
                             .clipShape(Circle())
                             .frame(alignment: .bottom)
                     }
+                    .accessibilityHint("Save your settings and return to the main screen")
                     .buttonStyle(.plain)
                     
                     Spacer()

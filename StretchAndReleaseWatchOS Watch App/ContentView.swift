@@ -174,6 +174,7 @@ struct ContentView: View {
                                 }
                                 .buttonStyle(.plain)
                                 .accessibilityInputLabels(["Settings"])
+                                .accessibilityLabel("Show Settings")
                             }
                             .containerRelativeFrame(.vertical) { length, _ in
                                 length * 0.35
