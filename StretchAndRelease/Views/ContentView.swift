@@ -32,6 +32,9 @@ struct ContentView: View {
     @State private var isResetToggled = false
     @State private var didStretchStart = false
     
+    //Variables to control UI appearance
+    @ScaledMetric var buttonWidth = 100
+    
     // Connectivity class for communication with Apple Watch
     @State private var connectivity = Connectivity()
     
@@ -75,6 +78,8 @@ struct ContentView: View {
                     ZStack {
                         Color.gray.opacity(differentiateWithoutColor ? 0.0 : 0.25)
                         HStack {
+                            Spacer()
+                            
                             Button {
                                 withAnimation {
                                     if stretchPhase == .stop {
@@ -103,14 +108,14 @@ struct ContentView: View {
                             } label: {
                                 if !differentiateWithoutColor {
                                     Text(!isTimerActive ? "START" : "PAUSE")
-                                        .frame(width: 100, height: 50)
+                                        .frame(width: buttonWidth, height: 50)
                                         .foregroundStyle(.white)
                                         .background(!isTimerActive ? .green : .yellow)
                                         .clipShape(.capsule)
                                         .shadow(color: colorScheme == .light ? .black.opacity(0.25) : .white.opacity(0.5), radius: 0.8, x: 2, y: 2)
                                 } else {
                                     Text(!isTimerActive ? "START" : "PAUSE")
-                                        .frame(width: 100, height: 50)
+                                        .frame(width: buttonWidth, height: 50)
                                         .font(.title)
                                         .fontWeight(.bold)
                                         .foregroundStyle(.black)
@@ -118,6 +123,8 @@ struct ContentView: View {
                             }
                             .accessibilityInputLabels(["Start", "Pause", "Start Timer", "Pause Timer"])
                             .accessibilityLabel("Start or Pause Timer")
+                            
+                            Spacer()
                             
                             Button {
                                 isTimerActive = false
@@ -131,14 +138,14 @@ struct ContentView: View {
                             } label: {
                                 if !differentiateWithoutColor {
                                     Text("RESET")
-                                        .frame(width: 100, height: 50)
+                                        .frame(width: buttonWidth, height: 50)
                                         .foregroundStyle(.white)
                                         .background(.red)
                                         .clipShape(.capsule)
                                         .shadow(color: colorScheme == .light ? .black.opacity(0.25) : .white.opacity(0.5), radius: 0.8, x: 2, y: 2)
                                 } else {
                                     Text("RESET")
-                                        .frame(width: 100, height: 50)
+                                        .frame(width: buttonWidth, height: 50)
                                         .font(.title)
                                         .fontWeight(.bold)
                                         .foregroundStyle(.black)
@@ -146,8 +153,10 @@ struct ContentView: View {
                             }
                             .accessibilityInputLabels(["Reset", "Reset Timer"])
                             .accessibilityLabel("Reset Timer")
+                            
+                            Spacer()
                         }
-                        .padding(.vertical)
+                        .padding([.horizontal, .vertical])
                     }
                 }
             }
