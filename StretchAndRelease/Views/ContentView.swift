@@ -11,6 +11,7 @@ struct ContentView: View {
     //Environment properties
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.accessibilityDifferentiateWithoutColor) var differentiateWithoutColor
+    @Environment(\.sizeCategory) var sizeCategory
     
     // State properties for settings
     @StateObject var timerSettings = TimerSettings()
@@ -32,9 +33,6 @@ struct ContentView: View {
     @State private var isResetToggled = false
     @State private var didStretchStart = false
     
-    //Variables to control UI appearance
-    @ScaledMetric var buttonWidth = 100
-    
     // Connectivity class for communication with Apple Watch
     @State private var connectivity = Connectivity()
     
@@ -44,10 +42,11 @@ struct ContentView: View {
                 VStack(spacing: 0) {
                     ZStack {
                         Color.green.opacity(0)
+                        
                         Arc(endAngle: endAngle)
-                            .stroke(differentiateWithoutColor ? .black : stretchPhase.phaseColor, style: StrokeStyle(lineWidth: 25, lineCap: .round))
-                            .rotationEffect(Angle(degrees: 90))
-                            .padding(.bottom)
+                                .stroke(differentiateWithoutColor ? .black : stretchPhase.phaseColor, style: StrokeStyle(lineWidth: 25, lineCap: .round))
+                                .rotationEffect(Angle(degrees: 90))
+                                .padding(.bottom)
                         
                         VStack {
                             Text("\(String(format: "%02d", Int(timeRemaining)))")
@@ -57,7 +56,7 @@ struct ContentView: View {
                             Text(!isTimerPaused ? stretchPhase.phaseText : "PAUSED")
                                 .scaleEffect(0.75)
                                 .accessibilityLabel(!isTimerPaused ? stretchPhase.phaseText : "WORKOUT PAUSED")
-                            Text("Reps Completed: \(repsCompleted)/\(timerSettings.totalReps)")
+                            Text("Reps: \(repsCompleted)/\(timerSettings.totalReps)")
                                 .accessibilityLabel("Repetitions Completed \(repsCompleted) of \(timerSettings.totalReps)")
                         }
                         .font(.largeTitle)
@@ -107,18 +106,18 @@ struct ContentView: View {
                                 }
                             } label: {
                                 if !differentiateWithoutColor {
-                                    Text(!isTimerActive ? "START" : "PAUSE")
-                                        .frame(width: buttonWidth, height: 50)
+                                    Image(systemName: !isTimerActive ? "play.fill" : "pause.fill")
+                                        .frame(width: 85, height: 50)
                                         .foregroundStyle(.white)
                                         .background(!isTimerActive ? .green : .yellow)
                                         .clipShape(.capsule)
                                         .shadow(color: colorScheme == .light ? .black.opacity(0.25) : .white.opacity(0.5), radius: 0.8, x: 2, y: 2)
+                                        .dynamicTypeSize(...DynamicTypeSize.accessibility3)
                                 } else {
-                                    Text(!isTimerActive ? "START" : "PAUSE")
-                                        .frame(width: buttonWidth, height: 50)
-                                        .font(.title)
-                                        .fontWeight(.bold)
+                                    Image(systemName: !isTimerActive ? "play.fill" : "pause.fill")
+                                        .frame(width: 75, height: 50)
                                         .foregroundStyle(.black)
+                                        .dynamicTypeSize(...DynamicTypeSize.accessibility3)
                                 }
                             }
                             .accessibilityInputLabels(["Start", "Pause", "Start Timer", "Pause Timer"])
@@ -137,18 +136,20 @@ struct ContentView: View {
                                 }
                             } label: {
                                 if !differentiateWithoutColor {
-                                    Text("RESET")
-                                        .frame(width: buttonWidth, height: 50)
+                                    Image(systemName: "arrow.counterclockwise")
+                                        .frame(width: 75, height: 50)
+                                        .fontWeight(.bold)
                                         .foregroundStyle(.white)
                                         .background(.red)
                                         .clipShape(.capsule)
                                         .shadow(color: colorScheme == .light ? .black.opacity(0.25) : .white.opacity(0.5), radius: 0.8, x: 2, y: 2)
+                                        .dynamicTypeSize(...DynamicTypeSize.accessibility3)
                                 } else {
-                                    Text("RESET")
-                                        .frame(width: buttonWidth, height: 50)
-                                        .font(.title)
+                                    Image(systemName: "arrow.counterclockwise")
+                                        .frame(width: 75, height: 50)
                                         .fontWeight(.bold)
                                         .foregroundStyle(.black)
+                                        .dynamicTypeSize(...DynamicTypeSize.accessibility3)
                                 }
                             }
                             .accessibilityInputLabels(["Reset", "Reset Timer"])
