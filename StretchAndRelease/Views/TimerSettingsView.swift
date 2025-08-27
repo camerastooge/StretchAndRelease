@@ -11,21 +11,29 @@ struct SettingsView: View {
     // Environment variables
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.dismiss) var dismiss
+    @Environment(\.dynamicTypeSize) var dynamicTypeSize
     
     // Binding settings passed from Timer Main view
     @EnvironmentObject var timerSettings: TimerSettings
     @Binding var didSettingsChange: Bool
+    
+    //local variables
+    var dynamicLayout: AnyLayout {
+        dynamicTypeSize.isAccessibilitySize ? AnyLayout(VStackLayout()) : AnyLayout(HStackLayout())
+    }
+    
+    @ScaledMetric var buttonWidth = 100
 
     var body: some View {
         NavigationStack {
             List {
                 Section {
-                    HStack {
+                    dynamicLayout {
                         Text("Stretch")
                             .accessibilityLabel("Stretch Duration")
                         Picker("Stretch Duration", selection: $timerSettings.totalStretch) {
                             ForEach(1...30, id:\.self) {
-                                Text("\($0)")
+                                Text("\($0)").font(.caption2)
                             }
                         }
                         .pickerStyle(.wheel)
@@ -33,9 +41,10 @@ struct SettingsView: View {
                             .font(.caption)
                             .accessibilityLabel("seconds")
                     }
-                    .frame(height: 100)
-                    .padding(.horizontal)
+                    .font(.subheadline)
+                    .frame(height: buttonWidth)
                 }
+                .listRowInsets(EdgeInsets())
                 .accessibilityElement(children: .combine)
                 .accessibilityHint("Adjust how long you want to hold each stretch")
                 .accessibilityValue(String(timerSettings.totalStretch))
@@ -47,15 +56,15 @@ struct SettingsView: View {
                         print("not handled")
                     }
                  }
-
                 
                 Section {
-                    HStack {
+                    dynamicLayout {
                         Text("Rest")
                             .accessibilityLabel("Rest Duration")
                         Picker("Rest Duration", selection: $timerSettings.totalRest) {
                             ForEach(1...10, id:\.self) {
                                 Text("\($0)")
+                                    .font(.caption2)
                             }
                         }
                         .pickerStyle(.wheel)
@@ -63,7 +72,10 @@ struct SettingsView: View {
                             .font(.caption)
                             .accessibilityLabel("seconds")
                     }
+                    .font(.subheadline)
+                    .frame(height: buttonWidth)
                 }
+                .listRowInsets(EdgeInsets())
                 .accessibilityElement(children: .combine)
                 .accessibilityHint("Adjust how long you want to rest between stretches")
                 .accessibilityValue(String(timerSettings.totalRest))
@@ -71,19 +83,17 @@ struct SettingsView: View {
                     switch direction {
                     case .increment: timerSettings.totalRest += 1
                     case .decrement: timerSettings.totalRest -= 1
-                    default: print("not handled")
+                    @unknown default: print("not handled")
                     }
                  }
-                .frame(height: 100)
-                .padding(.horizontal)
                 
                 Section {
-                    HStack {
+                    dynamicLayout {
                         Text("Repetitions")
                             .accessibilityLabel("Number of Repetitiions")
                         Picker("Number of Repetitions to Complete", selection: $timerSettings.totalReps) {
-                            ForEach(1...10, id:\.self) {
-                                Text("\($0)")
+                            ForEach(1...20, id:\.self) {
+                                Text("\($0)").font(.caption2)
                             }
                         }
                         .pickerStyle(.wheel)
@@ -91,9 +101,10 @@ struct SettingsView: View {
                             .font(.caption)
                             .accessibilityLabel("repetitions")
                     }
+                    .font(.subheadline)
+                    .frame(height: buttonWidth)
                 }
-                .frame(height: 100)
-                .padding(.horizontal)
+                .listRowInsets(EdgeInsets())
                 .accessibilityElement(children: .combine)
                 .accessibilityHint("Set the number of times you want to perform this stretch")
                 .accessibilityValue(String(timerSettings.totalReps))
@@ -117,13 +128,14 @@ struct SettingsView: View {
             }
             .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.inline)
+            
             VStack {
                 Button {
                     didSettingsChange = true
                     dismiss()
                 } label: {
                     Text("SAVE")
-                        .frame(width: 100, height: 50)
+                        .frame(width: buttonWidth, height: 50)
                         .font(.headline)
                         .fontWeight(.bold)
                         .foregroundStyle(.white)
@@ -141,4 +153,5 @@ struct SettingsView: View {
 #Preview {
     @Previewable @State var didSettingsChange = false
     SettingsView(didSettingsChange: $didSettingsChange)
+        .environmentObject(TimerSettings())
 }

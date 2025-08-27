@@ -43,29 +43,36 @@ struct ContentView: View {
                     ZStack {
                         Color.green.opacity(0)
                         
-                        Arc(endAngle: endAngle)
+                        ZStack {
+                            Arc(endAngle: endAngle)
                                 .stroke(differentiateWithoutColor ? .black : stretchPhase.phaseColor, style: StrokeStyle(lineWidth: 25, lineCap: .round))
                                 .rotationEffect(Angle(degrees: 90))
                                 .padding(.bottom)
+                            
+                            VStack {
+                                Spacer()
+                                Text("\(String(format: "%02d", Int(timeRemaining)))")
+                                    .kerning(2)
+                                    .contentTransition(.numericText(countsDown: true))
+                                    .accessibilityLabel("\(timeRemaining) seconds remaining")
+                                Text(!isTimerPaused ? stretchPhase.phaseText : "PAUSED")
+                                    .scaleEffect(0.75)
+                                    .accessibilityLabel(!isTimerPaused ? stretchPhase.phaseText : "WORKOUT PAUSED")
+                                Text("Reps: \(repsCompleted)/\(timerSettings.totalReps)")
+                                    .accessibilityLabel("Repetitions Completed \(repsCompleted) of \(timerSettings.totalReps)")
+                                Spacer()
+                            }
+                            .font(.largeTitle)
+                            .foregroundStyle(!isTimerPaused ? differentiateWithoutColor ? .black : stretchPhase.phaseColor : .gray)
+                            .fontWeight(.bold)
+                            .sensoryFeedback(.impact(intensity: stretchPhase.phaseIntensity), trigger: endAngle)
+                            .padding(.bottom)
+                            .containerRelativeFrame(.vertical, alignment: .bottom) { length, _ in
+                                length / 1.15
+                            }
+                        }
                         
-                        VStack {
-                            Text("\(String(format: "%02d", Int(timeRemaining)))")
-                                .kerning(2)
-                                .contentTransition(.numericText(countsDown: true))
-                                .accessibilityLabel("\(timeRemaining) seconds remaining")
-                            Text(!isTimerPaused ? stretchPhase.phaseText : "PAUSED")
-                                .scaleEffect(0.75)
-                                .accessibilityLabel(!isTimerPaused ? stretchPhase.phaseText : "WORKOUT PAUSED")
-                            Text("Reps: \(repsCompleted)/\(timerSettings.totalReps)")
-                                .accessibilityLabel("Repetitions Completed \(repsCompleted) of \(timerSettings.totalReps)")
-                        }
-                        .font(.largeTitle)
-                        .foregroundStyle(!isTimerPaused ? differentiateWithoutColor ? .black : stretchPhase.phaseColor : .gray)
-                        .fontWeight(.bold)
-                        .sensoryFeedback(.impact(intensity: stretchPhase.phaseIntensity), trigger: endAngle)
-                        .containerRelativeFrame(.vertical, alignment: .bottom) { length, _ in
-                            length / 1.15
-                        }
+                        
                     }
                     .containerRelativeFrame(.horizontal, alignment: .center) { length, _ in
                         length * 0.9
