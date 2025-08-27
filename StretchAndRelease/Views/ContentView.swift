@@ -63,6 +63,7 @@ struct ContentView: View {
                                 Spacer()
                             }
                             .font(.largeTitle)
+                            .dynamicTypeSize(DynamicTypeSize.xxxLarge...)
                             .foregroundStyle(!isTimerPaused ? differentiateWithoutColor ? .black : stretchPhase.phaseColor : .gray)
                             .fontWeight(.bold)
                             .sensoryFeedback(.impact(intensity: stretchPhase.phaseIntensity), trigger: endAngle)
@@ -224,12 +225,14 @@ struct ContentView: View {
                     } else {
                         repsCompleted += 1
                         if repsCompleted < timerSettings.totalReps {
-                            stretchPhase = .rest
+                            withAnimation(.linear(duration: 1.0)){
+                                stretchPhase = .rest
+                            }
                             SoundManager.instance.playSound(sound: .rest)
                         } else {
-                            stretchPhase = .stop
                             timeRemaining = timerSettings.totalStretch
                             withAnimation(.linear(duration: 1.0)) {
+                                stretchPhase = .stop
                                 updateEndAngle()
                             }
                             SoundManager.instance.playSound(sound: .relax)
@@ -244,8 +247,10 @@ struct ContentView: View {
                             updateEndAngle()
                         }
                     } else {
-                        stretchPhase = .stretch
                         timeRemaining = timerSettings.totalStretch
+                        withAnimation(.linear(duration: 1.0)) {
+                            stretchPhase = .stretch
+                        }
                         SoundManager.instance.playSound(sound: .stretch)
                     }
                 }()
