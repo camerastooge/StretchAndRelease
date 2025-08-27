@@ -206,6 +206,11 @@ struct ContentView: View {
             didSettingsChange = false
         }
         
+        //when user changes totalStretch in SettingsView, force timeRemaining to reset to TotalStretch
+        .onChange(of: timerSettings.totalStretch) {
+            timeRemaining = timerSettings.totalStretch
+        }
+        
         //sets timeRemaining to totalStretch on appearance
         .onAppear {
             timeRemaining = timerSettings.totalStretch

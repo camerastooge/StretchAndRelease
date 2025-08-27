@@ -144,4 +144,5 @@ struct TimerSettingsViewWatch: View {
 #Preview {
     @Previewable @State var didSettingsChange: Bool = false
     TimerSettingsViewWatch(didSettingsChange: $didSettingsChange)
+        .environmentObject(TimerSettings())
 }
