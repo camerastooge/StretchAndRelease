@@ -40,6 +40,13 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		E4B0BEE02E75246000E86E13 /* Exceptions for "StretchAndRelease" folder in "StretchAndRelease" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = E41BF9572DFCDD5800E16C07 /* StretchAndRelease */;
+		};
 		E4F1C1AD2DFE0B3700114B7C /* Exceptions for "StretchAndRelease" folder in "StretchAndReleaseWatchOS Watch App" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -63,6 +70,7 @@
 		E41BF95A2DFCDD5800E16C07 /* StretchAndRelease */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
+				E4B0BEE02E75246000E86E13 /* Exceptions for "StretchAndRelease" folder in "StretchAndRelease" target */,
 				E4F1C1AD2DFE0B3700114B7C /* Exceptions for "StretchAndRelease" folder in "StretchAndReleaseWatchOS Watch App" target */,
 			);
 			path = StretchAndRelease;
@@ -372,6 +380,7 @@
 				DEVELOPMENT_TEAM = UZ93PUXX5H;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = StretchAndRelease/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Stretch & Release";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -407,6 +416,7 @@
 				DEVELOPMENT_TEAM = UZ93PUXX5H;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = StretchAndRelease/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Stretch & Release";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;

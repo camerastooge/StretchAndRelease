@@ -12,8 +12,13 @@ struct ContentView: View {
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.accessibilityDifferentiateWithoutColor) var differentiateWithoutColor
     
-    // State properties for settings
-    @StateObject var timerSettings = TimerSettings()
+    // Properties stored in UserDefaults
+    @AppStorage("stretch") private var totalStretch = 10
+    @AppStorage("rest") private var totalRest = 5
+    @AppStorage("reps") private var totalReps = 3
+    
+    @AppStorage("audio") private var audio = true
+    @AppStorage("haptics") private var haptics = true
     
     // state variables used across views
     @State private var timeRemaining: Int = 0
@@ -60,14 +65,14 @@ struct ContentView: View {
                                         Text(!isTimerPaused ? stretchPhase.phaseText : "PAUSED")
                                             .scaleEffect(0.75)
                                             .accessibilityLabel(!isTimerPaused ? stretchPhase.phaseText : "WORKOUT PAUSED")
-                                        Text("Reps: \(repsCompleted)/\(timerSettings.totalReps)")
-                                            .accessibilityLabel("Repetitions Completed \(repsCompleted) of \(timerSettings.totalReps)")
+                                        Text("Reps: \(repsCompleted)/\(totalReps)")
+                                            .accessibilityLabel("Repetitions Completed \(repsCompleted) of \(totalReps)")
                                     }
                                     .font(.caption)
                                     .fontWeight(.bold)
                                     .foregroundStyle(!isTimerPaused ? stretchPhase.phaseColor : .gray)
                                 }
-                                .sensoryFeedback(.impact(intensity: stretchPhase.phaseIntensity), trigger: endAngle)
+                                .sensoryFeedback(.impact(intensity: haptics ? stretchPhase.phaseIntensity : 0.0), trigger: endAngle)
                             }
                             .containerRelativeFrame(.horizontal, alignment: .center) { length, _ in
                                 length * 0.9
@@ -130,7 +135,7 @@ struct ContentView: View {
                                     isTimerPaused = false
                                     repsCompleted = 0
                                     stretchPhase = .stop
-                                    timeRemaining = timerSettings.totalStretch
+                                    timeRemaining = totalStretch
                                     withAnimation(.easeInOut(duration: 0.5)) {
                                         updateEndAngle()
                                     }
@@ -184,32 +189,31 @@ struct ContentView: View {
                     }
                 }
                 .sheet(isPresented: $isShowingSettings) {
-                    TimerSettingsViewWatch(didSettingsChange: $didSettingsChange)
-                        .environmentObject(timerSettings)
+                    TimerSettingsViewWatch(totalStretch: $totalStretch, totalRest: $totalRest, totalReps: $totalReps, didSettingsChange: $didSettingsChange, audio: $audio, haptics: $haptics)
                 }
                 
                 //receives changed settings from iOS app
                 .onChange(of: connectivity.didStatusChange) {
-                    timerSettings.totalStretch = connectivity.statusContext["stretch"] as? Int ?? 10
-                    timerSettings.totalRest = connectivity.statusContext["rest"] as? Int ?? 5
-                    timerSettings.totalReps = connectivity.statusContext["reps"] as? Int ?? 5
+                    totalStretch = connectivity.statusContext["stretch"] as? Int ?? 10
+                    totalRest = connectivity.statusContext["rest"] as? Int ?? 5
+                    totalReps = connectivity.statusContext["reps"] as? Int ?? 5
                     connectivity.didStatusChange = false
                 }
                 
                 //sends updated settings to iOS app
                 .onChange(of: didSettingsChange) {
-                    sendContext(stretch: timerSettings.totalStretch, rest: timerSettings.totalRest, reps: timerSettings.totalReps)
+                    sendContext(stretch: totalStretch, rest: totalRest, reps: totalReps)
                     didSettingsChange = false
                 }
                 
                 //when user changes totalStretch in SettingsView, force timeRemaining to reset to TotalStretch
-                .onChange(of: timerSettings.totalStretch) {
-                    timeRemaining = timerSettings.totalStretch
+                .onChange(of: totalStretch) {
+                    timeRemaining = totalStretch
                 }
                 
                 //sets timeRemaining to totalStretch on appearance
                 .onAppear {
-                    timeRemaining = timerSettings.totalStretch
+                    timeRemaining = totalStretch
                 }
                 
                 //this modifier runs when the timer publishes
@@ -225,12 +229,12 @@ struct ContentView: View {
                                 SoundManager.instance.playSound(sound: .tick)
                             } else {
                                 repsCompleted += 1
-                                if repsCompleted < timerSettings.totalReps {
+                                if repsCompleted < totalReps {
                                     stretchPhase = .rest
                                     SoundManager.instance.playSound(sound: .rest)
                                 } else {
                                     stretchPhase = .stop
-                                    timeRemaining = timerSettings.totalStretch
+                                    timeRemaining = totalStretch
                                     withAnimation(.linear(duration: 1.0)) {
                                         updateEndAngle()
                                     }
@@ -240,14 +244,14 @@ struct ContentView: View {
                         }()
                             
                         case .rest: return {
-                            if timeRemaining < timerSettings.totalRest {
+                            if timeRemaining < totalRest {
                                 timeRemaining += 1
                                 withAnimation(.linear(duration: 1.0)) {
                                     updateEndAngle()
                                 }
                             } else {
                                 stretchPhase = .stretch
-                                timeRemaining = timerSettings.totalStretch
+                                timeRemaining = totalStretch
                                 SoundManager.instance.playSound(sound: .stretch)
                             }
                         }()
@@ -267,9 +271,9 @@ struct ContentView: View {
     func updateEndAngle() {
         switch stretchPhase {
         case .stretch:
-            endAngle = Angle(degrees: Double(timeRemaining) / Double(timerSettings.totalStretch) * 320 + 20)
+            endAngle = Angle(degrees: Double(timeRemaining) / Double(totalStretch) * 320 + 20)
         case .rest:
-            endAngle = Angle(degrees: Double(timeRemaining) / Double(timerSettings.totalRest) * 320 + 20)
+            endAngle = Angle(degrees: Double(timeRemaining) / Double(totalRest) * 320 + 20)
         case .stop:
             endAngle = Angle(degrees: 340)
         }

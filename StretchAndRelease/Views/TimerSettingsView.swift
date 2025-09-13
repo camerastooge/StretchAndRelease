@@ -10,12 +10,18 @@ import SwiftUI
 struct SettingsView: View {
     // Environment variables
     @Environment(\.colorScheme) var colorScheme
+    @Environment(\.accessibilityDifferentiateWithoutColor) var differentiateWithoutColor
     @Environment(\.dismiss) var dismiss
     @Environment(\.dynamicTypeSize) var dynamicTypeSize
     
     // Binding settings passed from Timer Main view
-    @EnvironmentObject var timerSettings: TimerSettings
+    @Binding var totalStretch: Int
+    @Binding var totalRest: Int
+    @Binding var totalReps: Int
+    
     @Binding var didSettingsChange: Bool
+    @Binding var audio: Bool
+    @Binding var haptics: Bool
     
     //local variables
     var dynamicLayout: AnyLayout {
@@ -26,96 +32,131 @@ struct SettingsView: View {
 
     var body: some View {
         NavigationStack {
-            List {
-                Section {
-                    dynamicLayout {
-                        Text("Stretch")
-                            .accessibilityLabel("Stretch Duration")
-                        Picker("Stretch Duration", selection: $timerSettings.totalStretch) {
-                            ForEach(1...30, id:\.self) {
-                                Text("\($0)").font(.caption2)
+            Section {
+                Group {
+                    Section {
+                        dynamicLayout {
+                            Text("Stretch")
+                                .accessibilityLabel("Stretch Duration")
+                            Picker("Stretch Duration", selection: $totalStretch) {
+                                ForEach(1...30, id:\.self) {
+                                    Text("\($0)").font(.caption2)
+                                }
                             }
+                            .pickerStyle(.wheel)
+                            Text("sec.")
+                                .font(.caption)
+                                .accessibilityLabel("seconds")
                         }
-                        .pickerStyle(.wheel)
-                        Text("sec.")
-                            .font(.caption)
-                            .accessibilityLabel("seconds")
+                        .font(.subheadline)
+                        .frame(height: buttonWidth)
                     }
-                    .font(.subheadline)
-                    .frame(height: buttonWidth)
-                }
-                .listRowInsets(EdgeInsets())
-                .accessibilityElement(children: .combine)
-                .accessibilityHint("Adjust how long you want to hold each stretch")
-                .accessibilityValue(String(timerSettings.totalStretch))
-                .accessibilityAdjustableAction { direction in
-                    switch direction {
-                    case .increment: timerSettings.totalStretch += 1
-                    case .decrement: timerSettings.totalStretch -= 1
-                    @unknown default:
-                        print("not handled")
-                    }
-                 }
-                
-                Section {
-                    dynamicLayout {
-                        Text("Rest")
-                            .accessibilityLabel("Rest Duration")
-                        Picker("Rest Duration", selection: $timerSettings.totalRest) {
-                            ForEach(1...10, id:\.self) {
-                                Text("\($0)")
-                                    .font(.caption2)
+                    .listRowInsets(EdgeInsets())
+                    .accessibilityElement(children: .combine)
+                    .accessibilityHint("Adjust how long you want to hold each stretch")
+                    .accessibilityValue(String(totalStretch))
+                    .accessibilityAdjustableAction { direction in
+                        switch direction {
+                        case .increment: totalStretch += 1
+                        case .decrement: totalStretch -= 1
+                        @unknown default:
+                            print("not handled")
+                        }
+                     }
+                    
+                    Section {
+                        dynamicLayout {
+                            Text("Rest")
+                                .accessibilityLabel("Rest Duration")
+                            Picker("Rest Duration", selection: $totalRest) {
+                                ForEach(1...10, id:\.self) {
+                                    Text("\($0)")
+                                        .font(.caption2)
+                                }
                             }
+                            .pickerStyle(.wheel)
+                            Text("sec.")
+                                .font(.caption)
+                                .accessibilityLabel("seconds")
                         }
-                        .pickerStyle(.wheel)
-                        Text("sec.")
-                            .font(.caption)
-                            .accessibilityLabel("seconds")
+                        .font(.subheadline)
+                        .frame(height: buttonWidth)
                     }
-                    .font(.subheadline)
-                    .frame(height: buttonWidth)
-                }
-                .listRowInsets(EdgeInsets())
-                .accessibilityElement(children: .combine)
-                .accessibilityHint("Adjust how long you want to rest between stretches")
-                .accessibilityValue(String(timerSettings.totalRest))
-                .accessibilityAdjustableAction { direction in
-                    switch direction {
-                    case .increment: timerSettings.totalRest += 1
-                    case .decrement: timerSettings.totalRest -= 1
-                    @unknown default: print("not handled")
-                    }
-                 }
-                
-                Section {
-                    dynamicLayout {
-                        Text("Repetitions")
-                            .accessibilityLabel("Number of Repetitiions")
-                        Picker("Number of Repetitions to Complete", selection: $timerSettings.totalReps) {
-                            ForEach(1...20, id:\.self) {
-                                Text("\($0)").font(.caption2)
+                    .listRowInsets(EdgeInsets())
+                    .accessibilityElement(children: .combine)
+                    .accessibilityHint("Adjust how long you want to rest between stretches")
+                    .accessibilityValue(String(totalRest))
+                    .accessibilityAdjustableAction { direction in
+                        switch direction {
+                        case .increment: totalRest += 1
+                        case .decrement: totalRest -= 1
+                        @unknown default: print("not handled")
+                        }
+                     }
+                    
+                    Section {
+                        dynamicLayout {
+                            Text("Repetitions")
+                                .accessibilityLabel("Number of Repetitiions")
+                            Picker("Number of Repetitions to Complete", selection: $totalReps) {
+                                ForEach(1...20, id:\.self) {
+                                    Text("\($0)").font(.caption2)
+                                }
                             }
+                            .pickerStyle(.wheel)
+                            Text("reps")
+                                .font(.caption)
+                                .accessibilityLabel("repetitions")
                         }
-                        .pickerStyle(.wheel)
-                        Text("reps")
-                            .font(.caption)
-                            .accessibilityLabel("repetitions")
+                        .font(.subheadline)
+                        .frame(height: buttonWidth)
                     }
-                    .font(.subheadline)
-                    .frame(height: buttonWidth)
+                    .listRowInsets(EdgeInsets())
+                    .accessibilityElement(children: .combine)
+                    .accessibilityHint("Set the number of times you want to perform this stretch")
+                    .accessibilityValue(String(totalReps))
+                    .accessibilityAdjustableAction { direction in
+                        switch direction {
+                        case .increment: totalReps += 1
+                        case .decrement: totalReps -= 1
+                        default: print("not handled")
+                        }
+                     }
                 }
-                .listRowInsets(EdgeInsets())
-                .accessibilityElement(children: .combine)
-                .accessibilityHint("Set the number of times you want to perform this stretch")
-                .accessibilityValue(String(timerSettings.totalReps))
-                .accessibilityAdjustableAction { direction in
-                    switch direction {
-                    case .increment: timerSettings.totalReps += 1
-                    case .decrement: timerSettings.totalReps -= 1
-                    default: print("not handled")
-                    }
-                 }
+                .padding(.horizontal)
             }
+            
+            Section("Interface Settings") {
+                HStack {
+                    Toggle("Audio cues on or off", isOn: $audio)
+                        .accessibilityHint("Turn audio cues on or off")
+                }
+                HStack {
+                    Toggle("Haptic feedback on or off", isOn: $haptics)
+                        .accessibilityHint("Turn haptic feedback on or off")
+                }
+            }
+            .padding(.horizontal)
+            .padding(.vertical)
+
+            
+            Section {
+                Button {
+                    didSettingsChange = true
+                    dismiss()
+                } label: {
+                    Text("SAVE")
+                        .frame(width: buttonWidth, height: 50)
+                        .font(.headline)
+                        .fontWeight(.bold)
+                        .foregroundStyle(.white)
+                        .background(.green)
+                        .clipShape(.capsule)
+                        .padding(.bottom, 5)
+                }
+                .accessibilityHint("Save your settings and return to the main screen")
+            }
+            .frame(height: 50)
             .toolbar {
                 ToolbarItem {
                     Button {
@@ -128,30 +169,17 @@ struct SettingsView: View {
             }
             .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.inline)
-            
-            VStack {
-                Button {
-                    didSettingsChange = true
-                    dismiss()
-                } label: {
-                    Text("SAVE")
-                        .frame(width: buttonWidth, height: 50)
-                        .font(.headline)
-                        .fontWeight(.bold)
-                        .foregroundStyle(.white)
-                        .background(.green)
-                        .clipShape(.capsule)
-                        .shadow(color: colorScheme == .light ? .black.opacity(0.25) : .white.opacity(0.5), radius: 0.8, x: 2, y: 2)
-                        .padding(.bottom, 5)
-                }
-                .accessibilityHint("Save your settings and return to the main screen")
-            }
         }
     }
 }
 
 #Preview {
-    @Previewable @State var didSettingsChange = false
-    SettingsView(didSettingsChange: $didSettingsChange)
-        .environmentObject(TimerSettings())
+    @Previewable @State var didSettingsChange: Bool = false
+    @Previewable @State var totalStretch = 10
+    @Previewable @State var totalRest = 5
+    @Previewable @State var totalReps = 3
+    @Previewable @State var audio = true
+    @Previewable @State var haptics = true
+    
+    SettingsView(totalStretch: $totalStretch, totalRest: $totalRest, totalReps: $totalReps, didSettingsChange: $didSettingsChange, audio: $audio, haptics: $haptics)
 }
