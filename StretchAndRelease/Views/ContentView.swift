@@ -21,6 +21,8 @@ struct ContentView: View {
     @AppStorage("audio") private var audio = true
     @AppStorage("haptics") private var haptics = true
     
+    @AppStorage("firstLaunch") private var firstLaunch = true
+    
     // state variables used across views
     @State private var timeRemaining: Int = 0
     @State private var repsCompleted: Int = 0
@@ -33,6 +35,7 @@ struct ContentView: View {
     // state variables only used on main view
     @State private var isShowingSettings = false
     @State private var didSettingsChange = false
+    @State private var isShowingHelp = false
     
     //local variable
     @State private var isResetToggled = false
@@ -179,6 +182,14 @@ struct ContentView: View {
             .toolbar {
                 ToolbarItem {
                     Button {
+                        isShowingHelp.toggle()
+                    } label: {
+                        Image(systemName: "questionmark.circle.fill")
+                    }
+                }
+                
+                ToolbarItem {
+                    Button {
                         isShowingSettings.toggle()
                     } label: {
                         Image(systemName: "gear")
@@ -190,6 +201,9 @@ struct ContentView: View {
         }
         .sheet(isPresented: $isShowingSettings) {
             SettingsView(totalStretch: $totalStretch, totalRest: $totalRest, totalReps: $totalReps, didSettingsChange: $didSettingsChange, audio: $audio, haptics: $haptics)
+        }
+        .sheet(isPresented: $isShowingHelp) {
+            
         }
         
         //receives changed settings from Apple Watch app
