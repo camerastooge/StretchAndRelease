@@ -36,8 +36,6 @@ struct ContentView: View {
     @State private var isShowingSettings = false
     @State private var didSettingsChange = false
     @State private var isShowingHelp = false
-    
-    //local variable
     @State private var isResetToggled = false
     
     // Connectivity class for communication with Apple Watch
@@ -179,10 +177,22 @@ struct ContentView: View {
                 }
             }
             .navigationTitle("Stretch & Release")
+            .overlay {
+                if isShowingHelp {
+                    ZStack {
+                        Color.clear
+                            .opacity(0.5)
+                            .ignoresSafeArea(.all)
+                            .background(.ultraThinMaterial)
+                    }
+                }
+            }
             .toolbar {
                 ToolbarItem {
                     Button {
-                        isShowingHelp.toggle()
+                        withAnimation(.smooth(duration: 0.3)) {
+                            isShowingHelp.toggle()
+                        }
                     } label: {
                         Image(systemName: "questionmark.circle.fill")
                     }
@@ -202,9 +212,7 @@ struct ContentView: View {
         .sheet(isPresented: $isShowingSettings) {
             SettingsView(totalStretch: $totalStretch, totalRest: $totalRest, totalReps: $totalReps, didSettingsChange: $didSettingsChange, audio: $audio, haptics: $haptics)
         }
-        .sheet(isPresented: $isShowingHelp) {
-            
-        }
+        
         
         //receives changed settings from Apple Watch app
         .onChange(of: connectivity.didStatusChange) {
@@ -225,14 +233,11 @@ struct ContentView: View {
             didSettingsChange = false
         }
         
-        //when user changes totalStretch in SettingsView, force timeRemaining to reset to TotalStretch
-        .onChange(of: totalStretch) {
+        //when user changes totalStretch in SettingsView, or app launches and loads totalStretch from AppStorage, force timeRemaining to reset to TotalStretch
+        .onChange(of: totalStretch, initial: true) {
             timeRemaining = totalStretch
-        }
-        
-        //sets timeRemaining to totalStretch on appearance
-        .onAppear {
-            timeRemaining = totalStretch
+            if firstLaunch { isShowingHelp.toggle() }
+            firstLaunch = false
         }
         
         //this modifier runs when the timer publishes
