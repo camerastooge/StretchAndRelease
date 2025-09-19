@@ -96,7 +96,7 @@ struct ContentView: View {
                                 withAnimation {
                                     if stretchPhase == .stop {
                                         if audio {
-                                            SoundManager.instance.playSound(sound: .countdownExpanded)
+                                            SoundManager.instance.playPrompt(sound: .countdownExpanded)
                                         }
                                         DispatchQueue.main.asyncAfter(deadline: audio ? .now() + 3.0 : .now() + 0.5) {
                                             withAnimation(.linear(duration: 0.25)) {
@@ -111,7 +111,7 @@ struct ContentView: View {
                                         isTimerActive = false
                                     } else {
                                         if audio {
-                                            SoundManager.instance.playSound(sound: .countdownExpanded)
+                                            SoundManager.instance.playPrompt(sound: .countdownExpanded)
                                         }
                                         DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
                                             withAnimation(.linear(duration: 0.25)) {
@@ -177,16 +177,6 @@ struct ContentView: View {
                 }
             }
             .navigationTitle("Stretch & Release")
-            .overlay {
-                if isShowingHelp {
-                    ZStack {
-                        Color.clear
-                            .opacity(0.5)
-                            .ignoresSafeArea(.all)
-                            .background(.ultraThinMaterial)
-                    }
-                }
-            }
             .toolbar {
                 ToolbarItem {
                     Button {
@@ -240,6 +230,11 @@ struct ContentView: View {
             firstLaunch = false
         }
         
+        //prep tick audio player when app launches
+        .onAppear {
+            SoundManager.instance.prepareTick(sound: .tick)
+        }
+        
         //this modifier runs when the timer publishes
         .onReceive(timer) { _ in
             if isTimerActive && !isTimerPaused {
@@ -251,7 +246,7 @@ struct ContentView: View {
                             updateEndAngle()
                         }
                         if audio {
-                            SoundManager.instance.playSound(sound: .tick)
+                            SoundManager.instance.playTick(sound: .tick)
                         }
                     } else {
                         repsCompleted += 1
@@ -260,7 +255,7 @@ struct ContentView: View {
                                 stretchPhase = .rest
                             }
                             if audio {
-                                SoundManager.instance.playSound(sound: .rest)
+                                SoundManager.instance.playPrompt(sound: .rest)
                             }
                         } else {
                             timeRemaining = totalStretch
@@ -269,7 +264,7 @@ struct ContentView: View {
                                 updateEndAngle()
                             }
                             if audio {
-                                SoundManager.instance.playSound(sound: .relax)
+                                SoundManager.instance.playPrompt(sound: .relax)
                             }
                         }
                     }
@@ -287,7 +282,7 @@ struct ContentView: View {
                             stretchPhase = .stretch
                         }
                         if audio {
-                            SoundManager.instance.playSound(sound: .stretch)
+                            SoundManager.instance.playPrompt(sound: .stretch)
                         }
                     }
                 }()

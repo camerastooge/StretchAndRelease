@@ -86,7 +86,7 @@ struct ContentView: View {
                                 Button {
                                     withAnimation {
                                         if stretchPhase == .stop {
-                                            SoundManager.instance.playSound(sound: .countdownExpanded)
+                                            SoundManager.instance.playPrompt(sound: .countdownExpanded)
                                             DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
                                                 withAnimation(.linear(duration: 0.25)) {
                                                     isTimerActive = true
@@ -99,7 +99,7 @@ struct ContentView: View {
                                             isTimerPaused = true
                                             isTimerActive = false
                                         } else {
-                                            SoundManager.instance.playSound(sound: .countdownExpanded)
+                                            SoundManager.instance.playPrompt(sound: .countdownExpanded)
                                             DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
                                                 withAnimation(.linear(duration: 0.25)) {
                                                     isTimerPaused = false
@@ -226,19 +226,19 @@ struct ContentView: View {
                                 withAnimation(.linear(duration: 1.0)) {
                                     updateEndAngle()
                                 }
-                                SoundManager.instance.playSound(sound: .tick)
+                                SoundManager.instance.playTick(sound: .tick)
                             } else {
                                 repsCompleted += 1
                                 if repsCompleted < totalReps {
                                     stretchPhase = .rest
-                                    SoundManager.instance.playSound(sound: .rest)
+                                    SoundManager.instance.playPrompt(sound: .rest)
                                 } else {
                                     stretchPhase = .stop
                                     timeRemaining = totalStretch
                                     withAnimation(.linear(duration: 1.0)) {
                                         updateEndAngle()
                                     }
-                                    SoundManager.instance.playSound(sound: .relax)
+                                    SoundManager.instance.playPrompt(sound: .relax)
                                 }
                             }
                         }()
@@ -252,7 +252,7 @@ struct ContentView: View {
                             } else {
                                 stretchPhase = .stretch
                                 timeRemaining = totalStretch
-                                SoundManager.instance.playSound(sound: .stretch)
+                                SoundManager.instance.playPrompt(sound: .stretch)
                             }
                         }()
                             
