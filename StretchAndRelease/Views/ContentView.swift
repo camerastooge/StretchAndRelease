@@ -40,14 +40,17 @@ struct ContentView: View {
     
     // Connectivity class for communication with Apple Watch
     @State private var connectivity = Connectivity()
-    
+
+
     var body: some View {
         NavigationStack {
             GeometryReader { proxy in
+                Color.clear
+                    .background(
+                        LinearGradient(gradient: Gradient(colors: colorScheme == .dark ? [.black, .gray] : [.gray, .white]), startPoint: .topLeading, endPoint: .bottomTrailing)
+                    )
                 VStack(spacing: 0) {
                     ZStack {
-                        Color.green.opacity(0)
-                        
                         ZStack {
                             Arc(endAngle: endAngle)
                                 .stroke(differentiateWithoutColor ? .black : stretchPhase.phaseColor, style: StrokeStyle(lineWidth: 25, lineCap: .round))
@@ -190,7 +193,8 @@ struct ContentView: View {
                                 .glassEffect()
                         } else {
                             Image(systemName: "questionmark.circle.fill")
-                        }                    }
+                        }
+                    }
                 }
                 
                 if #available(iOS 26.0, *) {

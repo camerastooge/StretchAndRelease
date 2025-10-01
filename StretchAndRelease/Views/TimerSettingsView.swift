@@ -141,8 +141,14 @@ struct SettingsView: View {
                             Button {
                                 dismiss()
                             } label: {
-                                Image(systemName: "x.circle.fill")
+                                if #available(iOS 26.0, *) {
+                                    Image(systemName: "x.circle.fill")
+                                        .glassEffect()
+                                } else {
+                                    Image(systemName: "x.circle.fill")
+                                }
                             }
+                            .tint(.red)
                             .accessibilityLabel("Return to main screen")
                         }
                     }
