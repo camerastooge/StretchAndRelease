@@ -163,20 +163,12 @@ struct ContentView: View {
                                 Button {
                                     isShowingSettings.toggle()
                                 } label: {
-                                    if !differentiateWithoutColor {
-                                        Image(systemName: "gear")
-                                            .frame(width: 40, height: 40)
-                                            .background(Color.blue)
-                                            .clipShape(Circle())
-                                            .scaleEffect(0.85)
-                                    } else {
-                                        Image(systemName: "gear")
-                                            .frame(width: 40, height: 40)
-                                            .background(.black)
-                                            .foregroundStyle(.white)
-                                            .clipShape(Circle())
-                                            .scaleEffect(0.85)
-                                    }
+                                    Image(systemName: "gear")
+                                        .frame(width: 40, height: 40)
+                                        .background(.blue)
+                                        .foregroundStyle(.white)
+                                        .clipShape(Circle())
+                                        .scaleEffect(0.85)
                                 }
                                 .buttonStyle(.plain)
                                 .accessibilityInputLabels(["Settings"])
