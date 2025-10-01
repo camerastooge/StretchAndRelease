@@ -184,20 +184,36 @@ struct ContentView: View {
                             isShowingHelp.toggle()
                         }
                     } label: {
-                        Image(systemName: "questionmark.circle.fill")
-                    }
+                        if #available(iOS 26.0, *) {
+                            Image(systemName: "questionmark.circle.fill")
+                                .foregroundStyle(.blue)
+                                .glassEffect()
+                        } else {
+                            Image(systemName: "questionmark.circle.fill")
+                        }                    }
+                }
+                
+                if #available(iOS 26.0, *) {
+                    ToolbarSpacer()
                 }
                 
                 ToolbarItem {
                     Button {
                         isShowingSettings.toggle()
                     } label: {
-                        Image(systemName: "gear")
+                        if #available(iOS 26.0, *) {
+                            Image(systemName: "gear")
+                                .foregroundStyle(.blue)
+                                .glassEffect()
+                        } else {
+                            Image(systemName: "gear")
+                        }
                     }
                     .accessibilityInputLabels(["Settings"])
                     .accessibilityLabel("Show Settings")
                 }
             }
+
         }
         .sheet(isPresented: $isShowingSettings) {
             SettingsView(totalStretch: $totalStretch, totalRest: $totalRest, totalReps: $totalReps, didSettingsChange: $didSettingsChange, audio: $audio, haptics: $haptics)
@@ -319,3 +335,4 @@ struct ContentView: View {
     #Preview {
         ContentView()
     }
+
