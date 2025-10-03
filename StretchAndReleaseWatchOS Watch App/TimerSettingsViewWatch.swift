@@ -20,6 +20,11 @@ struct TimerSettingsViewWatch: View {
     @Binding var audio: Bool
     @Binding var haptics: Bool
     
+    // Local variables
+    @State private var stretch = 0
+    @State private var rest = 0
+    @State private var reps = 0
+    
     var body: some View {
         GeometryReader { proxy in
             let firstColumnWidth = proxy.size.width * (2/5)
@@ -33,7 +38,7 @@ struct TimerSettingsViewWatch: View {
                     
                     Spacer()
                     
-                    Picker("Stretch Duration", selection: $totalStretch) {
+                    Picker("Stretch Duration", selection: $stretch) {
                         ForEach(1...30, id:\.self) {
                             Text("\($0)")
                         }
@@ -45,11 +50,11 @@ struct TimerSettingsViewWatch: View {
                 }
                 .accessibilityElement(children: .combine)
                 .accessibilityHint("Adjust how long you want to hold each stretch")
-                .accessibilityValue(String(totalStretch))
+                .accessibilityValue(String(stretch))
                 .accessibilityAdjustableAction { direction in
                     switch direction {
-                    case .increment: totalStretch += 1
-                    case .decrement: totalStretch -= 1
+                    case .increment: stretch += 1
+                    case .decrement: stretch -= 1
                     @unknown default:
                         print("not handled")
                     }
@@ -64,7 +69,7 @@ struct TimerSettingsViewWatch: View {
                     
                     Spacer()
                     
-                    Picker("Rest Duration", selection: $totalRest) {
+                    Picker("Rest Duration", selection: $rest) {
                         ForEach(1...30, id:\.self) {
                             Text("\($0)")
                         }
@@ -76,11 +81,11 @@ struct TimerSettingsViewWatch: View {
                 }
                 .accessibilityElement(children: .combine)
                 .accessibilityHint("Adjust how long you want to rest between stretches")
-                .accessibilityValue(String(totalRest))
+                .accessibilityValue(String(rest))
                 .accessibilityAdjustableAction { direction in
                     switch direction {
-                    case .increment: totalRest += 1
-                    case .decrement: totalRest -= 1
+                    case .increment: rest += 1
+                    case .decrement: rest -= 1
                     default: print("not handled")
                     }
                  }
@@ -93,7 +98,7 @@ struct TimerSettingsViewWatch: View {
                     
                     Spacer()
                     
-                    Picker("Number of Repetitions", selection: $totalReps) {
+                    Picker("Number of Repetitions", selection: $reps) {
                         ForEach(1...30, id:\.self) {
                             Text("\($0)")
                         }
@@ -105,21 +110,21 @@ struct TimerSettingsViewWatch: View {
                 }
                 .accessibilityElement(children: .combine)
                 .accessibilityHint("Set the number of times you want to perform this stretch")
-                .accessibilityValue(String(totalReps))
+                .accessibilityValue(String(reps))
                 .accessibilityAdjustableAction { direction in
                     switch direction {
-                    case .increment: totalReps += 1
-                    case .decrement: totalReps -= 1
+                    case .increment: reps += 1
+                    case .decrement: reps -= 1
                     default: print("not handled")
                     }
                  }
                 .padding(.horizontal)
                 
                 Group {
-                    Toggle("Audio", isOn: $audio)
+                    Toggle("Audio: \(audio ? "on" : "off")", isOn: $audio)
                         .font(.caption2)
                         .accessibilityHint("Turn audio cues on or off")
-                    Toggle("Haptics", isOn: $haptics)
+                    Toggle("Haptics: \(haptics ? "on" : "off")", isOn: $haptics)
                         .font(.caption2)
                         .accessibilityHint("Turn haptic feedback on or off")
                 }
@@ -130,6 +135,9 @@ struct TimerSettingsViewWatch: View {
                     Spacer()
                     
                     Button {
+                        totalStretch = stretch
+                        totalRest = rest
+                        totalReps = reps
                         didSettingsChange = true
                         dismiss()
                     } label: {
@@ -148,6 +156,11 @@ struct TimerSettingsViewWatch: View {
             }
             .frame(width: proxy.size.width, height: proxy.size.height)
             .padding(.horizontal)
+            .onAppear {
+                stretch = totalStretch
+                rest = totalRest
+                reps = totalReps
+            }
         }
 
     }

@@ -24,6 +24,10 @@ struct SettingsView: View {
     @Binding var haptics: Bool
     
     //local variables
+    @State private var stretch = 0
+    @State private var rest = 0
+    @State private var reps = 0
+    
     var dynamicLayout: AnyLayout {
         dynamicTypeSize.isAccessibilitySize ? AnyLayout(VStackLayout()) : AnyLayout(HStackLayout())
     }
@@ -36,7 +40,7 @@ struct SettingsView: View {
                     Group {
                         Section("Stretch Time") {
                             dynamicLayout {
-                                Picker("Stretch Duration", selection: $totalStretch) {
+                                Picker("Stretch Duration", selection: $stretch) {
                                     ForEach(1...30, id:\.self) {
                                         Text("\($0)").font(.title2)
                                     }
@@ -52,11 +56,11 @@ struct SettingsView: View {
                         .padding(.vertical, 10)
                         .accessibilityElement(children: .combine)
                         .accessibilityHint("Adjust how long you want to hold each stretch")
-                        .accessibilityValue(String(totalStretch))
+                        .accessibilityValue(String(stretch))
                         .accessibilityAdjustableAction { direction in
                             switch direction {
-                            case .increment: totalStretch += 1
-                            case .decrement: totalStretch -= 1
+                            case .increment: stretch += 1
+                            case .decrement: stretch -= 1
                             @unknown default:
                                 print("not handled")
                             }
@@ -68,7 +72,7 @@ struct SettingsView: View {
                         
                         Section("Rest Time") {
                             dynamicLayout {
-                                Picker("Rest Duration", selection: $totalRest) {
+                                Picker("Rest Duration", selection: $rest) {
                                     ForEach(1...10, id:\.self) {
                                         Text("\($0)")
                                             .font(.title2)
@@ -85,11 +89,11 @@ struct SettingsView: View {
                         .padding(.vertical, 10)
                         .accessibilityElement(children: .combine)
                         .accessibilityHint("Adjust how long you want to rest between stretches")
-                        .accessibilityValue(String(totalRest))
+                        .accessibilityValue(String(rest))
                         .accessibilityAdjustableAction { direction in
                             switch direction {
-                            case .increment: totalRest += 1
-                            case .decrement: totalRest -= 1
+                            case .increment: rest += 1
+                            case .decrement: rest -= 1
                             @unknown default: print("not handled")
                             }
                          }
@@ -100,7 +104,7 @@ struct SettingsView: View {
                         
                         Section("Repetitions") {
                             dynamicLayout {
-                                Picker("Number of Repetitions to Complete", selection: $totalReps) {
+                                Picker("Number of Repetitions to Complete", selection: $reps) {
                                     ForEach(1...20, id:\.self) {
                                         Text("\($0)").font(.title2)
                                     }
@@ -116,11 +120,11 @@ struct SettingsView: View {
                         .padding(.vertical, 5)
                         .accessibilityElement(children: .combine)
                         .accessibilityHint("Set the number of times you want to perform this stretch")
-                        .accessibilityValue(String(totalReps))
+                        .accessibilityValue(String(reps))
                         .accessibilityAdjustableAction { direction in
                             switch direction {
-                            case .increment: totalReps += 1
-                            case .decrement: totalReps -= 1
+                            case .increment: reps += 1
+                            case .decrement: reps -= 1
                             default: print("not handled")
                             }
                          }
@@ -156,11 +160,11 @@ struct SettingsView: View {
                 Group {
                     Section("Interface Settings") {
                         HStack {
-                            Toggle("Audio cues on or off", isOn: $audio)
+                            Toggle("Audio cues: \(audio ? "on" : "off")", isOn: $audio)
                                 .accessibilityHint("Turn audio cues on or off")
                         }
                         HStack {
-                            Toggle("Haptic feedback on or off", isOn: $haptics)
+                            Toggle("Haptic feedback: \(haptics ? "on" : "off")", isOn: $haptics)
                                 .accessibilityHint("Turn haptic feedback on or off")
                         }
                     }
@@ -169,6 +173,9 @@ struct SettingsView: View {
                     
                     Section {
                         Button {
+                            totalStretch = stretch
+                            totalRest = rest
+                            totalReps = reps
                             didSettingsChange = true
                             dismiss()
                         } label: {
@@ -186,6 +193,11 @@ struct SettingsView: View {
                 }
                 .navigationTitle("Settings")
                 .navigationBarTitleDisplayMode(.inline)
+                .onAppear {
+                    stretch = totalStretch
+                    rest = totalRest
+                    reps = totalReps
+                }
             }
     }
 }

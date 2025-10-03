@@ -61,6 +61,7 @@
 				"Models and Settings/StretchPhase.swift",
 				"Models and Settings/TimerSettings.swift",
 				Views/Arc.swift,
+				Views/SplashView.swift,
 			);
 			target = E4F1C1972DFE0AAB00114B7C /* StretchAndReleaseWatchOS Watch App */;
 		};
@@ -176,7 +177,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1640;
-				LastUpgradeCheck = 1640;
+				LastUpgradeCheck = 2600;
 				TargetAttributes = {
 					E41BF9572DFCDD5800E16C07 = {
 						CreatedOnToolsVersion = 16.4;
@@ -308,6 +309,7 @@
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
@@ -365,6 +367,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				VALIDATE_PRODUCT = YES;
 			};
