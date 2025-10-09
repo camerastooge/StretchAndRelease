@@ -61,7 +61,6 @@
 				"Models and Settings/StretchPhase.swift",
 				"Models and Settings/TimerSettings.swift",
 				Views/Arc.swift,
-				Views/SplashView.swift,
 			);
 			target = E4F1C1972DFE0AAB00114B7C /* StretchAndReleaseWatchOS Watch App */;
 		};
