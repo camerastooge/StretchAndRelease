@@ -25,6 +25,10 @@ struct TimerSettingsViewWatch: View {
     @State private var rest = 0
     @State private var reps = 0
     
+    // variable for button view
+    var buttonRoles: ButtonRoles = .settings
+    var deviceType: DeviceType = .watch
+    
     var body: some View {
         GeometryReader { proxy in
             let firstColumnWidth = proxy.size.width * (2/5)
@@ -141,12 +145,7 @@ struct TimerSettingsViewWatch: View {
                         didSettingsChange = true
                         dismiss()
                     } label: {
-                        Image(systemName: "square.and.arrow.up.circle")
-                            .font(.title)
-                            .frame(width: 30, height: 30)
-                            .background(Color.green)
-                            .clipShape(Circle())
-                            .frame(alignment: .bottom)
+                        ButtonView(buttonRoles: buttonRoles, deviceType: deviceType)
                     }
                     .accessibilityHint("Save your settings and return to the main screen")
                     .buttonStyle(.plain)

@@ -56,11 +56,12 @@
 				Assets/SFX/and_rest.mp3,
 				Assets/SFX/and_stretch.mp3,
 				Assets/SFX/tick.mp3,
+				"Models and Settings/ButtonSettings.swift",
 				"Models and Settings/Connectivity.swift",
 				"Models and Settings/SoundManager.swift",
 				"Models and Settings/StretchPhase.swift",
-				"Models and Settings/TimerSettings.swift",
 				Views/Arc.swift,
+				Views/ButtonView.swift,
 			);
 			target = E4F1C1972DFE0AAB00114B7C /* StretchAndReleaseWatchOS Watch App */;
 		};

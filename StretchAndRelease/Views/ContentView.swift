@@ -40,7 +40,10 @@ struct ContentView: View {
     
     // Connectivity class for communication with Apple Watch
     @State private var connectivity = Connectivity()
-
+    
+    // variables for button view
+    var buttonRoles: ButtonRoles = .play
+    var deviceType: DeviceType = .phone
 
     var body: some View {
         NavigationStack {
@@ -51,37 +54,7 @@ struct ContentView: View {
                     )
                 VStack(spacing: 0) {
                     ZStack {
-                        ZStack {
-                            Arc(endAngle: endAngle)
-                                .stroke(differentiateWithoutColor ? .black : stretchPhase.phaseColor, style: StrokeStyle(lineWidth: 25, lineCap: .round))
-                                .rotationEffect(Angle(degrees: 90))
-                                .padding(.bottom)
-                            
-                            VStack {
-                                Spacer()
-                                Text("\(String(format: "%02d", Int(timeRemaining)))")
-                                    .kerning(2)
-                                    .contentTransition(.numericText(countsDown: true))
-                                    .accessibilityLabel("\(timeRemaining) seconds remaining")
-                                Text(!isTimerPaused ? stretchPhase.phaseText : "PAUSED")
-                                    .scaleEffect(0.75)
-                                    .accessibilityLabel(!isTimerPaused ? stretchPhase.phaseText : "WORKOUT PAUSED")
-                                Text("Reps: \(repsCompleted)/\(totalReps)")
-                                    .accessibilityLabel("Repetitions Completed \(repsCompleted) of \(totalReps)")
-                                Spacer()
-                            }
-                            .font(.largeTitle)
-                            .dynamicTypeSize(DynamicTypeSize.xxxLarge...)
-                            .foregroundStyle(!isTimerPaused ? differentiateWithoutColor ? .black : stretchPhase.phaseColor : .gray)
-                            .fontWeight(.bold)
-                            .sensoryFeedback(.impact(intensity: haptics ? stretchPhase.phaseIntensity : 0.0), trigger: endAngle)
-                            .padding(.bottom)
-                            .containerRelativeFrame(.vertical, alignment: .bottom) { length, _ in
-                                length / 1.15
-                            }
-                        }
-                        
-                        
+                        MainArcView(stretchPhase: $stretchPhase, haptics: $haptics, isTimerActive: $isTimerActive, isTimerPaused: $isTimerPaused, endAngle: $endAngle, timeRemaining: $timeRemaining, totalReps: $totalReps, repsCompleted: $repsCompleted)
                     }
                     .containerRelativeFrame(.horizontal, alignment: .center) { length, _ in
                         length * 0.9
@@ -125,19 +98,7 @@ struct ContentView: View {
                                     }
                                 }
                             } label: {
-                                if !differentiateWithoutColor {
-                                    Image(systemName: !isTimerActive ? "play.fill" : "pause.fill")
-                                        .frame(width: 85, height: 50)
-                                        .foregroundStyle(.white)
-                                        .background(!isTimerActive ? .green : .yellow)
-                                        .clipShape(.capsule)
-                                        .dynamicTypeSize(...DynamicTypeSize.accessibility3)
-                                } else {
-                                    Image(systemName: !isTimerActive ? "play.fill" : "pause.fill")
-                                        .frame(width: 75, height: 50)
-                                        .foregroundStyle(.black)
-                                        .dynamicTypeSize(...DynamicTypeSize.accessibility3)
-                                }
+                                ButtonView(buttonRoles: !isTimerActive ? .play : .pause, deviceType: deviceType)
                             }
                             .accessibilityInputLabels(["Start", "Pause", "Start Timer", "Pause Timer"])
                             .accessibilityLabel("Start or Pause Timer")
@@ -154,21 +115,7 @@ struct ContentView: View {
                                     updateEndAngle()
                                 }
                             } label: {
-                                if !differentiateWithoutColor {
-                                    Image(systemName: "arrow.counterclockwise")
-                                        .frame(width: 75, height: 50)
-                                        .fontWeight(.bold)
-                                        .foregroundStyle(.white)
-                                        .background(.red)
-                                        .clipShape(.capsule)
-                                        .dynamicTypeSize(...DynamicTypeSize.accessibility3)
-                                } else {
-                                    Image(systemName: "arrow.counterclockwise")
-                                        .frame(width: 75, height: 50)
-                                        .fontWeight(.bold)
-                                        .foregroundStyle(.black)
-                                        .dynamicTypeSize(...DynamicTypeSize.accessibility3)
-                                }
+                                ButtonView(buttonRoles: .reset, deviceType: .phone)
                             }
                             .accessibilityInputLabels(["Reset", "Reset Timer"])
                             .accessibilityLabel("Reset Timer")
@@ -335,8 +282,7 @@ struct ContentView: View {
 }
         
 
-    
-    #Preview {
-        ContentView()
-    }
 
+#Preview {
+    ContentView()
+}

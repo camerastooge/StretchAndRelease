@@ -36,6 +36,10 @@ struct ContentView: View {
     //Connectivity class for communication with phone
     @State private var connectivity = Connectivity()
     
+    // variables for button view
+    var buttonRoles: ButtonRoles = .play
+    var deviceType: DeviceType = .watch
+    
     
     var body: some View {
         NavigationStack {
@@ -86,7 +90,9 @@ struct ContentView: View {
                                 Button {
                                     withAnimation {
                                         if stretchPhase == .stop {
-                                            SoundManager.instance.playPrompt(sound: .countdownExpanded)
+                                            if audio {
+                                                SoundManager.instance.playPrompt(sound: .countdownExpanded)
+                                            }
                                             DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
                                                 withAnimation(.linear(duration: 0.25)) {
                                                     isTimerActive = true
@@ -99,7 +105,9 @@ struct ContentView: View {
                                             isTimerPaused = true
                                             isTimerActive = false
                                         } else {
-                                            SoundManager.instance.playPrompt(sound: .countdownExpanded)
+                                            if audio {
+                                                SoundManager.instance.playPrompt(sound: .countdownExpanded)
+                                            }
                                             DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
                                                 withAnimation(.linear(duration: 0.25)) {
                                                     isTimerPaused = false
@@ -109,20 +117,7 @@ struct ContentView: View {
                                         }
                                     }
                                 } label: {
-                                    if !differentiateWithoutColor {
-                                        Image(systemName: "playpause.fill")
-                                            .frame(width: 40, height: 40)
-                                            .background(!isTimerActive ? .green : .yellow)
-                                            .clipShape(Circle())
-                                            .scaleEffect(0.85)
-                                    } else {
-                                        Image(systemName: isTimerPaused || !isTimerActive ? "play.fill" : "pause.fill")
-                                            .frame(width: 40, height: 40)
-                                            .background(.black)
-                                            .foregroundStyle(.white)
-                                            .clipShape(Circle())
-                                            .scaleEffect(0.85)
-                                    }
+                                    ButtonView(buttonRoles: !isTimerActive ? .play : .pause, deviceType: deviceType)
                                     
                                 }
                                 .buttonStyle(.plain)
@@ -140,20 +135,7 @@ struct ContentView: View {
                                         updateEndAngle()
                                     }
                                 } label: {
-                                    if !differentiateWithoutColor {
-                                        Image(systemName: "arrow.counterclockwise")
-                                            .frame(width: 40, height: 40)
-                                            .background(Color.red)
-                                            .clipShape(Circle())
-                                            .scaleEffect(0.85)
-                                    } else {
-                                        Image(systemName: "arrow.counterclockwise")
-                                            .frame(width: 40, height: 40)
-                                            .background(.black)
-                                            .foregroundStyle(.white)
-                                            .clipShape(Circle())
-                                            .scaleEffect(0.85)
-                                    }
+                                    ButtonView(buttonRoles: .reset, deviceType: deviceType)
                                 }
                                 .buttonStyle(.plain)
                                 .padding(.trailing)
@@ -163,12 +145,7 @@ struct ContentView: View {
                                 Button {
                                     isShowingSettings.toggle()
                                 } label: {
-                                    Image(systemName: "gear")
-                                        .frame(width: 40, height: 40)
-                                        .background(.blue)
-                                        .foregroundStyle(.white)
-                                        .clipShape(Circle())
-                                        .scaleEffect(0.85)
+                                    ButtonView(buttonRoles: .settings, deviceType: deviceType)
                                 }
                                 .buttonStyle(.plain)
                                 .accessibilityInputLabels(["Settings"])
@@ -218,19 +195,25 @@ struct ContentView: View {
                                 withAnimation(.linear(duration: 1.0)) {
                                     updateEndAngle()
                                 }
-                                SoundManager.instance.playTick(sound: .tick)
+                                if audio {
+                                    SoundManager.instance.playTick(sound: .tick)
+                                }
                             } else {
                                 repsCompleted += 1
                                 if repsCompleted < totalReps {
                                     stretchPhase = .rest
-                                    SoundManager.instance.playPrompt(sound: .rest)
+                                    if audio {
+                                        SoundManager.instance.playPrompt(sound: .rest)
+                                    }
                                 } else {
                                     stretchPhase = .stop
                                     timeRemaining = totalStretch
                                     withAnimation(.linear(duration: 1.0)) {
                                         updateEndAngle()
                                     }
-                                    SoundManager.instance.playPrompt(sound: .relax)
+                                    if audio {
+                                        SoundManager.instance.playPrompt(sound: .relax)
+                                    }
                                 }
                             }
                         }()
@@ -244,7 +227,9 @@ struct ContentView: View {
                             } else {
                                 stretchPhase = .stretch
                                 timeRemaining = totalStretch
-                                SoundManager.instance.playPrompt(sound: .stretch)
+                                if audio {
+                                    SoundManager.instance.playPrompt(sound: .stretch)
+                                }
                             }
                         }()
                             
