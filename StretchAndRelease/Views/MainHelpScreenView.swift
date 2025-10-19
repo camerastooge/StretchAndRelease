@@ -12,41 +12,42 @@ struct MainHelpScreenView: View {
     var buttonRole: ButtonRoles = .play
     
     var body: some View {
-        Form {
-            Section {
-                HStack {
-                    ButtonView(buttonRoles: .play, deviceType: deviceType)
+        NavigationStack {
+            Form {
+                Section {
+                    HStack {
+                        VStack {
+                            ButtonView(buttonRoles: .play, deviceType: deviceType)
+                            ButtonView(buttonRoles: .pause, deviceType: deviceType)
+                        }
                         .padding(.trailing, 25)
-                    Text("Starts the timer")
+                        Text("Starts or pauses the timer")
+                    }
+                    .accessibilityHint("The play button starts the timer, then pauses when tapped again")
+                 }
+                
+                Section {
+                    HStack {
+                        ButtonView(buttonRoles: .reset, deviceType: deviceType)
+                            .padding(.trailing, 25)
+                        Text("Resets the timer to your starting point")
+                    }
+                    .accessibilityHint("The reset button resets the timer to your starting values")
                 }
-             }
-            
-            Section {
-                HStack {
-                    ButtonView(buttonRoles: .pause, deviceType: deviceType)
-                        .padding(.trailing, 25)
-                    Text("Pauses the timer")
+                
+                Section {
+                    HStack {
+                        ButtonView(buttonRoles: .settings, deviceType: deviceType)
+                            .padding(.trailing, 25)
+                        Text("Access timer settings")
+                    }
+                    .accessibilityHint("The settings button accesses the settings menu")
                 }
             }
-            
-            Section {
-                HStack {
-                    ButtonView(buttonRoles: .reset, deviceType: deviceType)
-                        .padding(.trailing, 25)
-                    Text("Resets the timer to your starting point")
-                }
-            }
-            
-            Section {
-                HStack {
-                    ButtonView(buttonRoles: .settings, deviceType: deviceType)
-                        .padding(.trailing, 25)
-                    Text("Access timer settings")
-                }
-            }
+            .listSectionSpacing(.compact)
+            .navigationTitle("Settings")
+            .navigationBarTitleDisplayMode(.inline)
         }
-        .navigationTitle("Settings")
-        .navigationBarTitleDisplayMode(.inline)
     }
 }
 

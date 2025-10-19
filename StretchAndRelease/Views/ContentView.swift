@@ -170,6 +170,7 @@ struct ContentView: View {
         .sheet(isPresented: $isShowingHelp) {
             MainHelpScreenView()
                 .presentationDetents([.medium])
+                .presentationDragIndicator(.visible)
         }
         
         
