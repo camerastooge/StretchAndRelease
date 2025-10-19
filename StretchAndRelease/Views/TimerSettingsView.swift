@@ -35,14 +35,15 @@ struct SettingsView: View {
     @ScaledMetric var buttonWidth = 100
 
     var body: some View {
-            NavigationStack {
-                ScrollView {
-                    Group {
+        NavigationStack {
+                VStack {
+                    Form {
                         Section("Stretch Time") {
                             dynamicLayout {
                                 Picker("Stretch Duration", selection: $stretch) {
                                     ForEach(1...30, id:\.self) {
-                                        Text("\($0)").font(.title2)
+                                        Text("\($0)")
+                                            .font(.title2)
                                     }
                                 }
                                 .pickerStyle(.wheel)
@@ -51,24 +52,19 @@ struct SettingsView: View {
                                     .accessibilityLabel("seconds")
                             }
                             .font(.headline)
-                            .frame(height: 45)
+                            .frame(height: 40)
                         }
                         .padding(.vertical, 10)
                         .accessibilityElement(children: .combine)
-                        .accessibilityHint("Adjust how long you want to hold each stretch")
+                        .accessibilityHint("Adjust how long you want to hold each strecth")
                         .accessibilityValue(String(stretch))
                         .accessibilityAdjustableAction { direction in
                             switch direction {
                             case .increment: stretch += 1
                             case .decrement: stretch -= 1
-                            @unknown default:
-                                print("not handled")
+                            @unknown default: print("not handled")
                             }
-                         }
-                        
-                        Divider()
-                            .frame(height: 5)
-                            .background(.secondary).opacity(0.75)
+                        }
                         
                         Section("Rest Time") {
                             dynamicLayout {
@@ -84,7 +80,7 @@ struct SettingsView: View {
                                     .accessibilityLabel("seconds")
                             }
                             .font(.subheadline)
-                            .frame(height: 45)
+                            .frame(height: 40)
                         }
                         .padding(.vertical, 10)
                         .accessibilityElement(children: .combine)
@@ -97,10 +93,6 @@ struct SettingsView: View {
                             @unknown default: print("not handled")
                             }
                          }
-                        
-                        Divider()
-                            .frame(height: 5)
-                            .background(.secondary).opacity(0.75)
                         
                         Section("Repetitions") {
                             dynamicLayout {
@@ -115,7 +107,7 @@ struct SettingsView: View {
                                     .accessibilityLabel("repetitions")
                             }
                             .font(.subheadline)
-                            .frame(height: 45)
+                            .frame(height: 40)
                         }
                         .padding(.vertical, 5)
                         .accessibilityElement(children: .combine)
@@ -141,8 +133,23 @@ struct SettingsView: View {
                     .background(.secondary)
                     .padding(.horizontal, 15)
                     .toolbar {
-                        ToolbarItem {
+                        ToolbarItem(placement: .topBarLeading) {
                             Button {
+                                //help screen view here
+                            } label: {
+                                if #available(iOS 26.0, *) {
+                                    Image(systemName: "questionmark.circle.fill")
+                                        .foregroundStyle(.blue)
+                                        .glassEffect()
+                                } else {
+                                    Image(systemName: "questionmark.circle.fill")
+                                }
+                            }
+                            .accessibilityLabel("Access the help screen")
+                        }
+                        
+                        ToolbarItem {
+                            Button(role: .cancel) {
                                 dismiss()
                             } label: {
                                 if #available(iOS 26.0, *) {
