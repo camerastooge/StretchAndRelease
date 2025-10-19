@@ -27,6 +27,7 @@ struct SettingsView: View {
     @State private var stretch = 0
     @State private var rest = 0
     @State private var reps = 0
+    @State private var isShowingHelp = false
     
     var dynamicLayout: AnyLayout {
         dynamicTypeSize.isAccessibilitySize ? AnyLayout(VStackLayout()) : AnyLayout(HStackLayout())
@@ -133,9 +134,9 @@ struct SettingsView: View {
                     .background(.secondary)
                     .padding(.horizontal, 15)
                     .toolbar {
-                        ToolbarItem(placement: .topBarLeading) {
+                        ToolbarItem {
                             Button {
-                                //help screen view here
+                                isShowingHelp.toggle()
                             } label: {
                                 if #available(iOS 26.0, *) {
                                     Image(systemName: "questionmark.circle.fill")
@@ -145,7 +146,10 @@ struct SettingsView: View {
                                     Image(systemName: "questionmark.circle.fill")
                                 }
                             }
-                            .accessibilityLabel("Access the help screen")
+                        }
+                        
+                        if #available(iOS 26.0, *) {
+                            ToolbarSpacer()
                         }
                         
                         ToolbarItem {

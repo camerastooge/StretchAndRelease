@@ -130,9 +130,7 @@ struct ContentView: View {
             .toolbar {
                 ToolbarItem {
                     Button {
-                        withAnimation(.smooth(duration: 0.3)) {
-                            isShowingHelp.toggle()
-                        }
+                        isShowingHelp.toggle()
                     } label: {
                         if #available(iOS 26.0, *) {
                             Image(systemName: "questionmark.circle.fill")
@@ -168,6 +166,10 @@ struct ContentView: View {
         }
         .sheet(isPresented: $isShowingSettings) {
             SettingsView(totalStretch: $totalStretch, totalRest: $totalRest, totalReps: $totalReps, didSettingsChange: $didSettingsChange, audio: $audio, haptics: $haptics)
+        }
+        .sheet(isPresented: $isShowingHelp) {
+            MainHelpScreenView()
+                .presentationDetents([.medium])
         }
         
         
