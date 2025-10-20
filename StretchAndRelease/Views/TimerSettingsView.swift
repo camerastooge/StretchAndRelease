@@ -27,7 +27,6 @@ struct SettingsView: View {
     @State private var stretch = 0
     @State private var rest = 0
     @State private var reps = 0
-    @State private var isShowingHelp = false
     
     var dynamicLayout: AnyLayout {
         dynamicTypeSize.isAccessibilitySize ? AnyLayout(VStackLayout()) : AnyLayout(HStackLayout())
@@ -134,24 +133,6 @@ struct SettingsView: View {
                     .background(.secondary)
                     .padding(.horizontal, 15)
                     .toolbar {
-                        ToolbarItem {
-                            Button {
-                                isShowingHelp.toggle()
-                            } label: {
-                                if #available(iOS 26.0, *) {
-                                    Image(systemName: "questionmark.circle.fill")
-                                        .foregroundStyle(.blue)
-                                        .glassEffect()
-                                } else {
-                                    Image(systemName: "questionmark.circle.fill")
-                                }
-                            }
-                        }
-                        
-                        if #available(iOS 26.0, *) {
-                            ToolbarSpacer()
-                        }
-                        
                         ToolbarItem {
                             Button(role: .cancel) {
                                 dismiss()
