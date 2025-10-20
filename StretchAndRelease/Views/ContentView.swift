@@ -55,6 +55,7 @@ struct ContentView: View {
                 VStack(spacing: 0) {
                     ZStack {
                         MainArcView(stretchPhase: $stretchPhase, haptics: $haptics, isTimerActive: $isTimerActive, isTimerPaused: $isTimerPaused, endAngle: $endAngle, timeRemaining: $timeRemaining, totalReps: $totalReps, repsCompleted: $repsCompleted)
+                            
                     }
                     .containerRelativeFrame(.horizontal, alignment: .center) { length, _ in
                         length * 0.9
@@ -169,7 +170,7 @@ struct ContentView: View {
         }
         .sheet(isPresented: $isShowingHelp) {
             MainHelpScreenView()
-                .presentationDetents([.medium])
+                .presentationDetents([.large])
                 .presentationDragIndicator(.visible)
         }
         

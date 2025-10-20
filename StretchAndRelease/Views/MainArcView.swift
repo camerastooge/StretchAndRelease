@@ -25,10 +25,18 @@ struct MainArcView: View {
     
     var body: some View {
         ZStack {
-            Arc(endAngle: endAngle)
-                .stroke(differentiateWithoutColor ? .black : stretchPhase.phaseColor, style: StrokeStyle(lineWidth: 25, lineCap: .round))
-                .rotationEffect(Angle(degrees: 90))
-                .padding(.bottom)
+            if !differentiateWithoutColor {
+                Arc(endAngle: endAngle)
+                    .stroke(stretchPhase.phaseColor, style: StrokeStyle(lineWidth: 25, lineCap: .round))
+                    .rotationEffect(Angle(degrees: 90))
+                    .shadow(color: colorScheme == .dark ? .gray.opacity(0.65) : .black.opacity(0.35), radius: 5, x: 8, y: 5)
+                    .padding(.bottom)
+            } else {
+                Arc(endAngle: endAngle)
+                    .stroke(.black, style: StrokeStyle(lineWidth: 25, lineCap: .round))
+                    .rotationEffect(Angle(degrees: 90))
+                    .padding(.bottom)
+            }
             
             VStack {
                 Spacer()
@@ -45,7 +53,7 @@ struct MainArcView: View {
             }
             .font(.largeTitle)
             .dynamicTypeSize(DynamicTypeSize.xxxLarge...)
-            .foregroundStyle(!isTimerPaused ? differentiateWithoutColor ? .black : stretchPhase.phaseColor : .gray)
+            .foregroundStyle(differentiateWithoutColor ? .black : isTimerPaused ? .gray : stretchPhase.phaseColor)
             .fontWeight(.bold)
             .sensoryFeedback(.impact(intensity: haptics ? stretchPhase.phaseIntensity : 0.0), trigger: endAngle)
             .padding(.bottom)
