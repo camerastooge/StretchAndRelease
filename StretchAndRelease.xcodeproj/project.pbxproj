@@ -50,6 +50,7 @@
 		E4F1C1AD2DFE0B3700114B7C /* Exceptions for "StretchAndRelease" folder in "StretchAndReleaseWatchOS Watch App" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				Assets/SaR_AppIconProject.icon,
 				Assets/SFX/321_stretch.mp3,
 				Assets/SFX/321.mp3,
 				Assets/SFX/and_relax.mp3,
@@ -376,8 +377,9 @@
 		E41BF9642DFCDD5900E16C07 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = SaR_AppIconProject;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = UZ93PUXX5H;
@@ -412,8 +414,9 @@
 		E41BF9652DFCDD5900E16C07 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = SaR_AppIconProject;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = UZ93PUXX5H;
