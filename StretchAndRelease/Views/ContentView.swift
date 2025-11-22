@@ -21,8 +21,6 @@ struct ContentView: View {
     @AppStorage("audio") private var audio = true
     @AppStorage("haptics") private var haptics = true
     
-    @AppStorage("firstLaunch") private var firstLaunch = true
-    
     // state variables used across views
     @State private var timeRemaining: Int = 0
     @State private var repsCompleted: Int = 0
@@ -197,8 +195,6 @@ struct ContentView: View {
         //when user changes totalStretch in SettingsView, or app launches and loads totalStretch from AppStorage, force timeRemaining to reset to TotalStretch
         .onChange(of: totalStretch, initial: true) {
             timeRemaining = totalStretch
-            if firstLaunch { isShowingHelp.toggle() }
-            firstLaunch = false
         }
         
         //prep tick audio player when app launches

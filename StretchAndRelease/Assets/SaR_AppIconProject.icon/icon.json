@@ -141,6 +141,7 @@
       "hidden" : false,
       "layers" : [
         {
+          "hidden" : false,
           "image-name" : "Banded background.png",
           "name" : "Banded background"
         }
