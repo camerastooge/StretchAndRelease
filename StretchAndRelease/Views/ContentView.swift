@@ -20,6 +20,7 @@ struct ContentView: View {
     
     @AppStorage("audio") private var audio = true
     @AppStorage("haptics") private var haptics = true
+    @AppStorage("promptVolume") private var promptVolume = 1.0
     
     // state variables used across views
     @State private var timeRemaining: Int = 0
@@ -164,7 +165,7 @@ struct ContentView: View {
 
         }
         .sheet(isPresented: $isShowingSettings) {
-            SettingsView(totalStretch: $totalStretch, totalRest: $totalRest, totalReps: $totalReps, didSettingsChange: $didSettingsChange, audio: $audio, haptics: $haptics)
+            SettingsView(totalStretch: $totalStretch, totalRest: $totalRest, totalReps: $totalReps, didSettingsChange: $didSettingsChange, audio: $audio, haptics: $haptics, promptVolume: $promptVolume)
         }
         .sheet(isPresented: $isShowingHelp) {
             MainHelpScreenView()
@@ -172,6 +173,15 @@ struct ContentView: View {
                 .presentationDragIndicator(.visible)
         }
         
+        //stops and resets tiner when either settings or help views are toggled
+        .onChange(of: isShowingSettings || isShowingHelp) {
+            withAnimation(.smooth(duration: 0.25)) {
+                stretchPhase = .stop
+                timeRemaining = totalStretch
+                repsCompleted = 0
+                endAngle = Angle(degrees: 340)
+            }
+        }
         
         //receives changed settings from Apple Watch app
         .onChange(of: connectivity.didStatusChange) {
@@ -198,8 +208,9 @@ struct ContentView: View {
         }
         
         //prep tick audio player when app launches
-        .onAppear {
+        .onAppear() {
             SoundManager.instance.prepareTick(sound: .tick)
+            SoundManager.instance.volume = promptVolume
         }
         
         //this modifier runs when the timer publishes
@@ -265,10 +276,8 @@ struct ContentView: View {
     //function to set end angle of arc
     func updateEndAngle() {
         switch stretchPhase {
-        case .stretch:
+        case .stretch, .rest:
             endAngle = Angle(degrees: Double(timeRemaining) / Double(totalStretch) * 320 + 20)
-        case .rest:
-            endAngle = Angle(degrees: Double(timeRemaining) / Double(totalRest) * 320 + 20)
         case .stop:
             endAngle = Angle(degrees: 340)
         }

@@ -19,14 +19,16 @@ struct TimerSettingsViewWatch: View {
     @Binding var didSettingsChange: Bool
     @Binding var audio: Bool
     @Binding var haptics: Bool
+    @Binding var promptVolume: Double
     
     // Local variables
     @State private var stretch = 0
     @State private var rest = 0
     @State private var reps = 0
+    @State private var isEditing = false
     
     // variable for button view
-    var buttonRoles: ButtonRoles = .settings
+    var buttonRoles: ButtonRoles = .save
     var deviceType: DeviceType = .watch
     
     var body: some View {
@@ -131,6 +133,20 @@ struct TimerSettingsViewWatch: View {
                     Toggle("Haptics: \(haptics ? "on" : "off")", isOn: $haptics)
                         .font(.caption2)
                         .accessibilityHint("Turn haptic feedback on or off")
+                    HStack {
+                        Slider(
+                            value: $promptVolume,
+                            in: 0.0...1.0
+                        ) {
+                            Text("Prompt Volume")
+                        } minimumValueLabel: {
+                            Image(systemName: "speaker.slash.fill")
+                        } maximumValueLabel: {
+                            Image(systemName: "speaker.fill")
+                        } onEditingChanged: { editing in
+                            isEditing = editing
+                        }
+                    }
                 }
                 .frame(width: .infinity, height: 20)
                 .padding(.horizontal)
@@ -142,6 +158,7 @@ struct TimerSettingsViewWatch: View {
                         totalStretch = stretch
                         totalRest = rest
                         totalReps = reps
+                        SoundManager.instance.volume = promptVolume
                         didSettingsChange = true
                         dismiss()
                     } label: {
@@ -172,6 +189,7 @@ struct TimerSettingsViewWatch: View {
     @Previewable @State var totalReps = 3
     @Previewable @State var audio = true
     @Previewable @State var haptics = true
+    @Previewable @State var promptVolume = 1.0
     
-    TimerSettingsViewWatch(totalStretch: $totalStretch, totalRest: $totalRest, totalReps: $totalReps, didSettingsChange: $didSettingsChange, audio: $audio, haptics: $haptics)
+    TimerSettingsViewWatch(totalStretch: $totalStretch, totalRest: $totalRest, totalReps: $totalReps, didSettingsChange: $didSettingsChange, audio: $audio, haptics: $haptics, promptVolume: $promptVolume)
 }

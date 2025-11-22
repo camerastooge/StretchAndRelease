@@ -6,10 +6,14 @@
 //
 
 import AVFoundation
+import SwiftUI
 
+@Observable
 class SoundManager: NSObject {
     
     static let instance = SoundManager()
+    
+    var volume: Double = 1.0
     
     var player: AVAudioPlayer?
     var tickPlayer: AVAudioPlayer?
@@ -64,6 +68,7 @@ class SoundManager: NSObject {
             configureSession(duck: true)
             
             player = try AVAudioPlayer(contentsOf: url)
+            player?.volume = Float(volume)
             player?.delegate = self
             player?.prepareToPlay()
             player?.play()

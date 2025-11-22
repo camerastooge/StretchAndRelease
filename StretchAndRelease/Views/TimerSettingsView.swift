@@ -22,11 +22,13 @@ struct SettingsView: View {
     @Binding var didSettingsChange: Bool
     @Binding var audio: Bool
     @Binding var haptics: Bool
+    @Binding var promptVolume: Double
     
     //local variables
     @State private var stretch = 0
     @State private var rest = 0
     @State private var reps = 0
+    @State private var isEditing = false
     
     var dynamicLayout: AnyLayout {
         dynamicTypeSize.isAccessibilitySize ? AnyLayout(VStackLayout()) : AnyLayout(HStackLayout())
@@ -54,7 +56,6 @@ struct SettingsView: View {
                             .font(.headline)
                             .frame(height: 40)
                         }
-                        .padding(.vertical, 10)
                         .accessibilityElement(children: .combine)
                         .accessibilityHint("Adjust how long you want to hold each strecth")
                         .accessibilityValue(String(stretch))
@@ -81,9 +82,7 @@ struct SettingsView: View {
                             }
                             .font(.subheadline)
                             .frame(height: 40)
-                        }
-                        .padding(.vertical, 10)
-                        .accessibilityElement(children: .combine)
+                        }                        .accessibilityElement(children: .combine)
                         .accessibilityHint("Adjust how long you want to rest between stretches")
                         .accessibilityValue(String(rest))
                         .accessibilityAdjustableAction { direction in
@@ -108,9 +107,7 @@ struct SettingsView: View {
                             }
                             .font(.subheadline)
                             .frame(height: 40)
-                        }
-                        .padding(.vertical, 5)
-                        .accessibilityElement(children: .combine)
+                        }                        .accessibilityElement(children: .combine)
                         .accessibilityHint("Set the number of times you want to perform this stretch")
                         .accessibilityValue(String(reps))
                         .accessibilityAdjustableAction { direction in
@@ -125,32 +122,27 @@ struct SettingsView: View {
                 }
                 .scrollDisabled(true)
                 .containerRelativeFrame(.vertical) { height, _ in
-                    height * 0.66
+                    height * 0.69
                 }
-                
-                Divider()
-                    .frame(height: 5)
-                    .background(.secondary)
-                    .padding(.horizontal, 15)
-                    .toolbar {
-                        ToolbarItem {
-                            Button(role: .cancel) {
-                                dismiss()
-                            } label: {
-                                if #available(iOS 26.0, *) {
-                                    Image(systemName: "x.circle.fill")
-                                        .glassEffect()
-                                } else {
-                                    Image(systemName: "x.circle.fill")
-                                }
+                .toolbar {
+                    ToolbarItem {
+                        Button(role: .cancel) {
+                            dismiss()
+                        } label: {
+                            if #available(iOS 26.0, *) {
+                                Image(systemName: "x.circle.fill")
+                                    .glassEffect()
+                            } else {
+                                Image(systemName: "x.circle.fill")
                             }
-                            .tint(.red)
-                            .accessibilityLabel("Return to main screen")
                         }
+                        .tint(.red)
+                        .accessibilityLabel("Return to main screen")
                     }
+                }                    
                 
                 Group {
-                    Section("Interface Settings") {
+                    Section {
                         HStack {
                             Toggle("Audio cues: \(audio ? "on" : "off")", isOn: $audio)
                                 .accessibilityHint("Turn audio cues on or off")
@@ -158,6 +150,20 @@ struct SettingsView: View {
                         HStack {
                             Toggle("Haptic feedback: \(haptics ? "on" : "off")", isOn: $haptics)
                                 .accessibilityHint("Turn haptic feedback on or off")
+                        }
+                        HStack {
+                            Slider(
+                                value: $promptVolume,
+                                in: 0.0...1.0
+                            ) {
+                                Text("Prompt Volume")
+                            } minimumValueLabel: {
+                                Image(systemName: "speaker.slash.fill")
+                            } maximumValueLabel: {
+                                Image(systemName: "speaker.fill")
+                            } onEditingChanged: { editing in
+                                isEditing = editing
+                            }
                         }
                     }
                         .padding(.horizontal)
@@ -168,6 +174,7 @@ struct SettingsView: View {
                             totalStretch = stretch
                             totalRest = rest
                             totalReps = reps
+                            SoundManager.instance.volume = promptVolume
                             didSettingsChange = true
                             dismiss()
                         } label: {
@@ -201,6 +208,7 @@ struct SettingsView: View {
     @Previewable @State var totalReps = 3
     @Previewable @State var audio = true
     @Previewable @State var haptics = true
+    @Previewable @State var promptVolume = 1.0
     
-    SettingsView(totalStretch: $totalStretch, totalRest: $totalRest, totalReps: $totalReps, didSettingsChange: $didSettingsChange, audio: $audio, haptics: $haptics)
+    SettingsView(totalStretch: $totalStretch, totalRest: $totalRest, totalReps: $totalReps, didSettingsChange: $didSettingsChange, audio: $audio, haptics: $haptics, promptVolume: $promptVolume)
 }

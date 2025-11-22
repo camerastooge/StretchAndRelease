@@ -19,6 +19,7 @@ struct ContentView: View {
     
     @AppStorage("audio") private var audio = true
     @AppStorage("haptics") private var haptics = true
+    @AppStorage("promptVolume") private var promptVolume = 1.0
     
     // state variables used across views
     @State private var timeRemaining: Int = 0
@@ -158,7 +159,17 @@ struct ContentView: View {
                     }
                 }
                 .sheet(isPresented: $isShowingSettings) {
-                    TimerSettingsViewWatch(totalStretch: $totalStretch, totalRest: $totalRest, totalReps: $totalReps, didSettingsChange: $didSettingsChange, audio: $audio, haptics: $haptics)
+                    TimerSettingsViewWatch(totalStretch: $totalStretch, totalRest: $totalRest, totalReps: $totalReps, didSettingsChange: $didSettingsChange, audio: $audio, haptics: $haptics, promptVolume: $promptVolume)
+                }
+                
+                //stops and resets tiner when settings view is toggled
+                .onChange(of: isShowingSettings) {
+                    withAnimation(.smooth(duration: 0.25)) {
+                        stretchPhase = .stop
+                        timeRemaining = totalStretch
+                        repsCompleted = 0
+                        endAngle = Angle(degrees: 340)
+                    }
                 }
                 
                 //receives changed settings from iOS app
@@ -183,6 +194,12 @@ struct ContentView: View {
                 //sets timeRemaining to totalStretch on appearance
                 .onAppear {
                     timeRemaining = totalStretch
+                }
+                
+                //prep tick audio player when app launches
+                .onAppear() {
+                    SoundManager.instance.prepareTick(sound: .tick)
+                    SoundManager.instance.volume = promptVolume
                 }
                 
                 //this modifier runs when the timer publishes
@@ -247,10 +264,8 @@ struct ContentView: View {
     //function to set end angle of arc
     func updateEndAngle() {
         switch stretchPhase {
-        case .stretch:
+        case .stretch, .rest:
             endAngle = Angle(degrees: Double(timeRemaining) / Double(totalStretch) * 320 + 20)
-        case .rest:
-            endAngle = Angle(degrees: Double(timeRemaining) / Double(totalRest) * 320 + 20)
         case .stop:
             endAngle = Angle(degrees: 340)
         }
