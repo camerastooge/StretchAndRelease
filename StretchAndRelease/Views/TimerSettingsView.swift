@@ -144,12 +144,12 @@ struct SettingsView: View {
                 Group {
                     Section {
                         HStack {
-                            Toggle("Audio cues: \(audio ? "on" : "off")", isOn: $audio)
-                                .accessibilityHint("Turn audio cues on or off")
-                        }
-                        HStack {
                             Toggle("Haptic feedback: \(haptics ? "on" : "off")", isOn: $haptics)
                                 .accessibilityHint("Turn haptic feedback on or off")
+                        }
+                        HStack {
+                            Toggle("Audio cues: \(audio ? "on" : "off")", isOn: $audio)
+                                .accessibilityHint("Turn audio cues on or off")
                         }
                         HStack {
                             Slider(
@@ -163,6 +163,15 @@ struct SettingsView: View {
                                 Image(systemName: "speaker.fill")
                             } onEditingChanged: { editing in
                                 isEditing = editing
+                            }
+                            .accessibilityHint("Adjust volume of voice prompts")
+                            .accessibilityValue(String(promptVolume))
+                            .accessibilityAdjustableAction { direction in
+                                switch direction {
+                                case .increment: promptVolume += 1
+                                case .decrement: promptVolume -= 1
+                                @unknown default: print("not handled")
+                                }
                             }
                         }
                     }
