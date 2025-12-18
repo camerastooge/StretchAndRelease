@@ -59,6 +59,7 @@
 				Assets/SFX/tick.mp3,
 				"Models and Settings/ButtonSettings.swift",
 				"Models and Settings/Connectivity.swift",
+				"Models and Settings/Settings.swift",
 				"Models and Settings/SoundManager.swift",
 				"Models and Settings/StretchPhase.swift",
 				Views/Arc.swift,

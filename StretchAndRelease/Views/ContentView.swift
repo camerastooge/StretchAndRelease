@@ -167,6 +167,7 @@ struct ContentView: View {
         .sheet(isPresented: $isShowingSettings) {
             SettingsView(totalStretch: $totalStretch, totalRest: $totalRest, totalReps: $totalReps, didSettingsChange: $didSettingsChange, audio: $audio, haptics: $haptics, promptVolume: $promptVolume)
         }
+        
         .sheet(isPresented: $isShowingHelp) {
             MainHelpScreenView()
                 .presentationDetents([.large])
