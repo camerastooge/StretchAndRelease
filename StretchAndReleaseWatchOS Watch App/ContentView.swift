@@ -13,13 +13,7 @@ struct ContentView: View {
     @Environment(\.accessibilityDifferentiateWithoutColor) var differentiateWithoutColor
     
     // Properties stored in UserDefaults
-    @AppStorage("stretch") private var totalStretch = 10
-    @AppStorage("rest") private var totalRest = 5
-    @AppStorage("reps") private var totalReps = 3
-    
-    @AppStorage("audio") private var audio = true
-    @AppStorage("haptics") private var haptics = true
-    @AppStorage("promptVolume") private var promptVolume = 1.0
+    @StateObject var settings = Settings()
     
     // state variables used across views
     @State private var timeRemaining: Int = 0
@@ -70,14 +64,14 @@ struct ContentView: View {
                                         Text(!isTimerPaused ? stretchPhase.phaseText : "PAUSED")
                                             .scaleEffect(0.75)
                                             .accessibilityLabel(!isTimerPaused ? stretchPhase.phaseText : "WORKOUT PAUSED")
-                                        Text("Reps: \(repsCompleted)/\(totalReps)")
-                                            .accessibilityLabel("Repetitions Completed \(repsCompleted) of \(totalReps)")
+                                        Text("Reps: \(repsCompleted)/\(settings.totalReps)")
+                                            .accessibilityLabel("Repetitions Completed \(repsCompleted) of \(settings.totalReps)")
                                     }
                                     .font(.caption)
                                     .fontWeight(.bold)
                                     .foregroundStyle(!isTimerPaused ? stretchPhase.phaseColor : .gray)
                                 }
-                                .sensoryFeedback(.impact(intensity: haptics ? stretchPhase.phaseIntensity : 0.0), trigger: endAngle)
+                                .sensoryFeedback(.impact(intensity: settings.haptics ? stretchPhase.phaseIntensity : 0.0), trigger: endAngle)
                             }
                             .containerRelativeFrame(.horizontal, alignment: .center) { length, _ in
                                 length * 0.9
@@ -91,7 +85,7 @@ struct ContentView: View {
                                 Button {
                                     withAnimation {
                                         if stretchPhase == .stop {
-                                            if audio {
+                                            if settings.audio {
                                                 SoundManager.instance.playPrompt(sound: .countdownExpanded)
                                             }
                                             DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
@@ -106,7 +100,7 @@ struct ContentView: View {
                                             isTimerPaused = true
                                             isTimerActive = false
                                         } else {
-                                            if audio {
+                                            if settings.audio {
                                                 SoundManager.instance.playPrompt(sound: .countdownExpanded)
                                             }
                                             DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
@@ -131,7 +125,7 @@ struct ContentView: View {
                                     isTimerPaused = false
                                     repsCompleted = 0
                                     stretchPhase = .stop
-                                    timeRemaining = totalStretch
+                                    timeRemaining = settings.totalStretch
                                     withAnimation(.easeInOut(duration: 0.5)) {
                                         updateEndAngle()
                                     }
@@ -159,14 +153,14 @@ struct ContentView: View {
                     }
                 }
                 .sheet(isPresented: $isShowingSettings) {
-                    TimerSettingsViewWatch(totalStretch: $totalStretch, totalRest: $totalRest, totalReps: $totalReps, didSettingsChange: $didSettingsChange, audio: $audio, haptics: $haptics, promptVolume: $promptVolume)
+                    TimerSettingsViewWatch(didSettingsChange: $didSettingsChange)
                 }
                 
                 //stops and resets tiner when settings view is toggled
                 .onChange(of: isShowingSettings) {
                     withAnimation(.smooth(duration: 0.25)) {
                         stretchPhase = .stop
-                        timeRemaining = totalStretch
+                        timeRemaining = settings.totalStretch
                         repsCompleted = 0
                         endAngle = Angle(degrees: 340)
                     }
@@ -174,32 +168,32 @@ struct ContentView: View {
                 
                 //receives changed settings from iOS app
                 .onChange(of: connectivity.didStatusChange) {
-                    totalStretch = connectivity.statusContext["stretch"] as? Int ?? 10
-                    totalRest = connectivity.statusContext["rest"] as? Int ?? 5
-                    totalReps = connectivity.statusContext["reps"] as? Int ?? 5
+                    settings.totalStretch = connectivity.statusContext["stretch"] as? Int ?? 10
+                    settings.totalRest = connectivity.statusContext["rest"] as? Int ?? 5
+                    settings.totalReps = connectivity.statusContext["reps"] as? Int ?? 5
                     connectivity.didStatusChange = false
                 }
                 
                 //sends updated settings to iOS app
                 .onChange(of: didSettingsChange) {
-                    sendContext(stretch: totalStretch, rest: totalRest, reps: totalReps)
+                    sendContext(stretch: settings.totalStretch, rest: settings.totalRest, reps: settings.totalReps)
                     didSettingsChange = false
                 }
                 
                 //when user changes totalStretch in SettingsView, force timeRemaining to reset to TotalStretch
-                .onChange(of: totalStretch) {
-                    timeRemaining = totalStretch
+                .onChange(of: settings.totalStretch) {
+                    timeRemaining = settings.totalStretch
                 }
                 
                 //sets timeRemaining to totalStretch on appearance
                 .onAppear {
-                    timeRemaining = totalStretch
+                    timeRemaining = settings.totalStretch
                 }
                 
                 //prep tick audio player when app launches
                 .onAppear() {
                     SoundManager.instance.prepareTick(sound: .tick)
-                    SoundManager.instance.volume = promptVolume
+                    SoundManager.instance.volume = settings.promptVolume
                 }
                 
                 //this modifier runs when the timer publishes
@@ -212,23 +206,23 @@ struct ContentView: View {
                                 withAnimation(.linear(duration: 1.0)) {
                                     updateEndAngle()
                                 }
-                                if audio {
+                                if settings.audio {
                                     SoundManager.instance.playTick(sound: .tick)
                                 }
                             } else {
                                 repsCompleted += 1
-                                if repsCompleted < totalReps {
+                                if repsCompleted < settings.totalReps {
                                     stretchPhase = .rest
-                                    if audio {
+                                    if settings.audio {
                                         SoundManager.instance.playPrompt(sound: .rest)
                                     }
                                 } else {
                                     stretchPhase = .stop
-                                    timeRemaining = totalStretch
+                                    timeRemaining = settings.totalStretch
                                     withAnimation(.linear(duration: 1.0)) {
                                         updateEndAngle()
                                     }
-                                    if audio {
+                                    if settings.audio {
                                         SoundManager.instance.playPrompt(sound: .relax)
                                     }
                                 }
@@ -236,15 +230,15 @@ struct ContentView: View {
                         }()
                             
                         case .rest: return {
-                            if timeRemaining < totalRest {
+                            if timeRemaining < settings.totalRest {
                                 timeRemaining += 1
                                 withAnimation(.linear(duration: 1.0)) {
                                     updateEndAngle()
                                 }
                             } else {
                                 stretchPhase = .stretch
-                                timeRemaining = totalStretch
-                                if audio {
+                                timeRemaining = settings.totalStretch
+                                if settings.audio {
                                     SoundManager.instance.playPrompt(sound: .stretch)
                                 }
                             }
@@ -265,7 +259,7 @@ struct ContentView: View {
     func updateEndAngle() {
         switch stretchPhase {
         case .stretch, .rest:
-            endAngle = Angle(degrees: Double(timeRemaining) / Double(totalStretch) * 320 + 20)
+            endAngle = Angle(degrees: Double(timeRemaining) / Double(settings.totalStretch) * 320 + 20)
         case .stop:
             endAngle = Angle(degrees: 340)
         }
