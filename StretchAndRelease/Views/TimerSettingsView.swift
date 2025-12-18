@@ -14,15 +14,11 @@ struct SettingsView: View {
     @Environment(\.dismiss) var dismiss
     @Environment(\.dynamicTypeSize) var dynamicTypeSize
     
-    // Binding settings passed from Timer Main view
-    @Binding var totalStretch: Int
-    @Binding var totalRest: Int
-    @Binding var totalReps: Int
+    // Settings
+    @StateObject var settings = Settings()
     
+    //Bindings passed from ContentView
     @Binding var didSettingsChange: Bool
-    @Binding var audio: Bool
-    @Binding var haptics: Bool
-    @Binding var promptVolume: Double
     
     //local variables
     @State private var stretch = 0
@@ -144,16 +140,16 @@ struct SettingsView: View {
                 Group {
                     Section {
                         HStack {
-                            Toggle("Haptic feedback: \(haptics ? "on" : "off")", isOn: $haptics)
+                            Toggle("Haptic feedback: \(settings.haptics ? "on" : "off")", isOn: $settings.haptics)
                                 .accessibilityHint("Turn haptic feedback on or off")
                         }
                         HStack {
-                            Toggle("Audio cues: \(audio ? "on" : "off")", isOn: $audio)
+                            Toggle("Audio cues: \(settings.audio ? "on" : "off")", isOn: $settings.audio)
                                 .accessibilityHint("Turn audio cues on or off")
                         }
                         HStack {
                             Slider(
-                                value: $promptVolume,
+                                value: $settings.promptVolume,
                                 in: 0.0...1.0
                             ) {
                                 Text("Prompt Volume")
@@ -165,11 +161,11 @@ struct SettingsView: View {
                                 isEditing = editing
                             }
                             .accessibilityHint("Adjust volume of voice prompts")
-                            .accessibilityValue(String(promptVolume))
+                            .accessibilityValue(String(settings.promptVolume))
                             .accessibilityAdjustableAction { direction in
                                 switch direction {
-                                case .increment: promptVolume += 1
-                                case .decrement: promptVolume -= 1
+                                case .increment: settings.promptVolume += 1
+                                case .decrement: settings.promptVolume -= 1
                                 @unknown default: print("not handled")
                                 }
                             }
@@ -180,10 +176,10 @@ struct SettingsView: View {
                     
                     Section {
                         Button {
-                            totalStretch = stretch
-                            totalRest = rest
-                            totalReps = reps
-                            SoundManager.instance.volume = promptVolume
+                            settings.totalStretch = stretch
+                            settings.totalRest = rest
+                            settings.totalReps = reps
+                            SoundManager.instance.volume = settings.promptVolume
                             didSettingsChange = true
                             dismiss()
                         } label: {
@@ -202,9 +198,9 @@ struct SettingsView: View {
                 .navigationTitle("Settings")
                 .navigationBarTitleDisplayMode(.inline)
                 .onAppear {
-                    stretch = totalStretch
-                    rest = totalRest
-                    reps = totalReps
+                    stretch = settings.totalStretch
+                    rest = settings.totalRest
+                    reps = settings.totalReps
                 }
             }
     }
@@ -212,12 +208,12 @@ struct SettingsView: View {
 
 #Preview {
     @Previewable @State var didSettingsChange: Bool = false
-    @Previewable @State var totalStretch = 10
-    @Previewable @State var totalRest = 5
-    @Previewable @State var totalReps = 3
-    @Previewable @State var audio = true
-    @Previewable @State var haptics = true
-    @Previewable @State var promptVolume = 1.0
+//    @Previewable @State var totalStretch = 10
+//    @Previewable @State var totalRest = 5
+//    @Previewable @State var totalReps = 3
+//    @Previewable @State var audio = true
+//    @Previewable @State var haptics = true
+//    @Previewable @State var promptVolume = 1.0
     
-    SettingsView(totalStretch: $totalStretch, totalRest: $totalRest, totalReps: $totalReps, didSettingsChange: $didSettingsChange, audio: $audio, haptics: $haptics, promptVolume: $promptVolume)
+    SettingsView(didSettingsChange: $didSettingsChange)
 }

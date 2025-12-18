@@ -13,14 +13,15 @@ struct MainArcView: View {
     @Environment(\.accessibilityDifferentiateWithoutColor) var differentiateWithoutColor
     @Environment(\.sizeCategory) var sizeCategory
     
+    //Settings
+    @StateObject var settings = Settings()
+    
     //Bindings from parent view
     @Binding var stretchPhase: StretchPhase
-    @Binding var haptics: Bool
     @Binding var isTimerActive: Bool
     @Binding var isTimerPaused: Bool
     @Binding var endAngle: Angle
     @Binding var timeRemaining: Int
-    @Binding var totalReps: Int
     @Binding var repsCompleted: Int
     
     var body: some View {
@@ -47,15 +48,15 @@ struct MainArcView: View {
                 Text(!isTimerPaused ? stretchPhase.phaseText : "PAUSED")
                     .scaleEffect(0.75)
                     .accessibilityLabel(!isTimerPaused ? stretchPhase.phaseText : "WORKOUT PAUSED")
-                Text("Reps: \(repsCompleted)/\(totalReps)")
-                    .accessibilityLabel("Repetitions Completed \(repsCompleted) of \(totalReps)")
+                Text("Reps: \(repsCompleted)/\(settings.totalReps)")
+                    .accessibilityLabel("Repetitions Completed \(repsCompleted) of \(settings.totalReps)")
                 Spacer()
             }
             .font(.largeTitle)
             .dynamicTypeSize(DynamicTypeSize.xxxLarge...)
             .foregroundStyle(differentiateWithoutColor ? .black : isTimerPaused ? .gray : stretchPhase.phaseColor)
             .fontWeight(.bold)
-            .sensoryFeedback(.impact(intensity: haptics ? stretchPhase.phaseIntensity : 0.0), trigger: endAngle)
+            .sensoryFeedback(.impact(intensity: settings.haptics ? stretchPhase.phaseIntensity : 0.0), trigger: endAngle)
             .padding(.bottom)
             .containerRelativeFrame(.vertical, alignment: .bottom) { length, _ in
                 length / 1.15
@@ -66,12 +67,10 @@ struct MainArcView: View {
 
 #Preview {
     @Previewable @State var stretchPhase: StretchPhase = .stretch
-    @Previewable @State var haptics = true
     @Previewable @State var isTimerActive = true
     @Previewable @State var isTimerPaused = false
     @Previewable @State var endAngle = Angle(degrees: 340.0)
     @Previewable @State var timeRemaining = 8
-    @Previewable @State var totalReps = 5
     @Previewable @State var repsCompleted = 2
-    MainArcView(stretchPhase: $stretchPhase, haptics: $haptics, isTimerActive: $isTimerActive, isTimerPaused: $isTimerPaused, endAngle: $endAngle, timeRemaining: $timeRemaining, totalReps: $totalReps, repsCompleted: $repsCompleted)
+    MainArcView(stretchPhase: $stretchPhase, isTimerActive: $isTimerActive, isTimerPaused: $isTimerPaused, endAngle: $endAngle, timeRemaining: $timeRemaining, repsCompleted: $repsCompleted)
 }
