@@ -11,15 +11,11 @@ struct TimerSettingsViewWatch: View {
     // Environment variables
     @Environment(\.dismiss) var dismiss
     
-    // Binding settings passed from Timer Main view
-    @Binding var totalStretch: Int
-    @Binding var totalRest: Int
-    @Binding var totalReps: Int
+    //Settings
+    @StateObject var settings = Settings()
     
+    // Binding settings passed from Timer Main view
     @Binding var didSettingsChange: Bool
-    @Binding var audio: Bool
-    @Binding var haptics: Bool
-    @Binding var promptVolume: Double
     
     // Local variables
     @State private var stretch = 0
@@ -127,15 +123,15 @@ struct TimerSettingsViewWatch: View {
                 .padding(.horizontal)
                 
                 Group {
-                    Toggle("Audio: \(audio ? "on" : "off")", isOn: $audio)
+                    Toggle("Audio: \(settings.audio ? "on" : "off")", isOn: $settings.audio)
                         .font(.caption2)
                         .accessibilityHint("Turn audio cues on or off")
-                    Toggle("Haptics: \(haptics ? "on" : "off")", isOn: $haptics)
+                    Toggle("Haptics: \(settings.haptics ? "on" : "off")", isOn: $settings.haptics)
                         .font(.caption2)
                         .accessibilityHint("Turn haptic feedback on or off")
                     HStack {
                         Slider(
-                            value: $promptVolume,
+                            value: $settings.promptVolume,
                             in: 0.0...1.0
                         ) {
                             Text("Prompt Volume")
@@ -155,10 +151,10 @@ struct TimerSettingsViewWatch: View {
                     Spacer()
                     
                     Button {
-                        totalStretch = stretch
-                        totalRest = rest
-                        totalReps = reps
-                        SoundManager.instance.volume = promptVolume
+                        settings.totalStretch = stretch
+                        settings.totalRest = rest
+                        settings.totalReps = reps
+                        SoundManager.instance.volume = settings.promptVolume
                         didSettingsChange = true
                         dismiss()
                     } label: {
@@ -173,9 +169,9 @@ struct TimerSettingsViewWatch: View {
             .frame(width: proxy.size.width, height: proxy.size.height)
             .padding(.horizontal)
             .onAppear {
-                stretch = totalStretch
-                rest = totalRest
-                reps = totalReps
+                stretch = settings.totalStretch
+                rest = settings.totalRest
+                reps = settings.totalReps
             }
         }
 
@@ -184,12 +180,6 @@ struct TimerSettingsViewWatch: View {
 
 #Preview {
     @Previewable @State var didSettingsChange: Bool = false
-    @Previewable @State var totalStretch = 10
-    @Previewable @State var totalRest = 5
-    @Previewable @State var totalReps = 3
-    @Previewable @State var audio = true
-    @Previewable @State var haptics = true
-    @Previewable @State var promptVolume = 1.0
     
-    TimerSettingsViewWatch(totalStretch: $totalStretch, totalRest: $totalRest, totalReps: $totalReps, didSettingsChange: $didSettingsChange, audio: $audio, haptics: $haptics, promptVolume: $promptVolume)
+    TimerSettingsViewWatch(didSettingsChange: $didSettingsChange)
 }

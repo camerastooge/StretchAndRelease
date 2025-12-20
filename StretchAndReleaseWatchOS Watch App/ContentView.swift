@@ -12,7 +12,7 @@ struct ContentView: View {
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.accessibilityDifferentiateWithoutColor) var differentiateWithoutColor
     
-    // Properties stored in UserDefaults
+    // Settings stored in UserDefaults
     @StateObject var settings = Settings()
     
     // state variables used across views
