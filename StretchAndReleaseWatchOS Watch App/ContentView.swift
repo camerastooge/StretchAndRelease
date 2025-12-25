@@ -244,6 +244,10 @@ struct ContentView: View {
                             }
                         }()
                             
+                        case .paused: return {
+                            isTimerActive = false
+                        }()
+                            
                         case .stop: return {
                             isTimerActive = false
                         }()
@@ -259,6 +263,8 @@ struct ContentView: View {
     func updateEndAngle() {
         switch stretchPhase {
         case .stretch, .rest:
+            endAngle = Angle(degrees: Double(timeRemaining) / Double(settings.totalStretch) * 320 + 20)
+        case .paused:
             endAngle = Angle(degrees: Double(timeRemaining) / Double(settings.totalStretch) * 320 + 20)
         case .stop:
             endAngle = Angle(degrees: 340)

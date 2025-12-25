@@ -208,12 +208,6 @@ struct SettingsView: View {
 
 #Preview {
     @Previewable @State var didSettingsChange: Bool = false
-//    @Previewable @State var totalStretch = 10
-//    @Previewable @State var totalRest = 5
-//    @Previewable @State var totalReps = 3
-//    @Previewable @State var audio = true
-//    @Previewable @State var haptics = true
-//    @Previewable @State var promptVolume = 1.0
     
-    SettingsView(didSettingsChange: $didSettingsChange)
+    SettingsView(settings: Settings.previewData, didSettingsChange: $didSettingsChange)
 }
