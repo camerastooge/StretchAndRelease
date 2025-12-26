@@ -6,20 +6,6 @@
 	objectVersion = 77;
 	objects = {
 
-/* Begin PBXBuildFile section */
-		E4F1C1A22DFE0AAF00114B7C /* StretchAndReleaseWatchOS Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = E4F1C1982DFE0AAB00114B7C /* StretchAndReleaseWatchOS Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-/* End PBXBuildFile section */
-
-/* Begin PBXContainerItemProxy section */
-		E4F1C1A02DFE0AAF00114B7C /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = E41BF9502DFCDD5800E16C07 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = E4F1C1972DFE0AAB00114B7C;
-			remoteInfo = "StretchAndReleaseWatchOS Watch App";
-		};
-/* End PBXContainerItemProxy section */
-
 /* Begin PBXCopyFilesBuildPhase section */
 		E4F1C1A32DFE0AAF00114B7C /* Embed Watch Content */ = {
 			isa = PBXCopyFilesBuildPhase;
@@ -27,7 +13,6 @@
 			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
 			dstSubfolderSpec = 16;
 			files = (
-				E4F1C1A22DFE0AAF00114B7C /* StretchAndReleaseWatchOS Watch App.app in Embed Watch Content */,
 			);
 			name = "Embed Watch Content";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -59,7 +44,6 @@
 				Assets/SFX/tick.mp3,
 				"Models and Settings/ButtonSettings.swift",
 				"Models and Settings/Connectivity.swift",
-				"Models and Settings/Settings.swift",
 				"Models and Settings/SoundManager.swift",
 				"Models and Settings/StretchPhase.swift",
 				Views/Arc.swift,
@@ -137,7 +121,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				E4F1C1A12DFE0AAF00114B7C /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				E41BF95A2DFCDD5800E16C07 /* StretchAndRelease */,
@@ -242,14 +225,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
-
-/* Begin PBXTargetDependency section */
-		E4F1C1A12DFE0AAF00114B7C /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = E4F1C1972DFE0AAB00114B7C /* StretchAndReleaseWatchOS Watch App */;
-			targetProxy = E4F1C1A02DFE0AAF00114B7C /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		E41BF9612DFCDD5900E16C07 /* Debug */ = {

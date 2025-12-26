@@ -15,14 +15,16 @@ struct MainArcView: View {
     
     //Properties passed in from parent view
     var phaseColor: Color
+    @Binding var startAngle: Angle
     @Binding var endAngle: Angle
-    @Binding var animationDuration: Double
+    
+    var animationDuration: Double
     
     var body: some View {
         ZStack {
             if !differentiateWithoutColor {
                 withAnimation(.linear(duration: animationDuration)) {
-                    Arc(endAngle: endAngle)
+                    Arc(startAngle: startAngle, endAngle: endAngle)
                         .stroke(phaseColor, style: StrokeStyle(lineWidth: 25, lineCap: .round))
                         .rotationEffect(Angle(degrees: 90))
                         .shadow(color: colorScheme == .dark ? .gray.opacity(0.65) : .black.opacity(0.35), radius: 5, x: 8, y: 5)
@@ -30,7 +32,7 @@ struct MainArcView: View {
                 }
             } else {
                 withAnimation(.linear(duration: animationDuration)) {
-                    Arc(endAngle: endAngle)
+                    Arc(startAngle: startAngle, endAngle: endAngle)
                         .stroke(.black, style: StrokeStyle(lineWidth: 25, lineCap: .round))
                         .rotationEffect(Angle(degrees: 90))
                         .padding(.bottom)
@@ -42,7 +44,8 @@ struct MainArcView: View {
 
 #Preview {
     @Previewable var phaseColor = Color.red
+    @Previewable var animationDuration = 0.0
+    @Previewable @State var startAngle = Angle(degrees: 20.0)
     @Previewable @State var endAngle = Angle(degrees: 340.0)
-    @Previewable @State var animationDuration = 0.0
-    MainArcView(phaseColor: phaseColor, endAngle: $endAngle, animationDuration: $animationDuration)
+    MainArcView(phaseColor: phaseColor, startAngle: $startAngle, endAngle: $endAngle, animationDuration: animationDuration)
 }

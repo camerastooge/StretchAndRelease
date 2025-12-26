@@ -17,13 +17,7 @@ struct ContentView: View {
     @StateObject var settings = Settings()
     
     // state variables used across views
-    @State private var timeRemaining: Int = 0
-    @State private var repsCompleted: Int = 0
-    @State private var isTimerActive = false
-    @State private var isTimerPaused = false
     @State private var stretchPhase: StretchPhase = .stop
-    @State private var endAngle = Angle(degrees: 340)
-    @State private var timer = Timer.publish(every: 1.0, on: .main, in: .common).autoconnect()
     
     // state variables only used on main view
     @State private var isShowingSettings = false
@@ -50,7 +44,7 @@ struct ContentView: View {
                     ZStack {
                         VStack {
                             //need to put countdown display here
-                            TimerCompositeView(stretchPhase: $stretchPhase, endAngle: $endAngle, timeRemaining: $timeRemaining, repsCompleted: $repsCompleted)
+                            TimerCompositeView(stretchPhase: $stretchPhase)
                         }
                         .containerRelativeFrame(.horizontal, alignment: .center) { length, _ in
                             length * 0.85
@@ -60,7 +54,7 @@ struct ContentView: View {
                     }
                         
                         //Button Row
-                        ButtonRowView(isTimerActive: $isTimerActive, isTimerPaused: $isTimerPaused, stretchPhase: $stretchPhase, timeRemaining: $timeRemaining, repsCompleted: $repsCompleted, endAngle: $endAngle, deviceType: $deviceType)
+                        ButtonRowView(stretchPhase: $stretchPhase, deviceType: $deviceType)
                 }
             }
                 .navigationTitle("Stretch & Release")
@@ -111,14 +105,9 @@ struct ContentView: View {
                     .presentationDragIndicator(.visible)
             }
             
-            //stops and resets tiner when either settings or help views are toggled
+            //stops and resets timer when either settings or help views are toggled
             .onChange(of: isShowingSettings || isShowingHelp) {
-                withAnimation(.smooth(duration: 0.25)) {
-                    stretchPhase = .stop
-                    timeRemaining = settings.totalStretch
-                    repsCompleted = 0
-                    endAngle = Angle(degrees: 340)
-                }
+                stretchPhase = .stop
             }
             
             //receives changed settings from Apple Watch app
@@ -132,17 +121,13 @@ struct ContentView: View {
             //when settings change, updates main display and sends updated settings to Apple Watch app
             .onChange(of: didSettingsChange) {
                 stretchPhase = .stop
-                isTimerActive = false
-                isTimerPaused = false
-                endAngle = Angle(degrees: 340)
-                timeRemaining = settings.totalStretch
                 sendContext(stretch: settings.totalStretch, rest: settings.totalRest, reps: settings.totalReps)
                 didSettingsChange = false
             }
             
             //when user changes totalStretch in SettingsView, or app launches and loads totalStretch from AppStorage, force timeRemaining to reset to TotalStretch
             .onChange(of: settings.totalStretch, initial: true) {
-                timeRemaining = settings.totalStretch
+                stretchPhase = .stop
             }
             
             //prep tick audio player when app launches
@@ -150,31 +135,6 @@ struct ContentView: View {
                 SoundManager.instance.prepareTick(sound: .tick)
                 SoundManager.instance.volume = settings.promptVolume
             }
-            
-            //this modifier runs when the timer publishes
-            .onReceive(timer) { _ in
-                if isTimerActive && !isTimerPaused {
-                    switch stretchPhase {
-                    case .stretch: handleStretchPhase()
-                        
-                    case .rest: handleRestPhase()
-                        
-                    case .paused: isTimerActive = false
-                        
-                    case .stop: isTimerActive = false
-                    }
-                }
-            }
-        }
-    
-    //function to set end angle of arc
-    func updateEndAngle() {
-        switch stretchPhase {
-        case .stretch, .rest:
-            endAngle = Angle(degrees: Double(timeRemaining) / Double(settings.totalStretch) * 320 + 20)
-        case .stop, .paused:
-            endAngle = Angle(degrees: 340)
-        }
     }
     
     //function sends updated settings to Apple Watch
@@ -183,55 +143,7 @@ struct ContentView: View {
         connectivity.setContext(to: settingsUpdate)
     }
     
-    //function to handle the stretch phase of the timer
-    func handleStretchPhase() {
-        if timeRemaining > 0 {
-            timeRemaining -= 1
-            withAnimation(.linear(duration: 1.0)) {
-                updateEndAngle()
-            }
-            if settings.audio {
-                SoundManager.instance.playTick(sound: .tick)
-            }
-        } else {
-            repsCompleted += 1
-            if repsCompleted < settings.totalReps {
-                withAnimation {
-                    stretchPhase = .rest
-                }
-                if settings.audio {
-                    SoundManager.instance.playPrompt(sound: .rest)
-                }
-            } else {
-                timeRemaining = settings.totalStretch
-                withAnimation(.linear(duration: 0.5)) {
-                    stretchPhase = .stop
-                    updateEndAngle()
-                }
-                if settings.audio {
-                    SoundManager.instance.playPrompt(sound: .relax)
-                }
-            }
-        }
-    }
-    
-    //function to handle the rest phase of the timer
-    func handleRestPhase() {
-        if timeRemaining < settings.totalRest {
-            timeRemaining += 1
-            withAnimation(.linear(duration: 1.0)) {
-                updateEndAngle()
-            }
-        } else {
-            timeRemaining = settings.totalStretch
-            withAnimation {
-                stretchPhase = .stretch
-            }
-            if settings.audio {
-                SoundManager.instance.playPrompt(sound: .stretch)
-            }
-        }
-    }
+
 }
         
 
