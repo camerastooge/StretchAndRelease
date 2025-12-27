@@ -132,6 +132,7 @@ struct ContentView: View {
             
             //prep tick audio player when app launches
             .onAppear() {
+                settings.timeRemaining = settings.totalStretch
                 SoundManager.instance.prepareTick(sound: .tick)
                 SoundManager.instance.volume = settings.promptVolume
             }
@@ -142,8 +143,6 @@ struct ContentView: View {
         let settingsUpdate = ["stretch" : stretch, "rest" : rest, "reps" : reps]
         connectivity.setContext(to: settingsUpdate)
     }
-    
-
 }
         
 

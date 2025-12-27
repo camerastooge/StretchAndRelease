@@ -31,12 +31,7 @@ struct ButtonRowView: View {
                     withAnimation {
                         switch stretchPhase {
                         case .stop, .paused: return {
-                            if settings.audio {
-                                SoundManager.instance.playPrompt(sound: .countdownExpanded)
-                            }
-                            DispatchQueue.main.asyncAfter(deadline: settings.audio ? .now() + 3.0 : .now() + 0.5) {
-                                stretchPhase = .stretch
-                            }
+                            stretchPhase = .stretch
                         }()
                         case .stretch, .rest : return {
                             stretchPhase = .paused

@@ -18,20 +18,21 @@ struct AnalogView: View {
     
     @Binding var stretchPhase: StretchPhase
     @Binding var timeRemaining: Int
-    @Binding var repsCompleted: Int
+    @Binding var repCount: Int
     
     var body: some View {
         VStack {
             Spacer()
             Text("\(String(format: "%02d", Int(timeRemaining)))")
+                .scaleEffect(1.25)
                 .kerning(2)
                 .contentTransition(.numericText(countsDown: true))
                 .accessibilityLabel("\(timeRemaining) seconds remaining")
             Text(stretchPhase.phaseText)
                 .scaleEffect(0.75)
                 .accessibilityLabel(stretchPhase.phaseText)
-            Text("Reps: \(repsCompleted)/\(settings.totalReps)")
-                .accessibilityLabel("Repetitions Completed \(repsCompleted) of \(settings.totalReps)")
+            Text("Reps: \(repCount)/\(settings.totalReps)")
+                .accessibilityLabel("Repetition \(repCount) of \(settings.totalReps)")
             Spacer()
         }
         .font(.largeTitle)
@@ -49,6 +50,6 @@ struct AnalogView: View {
 #Preview {
     @Previewable @State var stretchPhase = StretchPhase.stop
     @Previewable @State var timeRemaining = 10
-    @Previewable @State var repsCompleted = 0
-    AnalogView(settings: Settings.previewData, stretchPhase: $stretchPhase, timeRemaining: $timeRemaining, repsCompleted: $repsCompleted)
+    @Previewable @State var repCount = 0
+    AnalogView(settings: Settings.previewData, stretchPhase: $stretchPhase, timeRemaining: $timeRemaining, repCount: $repCount)
 }

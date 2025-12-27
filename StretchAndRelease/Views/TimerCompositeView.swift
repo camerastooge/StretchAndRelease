@@ -20,28 +20,21 @@ struct TimerCompositeView: View {
     @Binding var stretchPhase: StretchPhase
     
     //State properties
-    @State private var timeRemaining: Int = 0
-    @State private var repsCompleted: Int = 0
+    @State private var repsCompleted = 0
+    @State private var repCount = 1
     @State private var startAngle = Angle(degrees: 20)
     @State private var endAngle = Angle(degrees: 340)
     @State private var isTimerActive = false
     @State private var isTimerPaused = false
     @State private var timer = Timer.publish(every: 1.0, on: .main, in: .common).autoconnect()
-    
-    var animationDuration: Int {
-        switch stretchPhase {
-        case .stretch: return settings.totalStretch
-        case .rest: return settings.totalRest
-        case .paused, .stop: return 0
-        }
-    }
+    @State private var pausedEndAngle = Angle(degrees: 340)
     
     var body: some View {
         VStack {
             ZStack {
-                MainArcView(phaseColor: stretchPhase.phaseColor,startAngle: $startAngle, endAngle: $endAngle, animationDuration: Double(animationDuration))
+                MainArcView(stretchPhase: $stretchPhase, endAngle: $endAngle)
                     .padding(.bottom, 450)
-                AnalogView(stretchPhase: $stretchPhase, timeRemaining: $timeRemaining, repsCompleted: $repsCompleted)
+                AnalogView(stretchPhase: $stretchPhase, timeRemaining: $settings.timeRemaining, repCount: $repCount)
             }
             .padding(.top, 325)
         }
@@ -68,8 +61,9 @@ struct TimerCompositeView: View {
                         }
                         DispatchQueue.main.asyncAfter(deadline: settings.audio ? .now() + 3.0 : .now() + 0.25) {
                             isTimerActive = true
-                            timeRemaining = settings.totalStretch
-                            updateAngle()
+                            withAnimation(.linear(duration: Double(settings.totalStretch))) {
+                                updateAngle()
+                            }
                         }
                     } else {
                         if settings.audio {
@@ -78,14 +72,20 @@ struct TimerCompositeView: View {
                         DispatchQueue.main.asyncAfter(deadline: settings.audio ? .now() + 3.0 : .now() + 0.25) {
                             isTimerActive = true
                             isTimerPaused = false
-                            updateAngle()
+                            withAnimation(.linear(duration: Double(settings.timeRemaining))) {
+                                updateAngle()
+                            }
                         }
                     }
                 } else {
                     if settings.audio {
                         SoundManager.instance.playPrompt(sound: .stretch)
                     }
-                    updateAngle()
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                        withAnimation(.linear(duration: Double(settings.totalStretch))) {
+                            updateAngle()
+                        }
+                    }
                 }
             }()
             case .rest: {
@@ -93,34 +93,37 @@ struct TimerCompositeView: View {
                     if settings.audio {
                         SoundManager.instance.playPrompt(sound: .rest)
                     }
-                    timeRemaining = settings.totalRest
-                    updateAngle()
+                    DispatchQueue.main.asyncAfter(deadline: settings.audio ? .now() + 1.0 : .now()) {
+                        withAnimation(.linear(duration: Double(settings.totalRest))) {
+                            updateAngle()
+                        }
+                    }
                 } else {
                     if settings.audio {
                         SoundManager.instance.playPrompt(sound: .countdown)
                     }
                     DispatchQueue.main.asyncAfter(deadline: settings.audio ? .now() + 3.0 : .now() + 0.25) {
-                        timeRemaining = settings.totalRest
                         isTimerPaused = false
-                        updateAngle()
+                        withAnimation(.linear(duration: Double(settings.timeRemaining))) {
+                            updateAngle()
+                        }
                     }
                 }
             }()
             case .paused: {
-                withAnimation(.linear(duration: 0.25)) {
-                    withAnimation(.linear(duration: 0.25)) {
-                        isTimerPaused = true
-                        isTimerActive = false
-                        updateAngle()
-                    }
-                }
+                isTimerPaused = true
+                isTimerActive = false
+                updateAngle()
             }()
             case .stop:
-                if settings.audio {
-                    SoundManager.instance.playPrompt(sound: .relax)
+                if repsCompleted == settings.totalReps {
+                    if settings.audio {
+                        SoundManager.instance.playPrompt(sound: .relax)
+                    }
                 }
                 withAnimation(.linear(duration: 0.5)) {
                     isTimerActive = false
+                    settings.timeRemaining = settings.totalStretch
                     updateAngle()
                 }
             }
@@ -131,46 +134,46 @@ struct TimerCompositeView: View {
     func updateAngle() {
         switch stretchPhase {
         case .stretch: {
-            startAngle = Angle(degrees: 20)
-            endAngle = Angle(degrees: 340)
+            endAngle = Angle(degrees: 20)
         }()
         case .rest, .stop: {
-            startAngle = Angle(degrees: 20)
             endAngle = Angle(degrees: 340)
         }()
         case .paused: {
-            startAngle = Angle(degrees: 20)
-            endAngle = Angle(degrees: 340)
+            endAngle = pausedEndAngle
         }()
         }
     }
     
     //function to handle the stretch phase of the timer
-    //this should only affect the AnalogView
     func handleStretchPhase() {
-        if timeRemaining > 0 {
-            timeRemaining -= 1
+        if settings.timeRemaining > 0 {
+            settings.timeRemaining -= 1
+            pausedEndAngle = Angle(degrees: Double(settings.timeRemaining) / Double(settings.totalStretch) * 320 + 20)
+            print(pausedEndAngle.degrees)
             if settings.audio {
                 SoundManager.instance.playTick(sound: .tick)
             }
         } else {
             repsCompleted += 1
             if repsCompleted < settings.totalReps {
+                repCount += 1
                 stretchPhase = .rest
             } else {
-                timeRemaining = settings.totalStretch
+                settings.timeRemaining = settings.totalStretch
                 stretchPhase = .stop
             }
         }
     }
     
     //function to handle the rest phase of the timer
-    //this should only affect the AnalogView
     func handleRestPhase() {
-        if timeRemaining < settings.totalRest {
-            timeRemaining += 1
+        if settings.timeRemaining < settings.totalRest {
+            settings.timeRemaining += 1
+            pausedEndAngle = Angle(degrees: Double(settings.timeRemaining) / Double(settings.totalRest) * 320 + 20)
+            print(pausedEndAngle.degrees)
         } else {
-            timeRemaining = settings.totalStretch
+            settings.timeRemaining = settings.totalStretch
             stretchPhase = .stretch
             if settings.audio {
                 SoundManager.instance.playPrompt(sound: .stretch)

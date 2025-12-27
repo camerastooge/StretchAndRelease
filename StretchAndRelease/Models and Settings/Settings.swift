@@ -16,6 +16,8 @@ class Settings: ObservableObject {
     @AppStorage("haptics") public var haptics = true
     @AppStorage("promptVolume") public var promptVolume = 1.0
     
+    @Published var timeRemaining = 10
+    
     init(totalStretch: Int = 10, totalRest: Int = 5, totalReps: Int = 3, audio: Bool = true, haptics: Bool = true, promptVolume: Double = 1.0) {
         self.totalStretch = totalStretch
         self.totalRest = totalRest

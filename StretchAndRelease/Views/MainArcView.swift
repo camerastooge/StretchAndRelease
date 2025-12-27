@@ -13,39 +13,33 @@ struct MainArcView: View {
     @Environment(\.accessibilityDifferentiateWithoutColor) var differentiateWithoutColor
     @Environment(\.sizeCategory) var sizeCategory
     
-    //Properties passed in from parent view
-    var phaseColor: Color
-    @Binding var startAngle: Angle
-    @Binding var endAngle: Angle
+    //Settings
+    @StateObject var settings = Settings()
     
-    var animationDuration: Double
+    //Properties passed in from parent view
+    @Binding var stretchPhase: StretchPhase
+    @Binding var endAngle: Angle
     
     var body: some View {
         ZStack {
             if !differentiateWithoutColor {
-                withAnimation(.linear(duration: animationDuration)) {
-                    Arc(startAngle: startAngle, endAngle: endAngle)
-                        .stroke(phaseColor, style: StrokeStyle(lineWidth: 25, lineCap: .round))
-                        .rotationEffect(Angle(degrees: 90))
-                        .shadow(color: colorScheme == .dark ? .gray.opacity(0.65) : .black.opacity(0.35), radius: 5, x: 8, y: 5)
-                        .padding(.bottom)
-                }
+                Arc(endAngle: endAngle)
+                    .stroke(stretchPhase.phaseColor, style: StrokeStyle(lineWidth: 25, lineCap: .round))
+                    .rotationEffect(Angle(degrees: 90))
+                    .shadow(color: colorScheme == .dark ? .gray.opacity(0.65) : .black.opacity(0.35), radius: 5, x: 8, y: 5)
+                    .padding(.bottom)
             } else {
-                withAnimation(.linear(duration: animationDuration)) {
-                    Arc(startAngle: startAngle, endAngle: endAngle)
-                        .stroke(.black, style: StrokeStyle(lineWidth: 25, lineCap: .round))
-                        .rotationEffect(Angle(degrees: 90))
-                        .padding(.bottom)
-                }
+                Arc(endAngle: endAngle)
+                    .stroke(.black, style: StrokeStyle(lineWidth: 25, lineCap: .round))
+                    .rotationEffect(Angle(degrees: 90))
+                    .padding(.bottom)
             }
         }
     }
 }
 
 #Preview {
-    @Previewable var phaseColor = Color.red
-    @Previewable var animationDuration = 0.0
-    @Previewable @State var startAngle = Angle(degrees: 20.0)
     @Previewable @State var endAngle = Angle(degrees: 340.0)
-    MainArcView(phaseColor: phaseColor, startAngle: $startAngle, endAngle: $endAngle, animationDuration: animationDuration)
+    @Previewable @State var stretchPhase = StretchPhase.stop
+    MainArcView(stretchPhase: $stretchPhase, endAngle: $endAngle)
 }

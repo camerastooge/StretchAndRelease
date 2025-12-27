@@ -8,23 +8,21 @@
 import SwiftUI
 
 struct Arc: Shape {
-    var startAngle: Angle
     var endAngle: Angle
     
-    var animatableData: AnimatablePair<Double, Double> {
+    var animatableData: Double {
         get {
-            AnimatablePair(startAngle.degrees, endAngle.degrees)
+            endAngle.degrees
         }
         set {
-            startAngle = Angle(degrees: newValue.first)
-            endAngle = Angle(degrees: newValue.second)
+            endAngle = Angle(degrees: newValue)
         }
     }
     
     func path(in rect: CGRect) -> Path {
         var path = Path()
         
-        path.addArc(center: CGPoint(x: rect.midX, y: rect.midY), radius: rect.width / 2, startAngle: startAngle, endAngle: endAngle, clockwise: false)
+        path.addArc(center: CGPoint(x: rect.midX, y: rect.midY), radius: rect.width / 2, startAngle: Angle(degrees:20), endAngle: endAngle, clockwise: false)
         return path
     }
 }
