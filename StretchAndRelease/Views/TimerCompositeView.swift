@@ -22,9 +22,8 @@ struct TimerCompositeView: View {
     //State properties
     @State private var repsCompleted = 0
     @State private var repCount = 1
-    @State private var startAngle = Angle(degrees: 20)
     @State private var endAngle = Angle(degrees: 340)
-    @State private var pausedEndAngle = Angle(degrees: 340)
+    @State private var totalTime = 0.0
     @State private var isTimerActive = false
     @State private var isTimerPaused = false
     @State private var timer = Timer.publish(every: 1.0, on: .main, in: .common).autoconnect()
@@ -36,8 +35,9 @@ struct TimerCompositeView: View {
                     .padding(.bottom, 450)
                 AnalogView(stretchPhase: $stretchPhase, timeRemaining: $settings.timeRemaining, repCount: $repCount)
             }
-            .padding(.top, 325)
         }
+        .padding(.top, 350)
+        .scaleEffect(0.95)
         
         //this modifier runs when the timer publishes
         .onReceive(timer) { _ in
@@ -61,7 +61,8 @@ struct TimerCompositeView: View {
                         }
                         DispatchQueue.main.asyncAfter(deadline: settings.audio ? .now() + 3.0 : .now() + 0.25) {
                             isTimerActive = true
-                            withAnimation(.linear(duration: Double(settings.totalStretch))) {
+                            totalTime = Double(settings.totalStretch)
+                            withAnimation(.linear(duration: totalTime)) {
                                 updateAngle()
                             }
                         }
@@ -82,19 +83,20 @@ struct TimerCompositeView: View {
                         SoundManager.instance.playPrompt(sound: .stretch)
                     }
                     DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                        withAnimation(.linear(duration: Double(settings.totalStretch))) {
+                        withAnimation(.linear(duration: totalTime)) {
                             updateAngle()
                         }
                     }
                 }
             }()
+                
             case .rest: {
                 if !isTimerPaused {
                     if settings.audio {
                         SoundManager.instance.playPrompt(sound: .rest)
                     }
                     DispatchQueue.main.asyncAfter(deadline: settings.audio ? .now() + 1.0 : .now()) {
-                        withAnimation(.linear(duration: Double(settings.totalRest))) {
+                        withAnimation(.linear(duration: totalTime)) {
                             updateAngle()
                         }
                     }
@@ -104,7 +106,7 @@ struct TimerCompositeView: View {
                     }
                     DispatchQueue.main.asyncAfter(deadline: settings.audio ? .now() + 3.0 : .now() + 0.25) {
                         isTimerPaused = false
-                        withAnimation(.linear(duration: Double(settings.timeRemaining))) {
+                        withAnimation(.linear(duration: totalTime)) {
                             updateAngle()
                         }
                     }
@@ -123,6 +125,7 @@ struct TimerCompositeView: View {
                 }
                 withAnimation(.linear(duration: 0.5)) {
                     isTimerActive = false
+                    isTimerPaused = false
                     settings.timeRemaining = settings.totalStretch
                     updateAngle()
                 }
@@ -140,7 +143,7 @@ struct TimerCompositeView: View {
             endAngle = Angle(degrees: 340)
         }()
         case .paused: {
-            endAngle = pausedEndAngle
+            endAngle = Angle(degrees: Double(settings.timeRemaining) / totalTime * 320 + 20)
         }()
         }
     }
@@ -149,8 +152,6 @@ struct TimerCompositeView: View {
     func handleStretchPhase() {
         if settings.timeRemaining > 0 {
             settings.timeRemaining -= 1
-            pausedEndAngle = Angle(degrees: Double(settings.timeRemaining) / Double(settings.totalStretch) * 320 + 20)
-            print(pausedEndAngle.degrees)
             if settings.audio {
                 SoundManager.instance.playTick(sound: .tick)
             }
@@ -158,9 +159,10 @@ struct TimerCompositeView: View {
             repsCompleted += 1
             if repsCompleted < settings.totalReps {
                 repCount += 1
+                totalTime = Double(settings.totalRest)
                 stretchPhase = .rest
             } else {
-                settings.timeRemaining = settings.totalStretch
+                totalTime = Double(settings.totalStretch)
                 stretchPhase = .stop
             }
         }
@@ -170,10 +172,8 @@ struct TimerCompositeView: View {
     func handleRestPhase() {
         if settings.timeRemaining < settings.totalRest {
             settings.timeRemaining += 1
-            pausedEndAngle = Angle(degrees: Double(settings.timeRemaining) / Double(settings.totalRest) * 320 + 20)
-            print(pausedEndAngle.degrees)
         } else {
-            settings.timeRemaining = settings.totalStretch
+            totalTime = Double(settings.totalStretch)
             stretchPhase = .stretch
             if settings.audio {
                 SoundManager.instance.playPrompt(sound: .stretch)
