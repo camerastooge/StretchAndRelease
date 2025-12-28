@@ -15,7 +15,7 @@ struct SettingsView: View {
     @Environment(\.dynamicTypeSize) var dynamicTypeSize
     
     // Settings
-    @StateObject var settings = Settings()
+    @EnvironmentObject var settings: Settings
     
     //Bindings passed from ContentView
     @Binding var didSettingsChange: Bool
@@ -210,5 +210,6 @@ struct SettingsView: View {
 #Preview {
     @Previewable @State var didSettingsChange: Bool = false
     
-    SettingsView(settings: Settings.previewData, didSettingsChange: $didSettingsChange)
+    SettingsView(didSettingsChange: $didSettingsChange)
+        .environmentObject(Settings.previewData)
 }

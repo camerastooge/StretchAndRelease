@@ -28,4 +28,13 @@ class Settings: ObservableObject {
     }
     
     static var previewData = Settings()
+    
+    func printProperties(of object: AnyObject) {
+        let mirror = Mirror(reflecting: object)
+        for child in mirror.children {
+            if let propertyName = child.label {
+                print("\(propertyName): \(child.value)")
+            }
+        }
+    }
 }

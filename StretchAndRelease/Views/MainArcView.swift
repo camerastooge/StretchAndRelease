@@ -14,7 +14,7 @@ struct MainArcView: View {
     @Environment(\.sizeCategory) var sizeCategory
     
     //Settings
-    @StateObject var settings = Settings()
+    @EnvironmentObject var settings: Settings
     
     //Properties passed in from parent view
     @Binding var stretchPhase: StretchPhase
@@ -42,4 +42,5 @@ struct MainArcView: View {
     @Previewable @State var endAngle = Angle(degrees: 340.0)
     @Previewable @State var stretchPhase = StretchPhase.stop
     MainArcView(stretchPhase: $stretchPhase, endAngle: $endAngle)
+        .environmentObject(Settings.previewData)
 }

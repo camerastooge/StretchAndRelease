@@ -14,7 +14,7 @@ struct ButtonRowView: View {
     @Environment(\.sizeCategory) var sizeCategory
     
     //Settings
-    @StateObject var settings = Settings()
+    @EnvironmentObject var settings: Settings
     
     //Bindings
     @Binding var stretchPhase: StretchPhase
@@ -65,5 +65,6 @@ struct ButtonRowView: View {
     @Previewable @State var stretchPhase = StretchPhase.stop
     @Previewable @State var deviceType: DeviceType = .phone
     
-    ButtonRowView(settings: Settings.previewData, stretchPhase: $stretchPhase, deviceType: $deviceType)
+    ButtonRowView(stretchPhase: $stretchPhase, deviceType: $deviceType)
+        .environmentObject(Settings.previewData)
 }

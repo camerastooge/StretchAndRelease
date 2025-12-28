@@ -14,7 +14,7 @@ struct TimerCompositeView: View {
     @Environment(\.sizeCategory) var sizeCategory
     
     //Settings
-    @StateObject var settings = Settings()
+    @EnvironmentObject var settings: Settings
     
     //Bindings passed from composite view
     @Binding var stretchPhase: StretchPhase
@@ -24,10 +24,10 @@ struct TimerCompositeView: View {
     @State private var repCount = 1
     @State private var startAngle = Angle(degrees: 20)
     @State private var endAngle = Angle(degrees: 340)
+    @State private var pausedEndAngle = Angle(degrees: 340)
     @State private var isTimerActive = false
     @State private var isTimerPaused = false
     @State private var timer = Timer.publish(every: 1.0, on: .main, in: .common).autoconnect()
-    @State private var pausedEndAngle = Angle(degrees: 340)
     
     var body: some View {
         VStack {
@@ -187,4 +187,5 @@ struct TimerCompositeView: View {
     @Previewable @State var stretchPhase: StretchPhase = .stop
     
     TimerCompositeView(stretchPhase: $stretchPhase)
+        .environmentObject(Settings.previewData)
 }

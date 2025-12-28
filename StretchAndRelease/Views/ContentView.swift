@@ -14,7 +14,7 @@ struct ContentView: View {
     @Environment(\.sizeCategory) var sizeCategory
     
     // Settings stored in AppStorage
-    @StateObject var settings = Settings()
+    @EnvironmentObject var settings: Settings
     
     // state variables used across views
     @State private var stretchPhase: StretchPhase = .stop
@@ -121,13 +121,11 @@ struct ContentView: View {
             //when settings change, updates main display and sends updated settings to Apple Watch app
             .onChange(of: didSettingsChange) {
                 stretchPhase = .stop
+                print("Changed: \(settings.totalStretch)")
+                print("Changed: \(settings.totalRest)")
+                print("Changed: \(settings.totalReps)")
                 sendContext(stretch: settings.totalStretch, rest: settings.totalRest, reps: settings.totalReps)
                 didSettingsChange = false
-            }
-            
-            //when user changes totalStretch in SettingsView, or app launches and loads totalStretch from AppStorage, force timeRemaining to reset to TotalStretch
-            .onChange(of: settings.totalStretch, initial: true) {
-                stretchPhase = .stop
             }
             
             //prep tick audio player when app launches
@@ -149,4 +147,5 @@ struct ContentView: View {
 
 #Preview {
     ContentView()
+        .environmentObject(Settings.previewData)
 }

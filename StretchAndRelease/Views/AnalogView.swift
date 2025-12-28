@@ -9,7 +9,7 @@ import SwiftUI
 
 struct AnalogView: View {
     //Settings
-    @StateObject var settings = Settings()
+    @EnvironmentObject var settings: Settings
     
     //Environment properties
     @Environment(\.colorScheme) var colorScheme
@@ -51,5 +51,6 @@ struct AnalogView: View {
     @Previewable @State var stretchPhase = StretchPhase.stop
     @Previewable @State var timeRemaining = 10
     @Previewable @State var repCount = 0
-    AnalogView(settings: Settings.previewData, stretchPhase: $stretchPhase, timeRemaining: $timeRemaining, repCount: $repCount)
+    AnalogView(stretchPhase: $stretchPhase, timeRemaining: $timeRemaining, repCount: $repCount)
+        .environmentObject(Settings.previewData)
 }
