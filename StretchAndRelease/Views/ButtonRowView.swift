@@ -13,8 +13,9 @@ struct ButtonRowView: View {
     @Environment(\.accessibilityDifferentiateWithoutColor) var differentiateWithoutColor
     @Environment(\.sizeCategory) var sizeCategory
     
-    //Settings
+    //Settings and Switches
     @EnvironmentObject var settings: Settings
+    @Environment(Switches.self) var switches
     
     //Bindings
     @Binding var stretchPhase: StretchPhase
@@ -28,15 +29,14 @@ struct ButtonRowView: View {
                 Spacer()
                 
                 Button {
-                    withAnimation {
-                        switch stretchPhase {
-                        case .stop, .paused: return {
-                            stretchPhase = .stretch
-                        }()
-                        case .stretch, .rest : return {
-                            stretchPhase = .paused
-                        }()
-                        }
+                    withAnimation(.linear(duration: 0.25)) {
+// if the timer has not started, timerIsActive = false, timerIsPaused = false, and isPhaseStretch = false
+// when the button is pressed to start the timer, isTimerActive = true and isPhaseStretch = true, isTimerPaused = false
+// when the button is pressed to pause the timer, isTimerActive = false and isTimerPaused = true
+// when the button is pressed to resume the timer, isTimerActive = true and isTimerPaused = false
+// if isPhaseStretch = true, then stretchPhase = stretch; otherwise stretchPhase = rest
+                        
+
                     }
                 } label: {
                     ButtonView(buttonRoles: stretchPhase != .stretch ? .play : .pause, deviceType: deviceType)

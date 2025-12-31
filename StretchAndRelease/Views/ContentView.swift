@@ -121,16 +121,12 @@ struct ContentView: View {
             //when settings change, updates main display and sends updated settings to Apple Watch app
             .onChange(of: didSettingsChange) {
                 stretchPhase = .stop
-                print("Changed: \(settings.totalStretch)")
-                print("Changed: \(settings.totalRest)")
-                print("Changed: \(settings.totalReps)")
                 sendContext(stretch: settings.totalStretch, rest: settings.totalRest, reps: settings.totalReps)
                 didSettingsChange = false
             }
             
             //prep tick audio player when app launches
             .onAppear() {
-                settings.timeRemaining = settings.totalStretch
                 SoundManager.instance.prepareTick(sound: .tick)
                 SoundManager.instance.volume = settings.promptVolume
             }

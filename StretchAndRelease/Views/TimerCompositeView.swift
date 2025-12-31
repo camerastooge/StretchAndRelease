@@ -83,6 +83,7 @@ struct TimerCompositeView: View {
                         SoundManager.instance.playPrompt(sound: .stretch)
                     }
                     DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                        totalTime = Double(settings.totalStretch)
                         withAnimation(.linear(duration: totalTime)) {
                             updateAngle()
                         }
@@ -95,7 +96,8 @@ struct TimerCompositeView: View {
                     if settings.audio {
                         SoundManager.instance.playPrompt(sound: .rest)
                     }
-                    DispatchQueue.main.asyncAfter(deadline: settings.audio ? .now() + 1.0 : .now()) {
+                    DispatchQueue.main.asyncAfter(deadline: settings.audio ? .now() + 0.25 : .now()) {
+                        totalTime = Double(settings.totalRest)
                         withAnimation(.linear(duration: totalTime)) {
                             updateAngle()
                         }
@@ -112,11 +114,15 @@ struct TimerCompositeView: View {
                     }
                 }
             }()
+                
             case .paused: {
                 isTimerPaused = true
                 isTimerActive = false
-                updateAngle()
+                withAnimation(.linear(duration: 0)) {
+                    updateAngle()
+                }
             }()
+                
             case .stop:
                 if repsCompleted == settings.totalReps {
                     if settings.audio {

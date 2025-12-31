@@ -10,11 +10,13 @@ import SwiftUI
 @main
 struct StretchAndReleaseApp: App {
     @StateObject private var settings = Settings()
+    @State private var switches = Switches()
     
     var body: some Scene {
         WindowGroup {
             ContentView()
                 .environmentObject(settings)
+                .environment(switches)
         }
     }
 }
