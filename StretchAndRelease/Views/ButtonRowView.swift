@@ -30,13 +30,23 @@ struct ButtonRowView: View {
                 
                 Button {
                     withAnimation(.linear(duration: 0.25)) {
-// if the timer has not started, timerIsActive = false, timerIsPaused = false, and isPhaseStretch = false
-// when the button is pressed to start the timer, isTimerActive = true and isPhaseStretch = true, isTimerPaused = false
-// when the button is pressed to pause the timer, isTimerActive = false and isTimerPaused = true
-// when the button is pressed to resume the timer, isTimerActive = true and isTimerPaused = false
-// if isPhaseStretch = true, then stretchPhase = stretch; otherwise stretchPhase = rest
+                        //start timer
+                        if !switches.isTimerActive && !switches.isTimerPaused {
+                            switches.isTimerActive = true
+                            switches.isPhaseStretch = true
+                        }
                         
-
+                        //pause timer from stretch
+                        if switches.isTimerActive && !switches.isTimerPaused {
+                            switches.isTimerActive = false
+                            switches.isTimerPaused = true
+                        }
+                        
+                        //restart timer to stretch, mechanism will used isPhaseStretch to determine what route to take
+                        if switches.isTimerPaused {
+                            switches.isTimerActive = true
+                            switches.isTimerPaused = false
+                        }
                     }
                 } label: {
                     ButtonView(buttonRoles: stretchPhase != .stretch ? .play : .pause, deviceType: deviceType)
@@ -67,4 +77,5 @@ struct ButtonRowView: View {
     
     ButtonRowView(stretchPhase: $stretchPhase, deviceType: $deviceType)
         .environmentObject(Settings.previewData)
+        .environment(switches)
 }

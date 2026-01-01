@@ -15,6 +15,7 @@ struct TimerCompositeView: View {
     
     //Settings
     @EnvironmentObject var settings: Settings
+    @Bindable var switches: Switches
     
     //Bindings passed from composite view
     @Binding var stretchPhase: StretchPhase
@@ -24,16 +25,16 @@ struct TimerCompositeView: View {
     @State private var repCount = 1
     @State private var endAngle = Angle(degrees: 340)
     @State private var totalTime = 0.0
-    @State private var isTimerActive = false
-    @State private var isTimerPaused = false
+    @State private var timeRemaining = 0
     @State private var timer = Timer.publish(every: 1.0, on: .main, in: .common).autoconnect()
+    
     
     var body: some View {
         VStack {
             ZStack {
                 MainArcView(stretchPhase: $stretchPhase, endAngle: $endAngle)
                     .padding(.bottom, 450)
-                AnalogView(stretchPhase: $stretchPhase, timeRemaining: $settings.timeRemaining, repCount: $repCount)
+                AnalogView(stretchPhase: $stretchPhase, timeRemaining: $timeRemaining, repCount: $repCount)
             }
         }
         .padding(.top, 350)
@@ -41,7 +42,7 @@ struct TimerCompositeView: View {
         
         //this modifier runs when the timer publishes
         .onReceive(timer) { _ in
-            if isTimerActive {
+            if switches.isTimerActive {
                 if stretchPhase == .stretch {
                     handleStretchPhase()
                 } else {
@@ -54,13 +55,13 @@ struct TimerCompositeView: View {
         .onChange(of: stretchPhase) {
             switch stretchPhase {
             case .stretch: {
-                if !isTimerActive {
-                    if !isTimerPaused {
+                if !switches.isTimerActive {
+                    if !switches.isTimerPaused {
                         if settings.audio {
                             SoundManager.instance.playPrompt(sound: .countdownExpanded)
                         }
                         DispatchQueue.main.asyncAfter(deadline: settings.audio ? .now() + 3.0 : .now() + 0.25) {
-                            isTimerActive = true
+                            switches.isTimerActive = true
                             totalTime = Double(settings.totalStretch)
                             withAnimation(.linear(duration: totalTime)) {
                                 updateAngle()
@@ -71,9 +72,9 @@ struct TimerCompositeView: View {
                             SoundManager.instance.playPrompt(sound: .countdown)
                         }
                         DispatchQueue.main.asyncAfter(deadline: settings.audio ? .now() + 3.0 : .now() + 0.25) {
-                            isTimerActive = true
-                            isTimerPaused = false
-                            withAnimation(.linear(duration: Double(settings.timeRemaining))) {
+                            switches.isTimerActive = true
+                            switches.isTimerPaused = false
+                            withAnimation(.linear(duration: Double(timeRemaining))) {
                                 updateAngle()
                             }
                         }
@@ -92,7 +93,7 @@ struct TimerCompositeView: View {
             }()
                 
             case .rest: {
-                if !isTimerPaused {
+                if !switches.isTimerPaused {
                     if settings.audio {
                         SoundManager.instance.playPrompt(sound: .rest)
                     }
@@ -107,7 +108,7 @@ struct TimerCompositeView: View {
                         SoundManager.instance.playPrompt(sound: .countdown)
                     }
                     DispatchQueue.main.asyncAfter(deadline: settings.audio ? .now() + 3.0 : .now() + 0.25) {
-                        isTimerPaused = false
+                        switches.isTimerPaused = false
                         withAnimation(.linear(duration: totalTime)) {
                             updateAngle()
                         }
@@ -116,8 +117,8 @@ struct TimerCompositeView: View {
             }()
                 
             case .paused: {
-                isTimerPaused = true
-                isTimerActive = false
+                switches.isTimerPaused = true
+                switches.isTimerActive = false
                 withAnimation(.linear(duration: 0)) {
                     updateAngle()
                 }
@@ -130,9 +131,9 @@ struct TimerCompositeView: View {
                     }
                 }
                 withAnimation(.linear(duration: 0.5)) {
-                    isTimerActive = false
-                    isTimerPaused = false
-                    settings.timeRemaining = settings.totalStretch
+                    switches.isTimerActive = false
+                    switches.isTimerPaused = false
+                    timeRemaining = settings.totalStretch
                     updateAngle()
                 }
             }
@@ -149,15 +150,15 @@ struct TimerCompositeView: View {
             endAngle = Angle(degrees: 340)
         }()
         case .paused: {
-            endAngle = Angle(degrees: Double(settings.timeRemaining) / totalTime * 320 + 20)
+            endAngle = Angle(degrees: Double(timeRemaining) / totalTime * 320 + 20)
         }()
         }
     }
     
     //function to handle the stretch phase of the timer
     func handleStretchPhase() {
-        if settings.timeRemaining > 0 {
-            settings.timeRemaining -= 1
+        if timeRemaining > 0 {
+            timeRemaining -= 1
             if settings.audio {
                 SoundManager.instance.playTick(sound: .tick)
             }
@@ -176,8 +177,8 @@ struct TimerCompositeView: View {
     
     //function to handle the rest phase of the timer
     func handleRestPhase() {
-        if settings.timeRemaining < settings.totalRest {
-            settings.timeRemaining += 1
+        if timeRemaining < settings.totalRest {
+            timeRemaining += 1
         } else {
             totalTime = Double(settings.totalStretch)
             stretchPhase = .stretch
@@ -191,7 +192,8 @@ struct TimerCompositeView: View {
 
 #Preview {
     @Previewable @State var stretchPhase: StretchPhase = .stop
+    @Previewable var switches: Switches = .init()
     
-    TimerCompositeView(stretchPhase: $stretchPhase)
+    TimerCompositeView(switches: switches, stretchPhase: $stretchPhase)
         .environmentObject(Settings.previewData)
 }

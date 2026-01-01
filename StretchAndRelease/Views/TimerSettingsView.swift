@@ -179,7 +179,6 @@ struct SettingsView: View {
                             settings.totalStretch = stretch
                             settings.totalRest = rest
                             settings.totalReps = reps
-                            settings.timeRemaining = settings.totalStretch
                             SoundManager.instance.volume = settings.promptVolume
                             didSettingsChange = true
                             dismiss()
