@@ -95,10 +95,12 @@ struct ContentView: View {
                 }
                 
             }
+            //sheet presents settings menu
             .sheet(isPresented: $isShowingSettings) {
                 SettingsView(didSettingsChange: $didSettingsChange)
             }
             
+            //sheet presents help screen
             .sheet(isPresented: $isShowingHelp) {
                 MainHelpScreenView()
                     .presentationDetents([.large])
@@ -144,4 +146,5 @@ struct ContentView: View {
 #Preview {
     ContentView()
         .environmentObject(Settings.previewData)
+        .environment(Switches())
 }

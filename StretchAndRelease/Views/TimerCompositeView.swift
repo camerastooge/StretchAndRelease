@@ -15,7 +15,7 @@ struct TimerCompositeView: View {
     
     //Settings
     @EnvironmentObject var settings: Settings
-    @Bindable var switches: Switches
+    @Environment(Switches.self) var switches
     
     //Bindings passed from composite view
     @Binding var stretchPhase: StretchPhase
@@ -192,8 +192,8 @@ struct TimerCompositeView: View {
 
 #Preview {
     @Previewable @State var stretchPhase: StretchPhase = .stop
-    @Previewable var switches: Switches = .init()
     
-    TimerCompositeView(switches: switches, stretchPhase: $stretchPhase)
+    TimerCompositeView(stretchPhase: $stretchPhase)
         .environmentObject(Settings.previewData)
+        .environment(Switches())
 }

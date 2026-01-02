@@ -58,6 +58,9 @@ struct ButtonRowView: View {
                 
                 Button {
                     stretchPhase = .stop
+                    switches.isTimerActive = false
+                    switches.isTimerPaused = false
+                    switches.isPhaseStretch = false
                 } label: {
                     ButtonView(buttonRoles: .reset, deviceType: .phone)
                 }
@@ -77,5 +80,5 @@ struct ButtonRowView: View {
     
     ButtonRowView(stretchPhase: $stretchPhase, deviceType: $deviceType)
         .environmentObject(Settings.previewData)
-        .environment(switches)
+        .environment(Switches())
 }
