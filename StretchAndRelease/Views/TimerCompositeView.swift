@@ -40,6 +40,16 @@ struct TimerCompositeView: View {
         .padding(.top, 350)
         .scaleEffect(0.95)
         
+        //set timeRemaining to totalStretch when the view loads
+        .onAppear {
+            timeRemaining = settings.totalStretch
+        }
+        
+        //when totalStretch changes, set timeRemaining to totalStretch
+        .onChange(of: settings.totalStretch) {
+            timeRemaining = settings.totalStretch
+        }
+        
         //this modifier runs when the timer publishes
         .onReceive(timer) { _ in
             if switches.isTimerActive {
@@ -62,6 +72,7 @@ struct TimerCompositeView: View {
                         }
                         DispatchQueue.main.asyncAfter(deadline: settings.audio ? .now() + 3.0 : .now() + 0.25) {
                             switches.isTimerActive = true
+                            switches.isPhaseStretch = true
                             totalTime = Double(settings.totalStretch)
                             withAnimation(.linear(duration: totalTime)) {
                                 updateAngle()
@@ -71,7 +82,7 @@ struct TimerCompositeView: View {
                         if settings.audio {
                             SoundManager.instance.playPrompt(sound: .countdown)
                         }
-                        DispatchQueue.main.asyncAfter(deadline: settings.audio ? .now() + 3.0 : .now() + 0.25) {
+                        DispatchQueue.main.asyncAfter(deadline: settings.audio ? .now() + 2.0 : .now() + 0.25) {
                             switches.isTimerActive = true
                             switches.isTimerPaused = false
                             withAnimation(.linear(duration: Double(timeRemaining))) {
@@ -84,6 +95,7 @@ struct TimerCompositeView: View {
                         SoundManager.instance.playPrompt(sound: .stretch)
                     }
                     DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                        switches.isPhaseStretch = true
                         totalTime = Double(settings.totalStretch)
                         withAnimation(.linear(duration: totalTime)) {
                             updateAngle()
@@ -98,6 +110,7 @@ struct TimerCompositeView: View {
                         SoundManager.instance.playPrompt(sound: .rest)
                     }
                     DispatchQueue.main.asyncAfter(deadline: settings.audio ? .now() + 0.25 : .now()) {
+                        switches.isPhaseStretch = false
                         totalTime = Double(settings.totalRest)
                         withAnimation(.linear(duration: totalTime)) {
                             updateAngle()
@@ -107,7 +120,7 @@ struct TimerCompositeView: View {
                     if settings.audio {
                         SoundManager.instance.playPrompt(sound: .countdown)
                     }
-                    DispatchQueue.main.asyncAfter(deadline: settings.audio ? .now() + 3.0 : .now() + 0.25) {
+                    DispatchQueue.main.asyncAfter(deadline: settings.audio ? .now() + 2.0 : .now() + 0.25) {
                         switches.isTimerPaused = false
                         withAnimation(.linear(duration: totalTime)) {
                             updateAngle()
@@ -117,8 +130,8 @@ struct TimerCompositeView: View {
             }()
                 
             case .paused: {
-                switches.isTimerPaused = true
                 switches.isTimerActive = false
+                switches.isTimerPaused = true
                 withAnimation(.linear(duration: 0)) {
                     updateAngle()
                 }
@@ -133,6 +146,7 @@ struct TimerCompositeView: View {
                 withAnimation(.linear(duration: 0.5)) {
                     switches.isTimerActive = false
                     switches.isTimerPaused = false
+                    switches.isPhaseStretch = false
                     timeRemaining = settings.totalStretch
                     updateAngle()
                 }
@@ -180,8 +194,9 @@ struct TimerCompositeView: View {
         if timeRemaining < settings.totalRest {
             timeRemaining += 1
         } else {
-            totalTime = Double(settings.totalStretch)
             stretchPhase = .stretch
+            totalTime = Double(settings.totalStretch)
+            timeRemaining = settings.totalStretch
             if settings.audio {
                 SoundManager.instance.playPrompt(sound: .stretch)
             }

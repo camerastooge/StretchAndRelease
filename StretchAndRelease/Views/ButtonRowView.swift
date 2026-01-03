@@ -32,20 +32,29 @@ struct ButtonRowView: View {
                     withAnimation(.linear(duration: 0.25)) {
                         //start timer
                         if !switches.isTimerActive && !switches.isTimerPaused {
-                            switches.isTimerActive = true
-                            switches.isPhaseStretch = true
+                            withAnimation(.linear(duration: 0.25)) {
+                                stretchPhase = .stretch
+                            }
                         }
                         
-                        //pause timer from stretch
+                        //pause timer
                         if switches.isTimerActive && !switches.isTimerPaused {
-                            switches.isTimerActive = false
-                            switches.isTimerPaused = true
+                            withAnimation(.linear(duration: 0.25)) {
+                                stretchPhase = .paused
+                            }
                         }
                         
                         //restart timer to stretch, mechanism will used isPhaseStretch to determine what route to take
                         if switches.isTimerPaused {
-                            switches.isTimerActive = true
-                            switches.isTimerPaused = false
+                            if switches.isPhaseStretch {
+                                withAnimation(.linear(duration: 0.25)) {
+                                    stretchPhase = .stretch
+                                }
+                            } else {
+                                withAnimation(.linear(duration: 0.25)) {
+                                    stretchPhase = .rest
+                                }
+                            }
                         }
                     }
                 } label: {
