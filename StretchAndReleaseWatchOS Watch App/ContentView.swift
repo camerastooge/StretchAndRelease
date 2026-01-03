@@ -48,8 +48,6 @@ struct ContentView: View {
                 //Screen area for TimerActionViewWatch
                 VStack {
                     ZStack {
-                        Color.gray.opacity(0)
-                        
                         VStack {
                             Color.gray.opacity(0)
                             
@@ -91,20 +89,25 @@ struct ContentView: View {
                                 Button {
                                     withAnimation {
                                         if stretchPhase == .stop {
+                                            withAnimation(.linear(duration: 0.5)) {
+                                                stretchPhase = .stretch
+                                            }
+                                            
                                             if audio {
                                                 SoundManager.instance.playPrompt(sound: .countdownExpanded)
                                             }
+                                            
                                             DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-                                                withAnimation(.linear(duration: 0.25)) {
-                                                    isTimerActive = true
-                                                    isTimerPaused = false
-                                                    stretchPhase = .stretch
-                                                    repsCompleted = 0
-                                                }
+                                                isTimerActive = true
+                                                isTimerPaused = false
+                                                repsCompleted = 0
+                                                
                                             }
                                         } else if !isTimerPaused {
-                                            isTimerPaused = true
-                                            isTimerActive = false
+                                            withAnimation(.linear(duration: 0.25)) {
+                                                isTimerPaused = true
+                                                isTimerActive = false
+                                            }
                                         } else {
                                             if audio {
                                                 SoundManager.instance.playPrompt(sound: .countdownExpanded)
@@ -127,11 +130,13 @@ struct ContentView: View {
                                 .accessibilityLabel("Start or Pause Timer")
                                 
                                 Button {
-                                    isTimerActive = false
-                                    isTimerPaused = false
-                                    repsCompleted = 0
-                                    stretchPhase = .stop
-                                    timeRemaining = totalStretch
+                                    withAnimation(.linear(duration: 0.25)) {
+                                        isTimerActive = false
+                                        isTimerPaused = false
+                                        repsCompleted = 0
+                                        stretchPhase = .stop
+                                        timeRemaining = totalStretch
+                                    }
                                     withAnimation(.easeInOut(duration: 0.5)) {
                                         updateEndAngle()
                                     }
@@ -218,12 +223,16 @@ struct ContentView: View {
                             } else {
                                 repsCompleted += 1
                                 if repsCompleted < totalReps {
-                                    stretchPhase = .rest
+                                    withAnimation(.linear(duration: 0.5)) {
+                                        stretchPhase = .rest
+                                    }
                                     if audio {
                                         SoundManager.instance.playPrompt(sound: .rest)
                                     }
                                 } else {
-                                    stretchPhase = .stop
+                                    withAnimation(.linear(duration: 0.25)) {
+                                        stretchPhase = .stop
+                                    }
                                     timeRemaining = totalStretch
                                     withAnimation(.linear(duration: 1.0)) {
                                         updateEndAngle()
@@ -242,7 +251,9 @@ struct ContentView: View {
                                     updateEndAngle()
                                 }
                             } else {
-                                stretchPhase = .stretch
+                                withAnimation(.linear(duration: 0.5)) {
+                                    stretchPhase = .stretch
+                                }
                                 timeRemaining = totalStretch
                                 if audio {
                                     SoundManager.instance.playPrompt(sound: .stretch)
@@ -264,8 +275,10 @@ struct ContentView: View {
     //function to set end angle of arc
     func updateEndAngle() {
         switch stretchPhase {
-        case .stretch, .rest:
+        case .stretch:
             endAngle = Angle(degrees: Double(timeRemaining) / Double(totalStretch) * 320 + 20)
+        case .rest:
+            endAngle = Angle(degrees: Double(timeRemaining) / Double(totalRest) * 320 + 20)
         case .stop:
             endAngle = Angle(degrees: 340)
         }

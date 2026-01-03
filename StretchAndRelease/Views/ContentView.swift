@@ -276,8 +276,10 @@ struct ContentView: View {
     //function to set end angle of arc
     func updateEndAngle() {
         switch stretchPhase {
-        case .stretch, .rest:
+        case .stretch:
             endAngle = Angle(degrees: Double(timeRemaining) / Double(totalStretch) * 320 + 20)
+        case .rest:
+            endAngle = Angle(degrees: Double(timeRemaining) / Double(totalRest) * 320 + 20)
         case .stop:
             endAngle = Angle(degrees: 340)
         }
