@@ -230,11 +230,11 @@ struct ContentView: View {
                                         SoundManager.instance.playPrompt(sound: .rest)
                                     }
                                 } else {
-                                    withAnimation(.linear(duration: 0.25)) {
+                                    withAnimation(.easeOut(duration: 0.25)) {
                                         stretchPhase = .stop
                                     }
                                     timeRemaining = totalStretch
-                                    withAnimation(.linear(duration: 1.0)) {
+                                    withAnimation(.easeOut(duration: 1.0)) {
                                         updateEndAngle()
                                     }
                                     if audio {
@@ -247,11 +247,11 @@ struct ContentView: View {
                         case .rest: return {
                             if timeRemaining < totalRest {
                                 timeRemaining += 1
-                                withAnimation(.linear(duration: 1.0)) {
+                                withAnimation(.easeOut(duration: 1.0)) {
                                     updateEndAngle()
                                 }
                             } else {
-                                withAnimation(.linear(duration: 0.5)) {
+                                withAnimation(.easeOut(duration: 0.5)) {
                                     stretchPhase = .stretch
                                 }
                                 timeRemaining = totalStretch

@@ -220,7 +220,7 @@ struct ContentView: View {
                 case .stretch: return {
                     if timeRemaining > 0 {
                         timeRemaining -= 1
-                        withAnimation(.linear(duration: 1.0)) {
+                        withAnimation(.easeOut(duration: 1.0)) {
                             updateEndAngle()
                         }
                         if audio {
@@ -237,7 +237,7 @@ struct ContentView: View {
                             }
                         } else {
                             timeRemaining = totalStretch
-                            withAnimation(.linear(duration: 0.5)) {
+                            withAnimation(.easeOut(duration: 0.5)) {
                                 stretchPhase = .stop
                                 updateEndAngle()
                             }
@@ -251,7 +251,7 @@ struct ContentView: View {
                 case .rest: return {
                     if timeRemaining < totalRest {
                         timeRemaining += 1
-                        withAnimation(.linear(duration: 1.0)) {
+                        withAnimation(.easeOut(duration: 1.0)) {
                             updateEndAngle()
                         }
                     } else {
