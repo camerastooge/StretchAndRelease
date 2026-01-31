@@ -183,8 +183,8 @@ struct ContentView: View {
             }
         }
         
-        //receives changed settings from Apple Watch app
         .onChange(of: connectivity.didStatusChange) {
+        //receives changed settings from Apple Watch app
             totalStretch = connectivity.statusContext["stretch"] as? Int ?? 10
             totalRest = connectivity.statusContext["rest"] as? Int ?? 5
             totalReps = connectivity.statusContext["reps"] as? Int ?? 5

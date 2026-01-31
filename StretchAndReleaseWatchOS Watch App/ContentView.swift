@@ -11,6 +11,9 @@ struct ContentView: View {
     //Environment properties
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.accessibilityDifferentiateWithoutColor) var differentiateWithoutColor
+    @Environment(\.scenePhase) var scenePhase
+    
+    @StateObject var stretchSession = StretchSession()
     
     // Properties stored in UserDefaults
     @AppStorage("stretch") private var totalStretch = 10
@@ -58,6 +61,9 @@ struct ContentView: View {
                                     Arc(endAngle: endAngle)
                                         .stroke(stretchPhase.phaseColor, style: StrokeStyle(lineWidth: 10, lineCap: .round))
                                         .rotationEffect(Angle(degrees: 90))
+                                        .sensoryFeedback(.impact(intensity: stretchPhase.phaseIntensity), trigger: endAngle) { oldValue, newValue in
+                                                return haptics
+                                        }
                                     
                                     VStack {
                                         Text("\(String(format: "%02d", Int(timeRemaining)))")
@@ -75,7 +81,7 @@ struct ContentView: View {
                                     .fontWeight(.bold)
                                     .foregroundStyle(!isTimerPaused ? stretchPhase.phaseColor : .gray)
                                 }
-                                .sensoryFeedback(.impact(intensity: haptics ? stretchPhase.phaseIntensity : 0.0), trigger: endAngle)
+                                
                             }
                             .containerRelativeFrame(.horizontal, alignment: .center) { length, _ in
                                 length * 0.9
@@ -93,11 +99,13 @@ struct ContentView: View {
                                                 stretchPhase = .stretch
                                             }
                                             
+                                            stretchSession.start()
+                                            
                                             if audio {
                                                 SoundManager.instance.playPrompt(sound: .countdownExpanded)
                                             }
                                             
-                                            DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                                            DispatchQueue.main.asyncAfter(deadline: audio ? .now() + 3 : .now() + 0.5) {
                                                 isTimerActive = true
                                                 isTimerPaused = false
                                                 repsCompleted = 0
@@ -112,7 +120,7 @@ struct ContentView: View {
                                             if audio {
                                                 SoundManager.instance.playPrompt(sound: .countdownExpanded)
                                             }
-                                            DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                                            DispatchQueue.main.asyncAfter(deadline: audio ? .now() + 3 : .now() + 0.5) {
                                                 withAnimation(.linear(duration: 0.25)) {
                                                     isTimerPaused = false
                                                     isTimerActive = true
@@ -127,7 +135,7 @@ struct ContentView: View {
                                 .buttonStyle(.plain)
                                 .padding(.trailing)
                                 .accessibilityInputLabels(["Start", "Pause", "Start Timer", "Pause Timer"])
-                                .accessibilityLabel("Start or Pause Timer")
+                                .accessibilityLabel(stretchPhase != .stretch ? "Start the Timer" : "Pause the Timer")
                                 
                                 Button {
                                     withAnimation(.linear(duration: 0.25)) {
@@ -136,6 +144,7 @@ struct ContentView: View {
                                         repsCompleted = 0
                                         stretchPhase = .stop
                                         timeRemaining = totalStretch
+                                        stretchSession.stop()
                                     }
                                     withAnimation(.easeInOut(duration: 0.5)) {
                                         updateEndAngle()
@@ -171,6 +180,7 @@ struct ContentView: View {
                 .onChange(of: isShowingSettings) {
                     withAnimation(.smooth(duration: 0.25)) {
                         stretchPhase = .stop
+                        stretchSession.stop()
                         timeRemaining = totalStretch
                         repsCompleted = 0
                         endAngle = Angle(degrees: 340)
@@ -194,6 +204,14 @@ struct ContentView: View {
                 //when user changes totalStretch in SettingsView, force timeRemaining to reset to TotalStretch
                 .onChange(of: totalStretch) {
                     timeRemaining = totalStretch
+                }
+                
+                //stop timer if application is fully backgrounded
+                .onChange(of: scenePhase) {
+                    if scenePhase == .background {
+                        stretchPhase = .stop
+                        stretchSession.stop()
+                    }
                 }
                 
                 //sets timeRemaining to totalStretch on appearance
@@ -263,6 +281,7 @@ struct ContentView: View {
                             
                         case .stop: return {
                             isTimerActive = false
+                            stretchSession.stop()
                         }()
                         }
                     }
