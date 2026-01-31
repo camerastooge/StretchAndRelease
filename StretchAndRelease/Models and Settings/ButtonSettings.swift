@@ -36,16 +36,52 @@ enum DeviceType {
 }
 
 struct PhoneFrame: ViewModifier {
+    @Environment(\.accessibilityDifferentiateWithoutColor) var differentiateWithoutColor
+    
+    private var phoneButtonFrameWidth: CGFloat {
+        if differentiateWithoutColor {
+            return 125
+        } else {
+            return 85
+        }
+    }
+    
+    private var phoneButtonFrameHeight: CGFloat {
+        if differentiateWithoutColor {
+            return 85
+        } else {
+            return 50
+        }
+    }
+    
     func body(content: Content) -> some View {
         content
-            .frame(width: 85, height: 50)
+            .frame(width: phoneButtonFrameWidth, height: phoneButtonFrameHeight)
     }
 }
 
 struct WatchFrame: ViewModifier {
+    @Environment(\.accessibilityDifferentiateWithoutColor) var differentiateWithoutColor
+    
+    private var watchButtonFrameWidth: CGFloat {
+        if differentiateWithoutColor {
+            return 50
+        } else {
+            return 30
+        }
+    }
+    
+    private var watchButtonFrameHeight: CGFloat {
+        if differentiateWithoutColor {
+            return 50
+        } else {
+            return 30
+        }
+    }
+    
     func body(content: Content) -> some View {
         content
-            .frame(width: 30, height: 30)
+            .frame(width: watchButtonFrameWidth, height: watchButtonFrameHeight)
     }
 }
 

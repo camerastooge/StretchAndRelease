@@ -55,7 +55,9 @@ struct MainArcView: View {
             .dynamicTypeSize(DynamicTypeSize.xxxLarge...)
             .foregroundStyle(differentiateWithoutColor ? .black : isTimerPaused ? .gray : stretchPhase.phaseColor)
             .fontWeight(.bold)
-            .sensoryFeedback(.impact(intensity: haptics ? stretchPhase.phaseIntensity : 0.0), trigger: endAngle)
+            .sensoryFeedback(.impact(intensity: stretchPhase.phaseIntensity), trigger: endAngle) { oldValue, newValue in
+                    return haptics
+            }
             .padding(.bottom)
             .containerRelativeFrame(.vertical, alignment: .bottom) { length, _ in
                 length / 1.15
