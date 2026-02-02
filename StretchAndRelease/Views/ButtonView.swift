@@ -22,6 +22,7 @@ struct ButtonView: View {
             if !differentiateWithoutColor {
                 Image(systemName: buttonRoles.buttonImage)
                     .phoneFrame()
+                    .font(.system(size: 30))
                     .foregroundStyle(.white)
                     .background(buttonRoles.buttonColor)
                     .clipShape(.capsule)
@@ -29,6 +30,7 @@ struct ButtonView: View {
             } else {
                 Image(systemName: buttonRoles.buttonImage)
                     .phoneFrame()
+                    .font(.system(size: 30))
                     .foregroundStyle(.black)
                     .dynamicTypeSize(...DynamicTypeSize.accessibility3)
             }

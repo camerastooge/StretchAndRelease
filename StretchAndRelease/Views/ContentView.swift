@@ -48,9 +48,8 @@ struct ContentView: View {
         NavigationStack {
             GeometryReader { proxy in
                 Color.clear
-                    .background(
-                        LinearGradient(gradient: Gradient(colors: colorScheme == .dark ? [.black, .gray] : [.gray, .white]), startPoint: .topLeading, endPoint: .bottomTrailing)
-                    )
+                    .gradientBackground()
+
                 VStack(spacing: 0) {
                     ZStack {
                         MainArcView(stretchPhase: $stretchPhase, haptics: $haptics, isTimerActive: $isTimerActive, isTimerPaused: $isTimerPaused, endAngle: $endAngle, timeRemaining: $timeRemaining, totalReps: $totalReps, repsCompleted: $repsCompleted)

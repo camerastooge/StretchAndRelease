@@ -61,6 +61,7 @@
 				"Models and Settings/Connectivity.swift",
 				"Models and Settings/SoundManager.swift",
 				"Models and Settings/StretchPhase.swift",
+				"Models and Settings/View Modifiers.swift",
 				Views/Arc.swift,
 				Views/ButtonView.swift,
 			);
