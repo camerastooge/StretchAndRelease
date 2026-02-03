@@ -86,9 +86,9 @@ struct ContentView: View {
                                         isTimerActive = false
                                     } else {
                                         if audio {
-                                            SoundManager.instance.playPrompt(sound: .countdownExpanded)
+                                            SoundManager.instance.playPrompt(sound: .countdown)
                                         }
-                                        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                                             withAnimation(.linear(duration: 0.25)) {
                                                 isTimerPaused = false
                                                 isTimerActive = true

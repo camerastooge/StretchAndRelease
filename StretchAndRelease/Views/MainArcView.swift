@@ -29,7 +29,7 @@ struct MainArcView: View {
                 Arc(endAngle: endAngle)
                     .stroke(stretchPhase.phaseColor, style: StrokeStyle(lineWidth: 25, lineCap: .round))
                     .rotationEffect(Angle(degrees: 90))
-                    .shadow(color: colorScheme == .dark ? .gray.opacity(0.65) : .black.opacity(0.35), radius: 5, x: 8, y: 5)
+                    .shadow(color: colorScheme == .dark ? .gray.opacity(0) : .black.opacity(0.35), radius: 5, x: 8, y: 5)
                     .padding(.bottom)
             } else {
                 Arc(endAngle: endAngle)
