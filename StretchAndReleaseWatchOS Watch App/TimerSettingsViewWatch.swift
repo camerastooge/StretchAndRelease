@@ -22,9 +22,9 @@ struct TimerSettingsViewWatch: View {
     @Binding var promptVolume: Double
     
     // Local variables
-    @State private var stretch = 0
-    @State private var rest = 0
-    @State private var reps = 0
+    @State private var stretch: Float = 0
+    @State private var rest: Float = 0
+    @State private var reps: Float = 0
     @State private var page = 1
     @State private var isEditing = false
     
@@ -41,9 +41,9 @@ struct TimerSettingsViewWatch: View {
                 .padding(.vertical)
             Divider()
             Button {
-                totalStretch = stretch
-                totalRest = rest
-                totalReps = reps
+                totalStretch = Int(stretch)
+                totalRest = Int(rest)
+                totalReps = Int(reps)
                 SoundManager.instance.volume = promptVolume
                 didSettingsChange = true
                 dismiss()
@@ -63,18 +63,18 @@ struct TimerSettingsViewWatch: View {
             
         }
         .onAppear {
-            stretch = totalStretch
-            rest = totalRest
-            reps = totalReps
+            stretch = Float(totalStretch)
+            rest = Float(totalRest)
+            reps = Float(totalReps)
         }
     }
 }
 
 struct WatchAppSettingsView: View {
     
-    @Binding var stretch: Int
-    @Binding var rest: Int
-    @Binding var reps: Int
+    @Binding var stretch: Float
+    @Binding var rest: Float
+    @Binding var reps: Float
     
     var body: some View {
         HStack {
@@ -91,6 +91,8 @@ struct WatchAppSettingsView: View {
             .pickerStyle(.wheel)
             .labelsHidden()
             .frame(width: 50, height: 25)
+            .focusable()
+            .digitalCrownRotation($stretch)
         }
         .accessibilityElement(children: .combine)
         .accessibilityHint("Adjust how long you want to hold each stretch")
@@ -119,6 +121,8 @@ struct WatchAppSettingsView: View {
             .pickerStyle(.wheel)
             .labelsHidden()
             .frame(width: 50, height: 25)
+            .focusable()
+            .digitalCrownRotation($rest)
         }
         .accessibilityElement(children: .combine)
         .accessibilityHint("Adjust how long you want to rest between stretches")
@@ -146,6 +150,8 @@ struct WatchAppSettingsView: View {
             .pickerStyle(.wheel)
             .labelsHidden()
             .frame(width: 50, height: 25)
+            .focusable()
+            .digitalCrownRotation($reps)
         }
         .accessibilityElement(children: .combine)
         .accessibilityHint("Set the number of times you want to perform this stretch")
@@ -173,10 +179,12 @@ struct WatchDeviceSettingsView: View {
                 .font(.caption2)
                 .accessibilityHint("Turn audio cues on or off")
                 .padding(.bottom, 5)
+                .focusable(false)
             Toggle("Haptics: \(haptics ? "on" : "off")", isOn: $haptics)
                 .font(.caption2)
                 .accessibilityHint("Turn haptic feedback on or off")
                 .padding(.bottom, 5)
+                .focusable(false)
             HStack {
                 Slider(
                     value: $promptVolume,
@@ -190,6 +198,8 @@ struct WatchDeviceSettingsView: View {
                 } onEditingChanged: { editing in
                     isEditing = editing
                 }
+                .focusable()
+                .digitalCrownRotation($promptVolume)
             }
         }
         .padding(.horizontal)
