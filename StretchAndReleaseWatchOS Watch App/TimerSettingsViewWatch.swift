@@ -22,10 +22,9 @@ struct TimerSettingsViewWatch: View {
     @Binding var promptVolume: Double
     
     // Local variables
-    @State private var stretch: Float = 0
-    @State private var rest: Float = 0
-    @State private var reps: Float = 0
-    @State private var page = 1
+    @State private var stretch = 0
+    @State private var rest = 0
+    @State private var reps = 0
     @State private var isEditing = false
     
     // variable for button view
@@ -33,137 +32,141 @@ struct TimerSettingsViewWatch: View {
     var deviceType: DeviceType = .watch
     
     var body: some View {
-        ScrollView(.vertical) {
-            WatchAppSettingsView(stretch: $stretch, rest: $rest, reps: $reps)
-                .padding(.vertical)
-            Divider()
-            WatchDeviceSettingsView(audio: $audio, haptics: $haptics, promptVolume: $promptVolume, isEditing: $isEditing)
-                .padding(.vertical)
-            Divider()
-            Button {
-                totalStretch = Int(stretch)
-                totalRest = Int(rest)
-                totalReps = Int(reps)
-                SoundManager.instance.volume = promptVolume
-                didSettingsChange = true
-                dismiss()
-            } label: {
-                Text("SAVE")
-                    .frame(width: 65, height: 25)
-                    .font(.headline)
-                    .fontWeight(.bold)
-                    .foregroundStyle(.white)
-                    .background(.green)
-                    .clipShape(.capsule)
-                    .padding(.bottom, 5)
-            }
-            .padding(.vertical)
-            .accessibilityHint("Save your settings and return to the main screen")
-            .buttonStyle(.plain)
+        ZStack(alignment: .center) {
+            Color.clear
+                .gradientBackground()
             
-        }
-        .onAppear {
-            stretch = Float(totalStretch)
-            rest = Float(totalRest)
-            reps = Float(totalReps)
+            VStack {
+                TabView {
+                    WatchAppSettingsView(stretch: $stretch, rest: $rest, reps: $reps)
+                        .tag(0)
+                    
+                    WatchDeviceSettingsView(audio: $audio, haptics: $haptics, promptVolume: $promptVolume, isEditing: $isEditing)
+                        .tag(1)
+                }
+                .focusable()
+                .tabViewStyle(.verticalPage)
+            }
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        totalStretch = Int(stretch)
+                        totalRest = Int(rest)
+                        totalReps = Int(reps)
+                        SoundManager.instance.volume = promptVolume
+                        didSettingsChange = true
+                        dismiss()
+                    } label: {
+                        if #available(watchOS 26.0, *) {
+                            ButtonView(buttonRoles: buttonRoles, deviceType: deviceType)
+                                .glassEffect()
+                        } else {
+                            ButtonView(buttonRoles: buttonRoles, deviceType: deviceType)
+                        }
+                    }
+                    .accessibilityHint("Save your settings and return to the main screen")
+                    .buttonStyle(.plain)
+                }
+            }
+            .onAppear {
+                stretch = totalStretch
+                rest = totalRest
+                reps = totalReps
+            }
         }
     }
 }
 
 struct WatchAppSettingsView: View {
     
-    @Binding var stretch: Float
-    @Binding var rest: Float
-    @Binding var reps: Float
+    @Binding var stretch: Int
+    @Binding var rest: Int
+    @Binding var reps: Int
     
     var body: some View {
-        HStack {
-            Text("Stretch")
-                .font(.caption2)
-            
-            Spacer()
-            
-            Picker("Stretch Duration", selection: $stretch) {
-                ForEach(1...30, id:\.self) {
-                    Text("\($0)")
+        VStack {
+            HStack {
+                Text("Stretch")
+                    .font(.caption2)
+                
+                Spacer()
+                
+                Picker("Stretch Duration", selection: $stretch) {
+                    ForEach(1...30, id:\.self) {
+                        Text("\($0)")
+                    }
+                }
+                .pickerStyle(.wheel)
+                .labelsHidden()
+                .frame(width: 50, height: 25)
+            }
+            .accessibilityElement(children: .combine)
+            .accessibilityHint("Adjust how long you want to hold each stretch")
+            .accessibilityValue(String(stretch))
+            .accessibilityAdjustableAction { direction in
+                switch direction {
+                case .increment: stretch += 1
+                case .decrement: stretch -= 1
+                @unknown default:
+                    print("not handled")
                 }
             }
-            .pickerStyle(.wheel)
-            .labelsHidden()
-            .frame(width: 50, height: 25)
-            .focusable()
-            .digitalCrownRotation($stretch)
-        }
-        .accessibilityElement(children: .combine)
-        .accessibilityHint("Adjust how long you want to hold each stretch")
-        .accessibilityValue(String(stretch))
-        .accessibilityAdjustableAction { direction in
-            switch direction {
-            case .increment: stretch += 1
-            case .decrement: stretch -= 1
-            @unknown default:
-                print("not handled")
+            .padding(.horizontal)
+            
+            HStack {
+                Text("Rest")
+                    .font(.caption2)
+                
+                Spacer()
+                
+                Picker("Rest Duration", selection: $rest) {
+                    ForEach(1...30, id:\.self) {
+                        Text("\($0)")
+                    }
+                }
+                .pickerStyle(.wheel)
+                .labelsHidden()
+                .frame(width: 50, height: 25)
             }
-        }
-        .padding(.horizontal)
-        
-        HStack {
-            Text("Rest")
-                .font(.caption2)
-            
-            Spacer()
-            
-            Picker("Rest Duration", selection: $rest) {
-                ForEach(1...30, id:\.self) {
-                    Text("\($0)")
+            .accessibilityElement(children: .combine)
+            .accessibilityHint("Adjust how long you want to rest between stretches")
+            .accessibilityValue(String(rest))
+            .accessibilityAdjustableAction { direction in
+                switch direction {
+                case .increment: rest += 1
+                case .decrement: rest -= 1
+                default: print("not handled")
                 }
             }
-            .pickerStyle(.wheel)
-            .labelsHidden()
-            .frame(width: 50, height: 25)
-            .focusable()
-            .digitalCrownRotation($rest)
-        }
-        .accessibilityElement(children: .combine)
-        .accessibilityHint("Adjust how long you want to rest between stretches")
-        .accessibilityValue(String(rest))
-        .accessibilityAdjustableAction { direction in
-            switch direction {
-            case .increment: rest += 1
-            case .decrement: rest -= 1
-            default: print("not handled")
+            .padding(.horizontal)
+            
+            HStack {
+                Text("Reps")
+                    .font(.caption2)
+                
+                Spacer()
+                
+                Picker("Number of Repetitions", selection: $reps) {
+                    ForEach(1...30, id:\.self) {
+                        Text("\($0)")
+                    }
+                }
+                .pickerStyle(.wheel)
+                .labelsHidden()
+                .frame(width: 50, height: 25)
             }
-        }
-        .padding(.horizontal)
-        
-        HStack {
-            Text("Reps")
-                .font(.caption2)
-            
-            Spacer()
-            
-            Picker("Number of Repetitions", selection: $reps) {
-                ForEach(1...30, id:\.self) {
-                    Text("\($0)")
+            .accessibilityElement(children: .combine)
+            .accessibilityHint("Set the number of times you want to perform this stretch")
+            .accessibilityValue(String(reps))
+            .accessibilityAdjustableAction { direction in
+                switch direction {
+                case .increment: reps += 1
+                case .decrement: reps -= 1
+                default: print("not handled")
                 }
             }
-            .pickerStyle(.wheel)
-            .labelsHidden()
-            .frame(width: 50, height: 25)
-            .focusable()
-            .digitalCrownRotation($reps)
+            .padding(.horizontal)
         }
-        .accessibilityElement(children: .combine)
-        .accessibilityHint("Set the number of times you want to perform this stretch")
-        .accessibilityValue(String(reps))
-        .accessibilityAdjustableAction { direction in
-            switch direction {
-            case .increment: reps += 1
-            case .decrement: reps -= 1
-            default: print("not handled")
-            }
-        }
-        .padding(.horizontal)
     }
 }
 
@@ -174,17 +177,15 @@ struct WatchDeviceSettingsView: View {
     @Binding var isEditing: Bool
     
     var body: some View {
-        Group {
+        VStack {
             Toggle("Audio: \(audio ? "on" : "off")", isOn: $audio)
                 .font(.caption2)
                 .accessibilityHint("Turn audio cues on or off")
                 .padding(.bottom, 5)
-                .focusable(false)
             Toggle("Haptics: \(haptics ? "on" : "off")", isOn: $haptics)
                 .font(.caption2)
                 .accessibilityHint("Turn haptic feedback on or off")
                 .padding(.bottom, 5)
-                .focusable(false)
             HStack {
                 Slider(
                     value: $promptVolume,
@@ -198,20 +199,12 @@ struct WatchDeviceSettingsView: View {
                 } onEditingChanged: { editing in
                     isEditing = editing
                 }
-                .focusable()
-                .digitalCrownRotation($promptVolume)
             }
         }
         .padding(.horizontal)
     }
 }
 
-struct SaveButtonView: View {
-    
-    var body: some View {
-        
-    }
-}
 
 #Preview {
     @Previewable @State var didSettingsChange: Bool = false
