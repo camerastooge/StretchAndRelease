@@ -48,6 +48,9 @@ struct ContentView: View {
     var body: some View {
         NavigationStack {
             ZStack {
+                Color.clear
+                    .gradientBackground()
+                
                 //Screen area for TimerActionViewWatch
                 VStack {
                     ZStack {
