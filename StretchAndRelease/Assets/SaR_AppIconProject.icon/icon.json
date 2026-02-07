@@ -141,9 +141,13 @@
       "hidden" : false,
       "layers" : [
         {
+          "blend-mode" : "normal",
+          "fill" : "automatic",
+          "glass" : true,
           "hidden" : false,
-          "image-name" : "Banded background.png",
-          "name" : "Banded background"
+          "image-name" : "SaR_Radial Gradient_Bkgrnd_REV.png",
+          "name" : "SaR_Radial Gradient_Bkgrnd_REV",
+          "opacity" : 0.77
         }
       ],
       "lighting-specializations" : [
