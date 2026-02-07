@@ -26,6 +26,7 @@ struct TimerSettingsViewWatch: View {
     @State private var rest = 0
     @State private var reps = 0
     @State private var isEditing = false
+    @State private var subviewIsToggled = false
     
     // variable for button view
     var buttonRoles: ButtonRoles = .save
@@ -35,11 +36,11 @@ struct TimerSettingsViewWatch: View {
         NavigationStack{
             ZStack(alignment: .center) {
                 Color.clear
-                    .gradientBackground()
+                    .watchSettingsGradientBackground()
                 
                 VStack {
                     TabView {
-                        WatchAppSettingsView(stretch: $stretch, rest: $rest, reps: $reps)
+                        WatchAppSettingsView(stretch: $stretch, rest: $rest, reps: $reps, subviewIsToggled: $subviewIsToggled)
                             .tag(0)
                         
                         WatchDeviceSettingsView(audio: $audio, haptics: $haptics, promptVolume: $promptVolume, isEditing: $isEditing)
@@ -69,9 +70,13 @@ struct TimerSettingsViewWatch: View {
                     }
                 }
                 .onAppear {
-                    stretch = totalStretch
-                    rest = totalRest
-                    reps = totalReps
+                    if !subviewIsToggled {
+                        stretch = totalStretch
+                        rest = totalRest
+                        reps = totalReps
+                    } else {
+                        subviewIsToggled = false
+                    }
                 }
             }
         }
@@ -83,6 +88,7 @@ struct WatchAppSettingsView: View {
     @Binding var stretch: Int
     @Binding var rest: Int
     @Binding var reps: Int
+    @Binding var subviewIsToggled: Bool
     
     var body: some View {
         List {
@@ -148,6 +154,9 @@ struct WatchAppSettingsView: View {
                         .foregroundColor(.white)
                 }
             }
+        }
+        .onDisappear {
+            subviewIsToggled = true
         }
 //        VStack {
 //            HStack {

@@ -36,3 +36,18 @@ extension View {
         self.modifier(BackGroundGradientView())
     }
 }
+
+
+struct WatchSettingsBackgroundGradientView: ViewModifier {
+    
+    func body(content: Content) -> some View {
+        content
+            .background(LinearGradient(gradient: Gradient(colors: [.purple, .gray]), startPoint: .topLeading, endPoint: .bottomTrailing))
+    }
+}
+
+extension View {
+    func watchSettingsGradientBackground() -> some View {
+        self.modifier(WatchSettingsBackgroundGradientView())
+    }
+}
