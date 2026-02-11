@@ -48,16 +48,12 @@ struct MainHelpScreenView: View {
                 }
                 
                 Section {
-                    if #available(iOS 26.0, *) {
-                        
-                    } else {
-                        HStack {
-                            Spacer()
-                            Link("View Our Privacy Policy", destination: privacyURL)
-                            Spacer()
-                        }
-                        .padding(.vertical, 8)
+                    HStack {
+                        Spacer()
+                        Link("View Our Privacy Policy", destination: privacyURL)
+                        Spacer()
                     }
+                    .padding(.vertical, 8)
                 }
             }
             .listSectionSpacing(.compact)
