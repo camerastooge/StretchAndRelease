@@ -6,10 +6,13 @@
 //
 
 import SwiftUI
+import WebKit
 
 struct MainHelpScreenView: View {
     var deviceType: DeviceType = .phone
     var buttonRole: ButtonRoles = .play
+    
+    let privacyURL = URL(filePath: "https://camerastooge.github.io/sar-privacy-policy")
     
     var body: some View {
         NavigationStack {
@@ -43,9 +46,22 @@ struct MainHelpScreenView: View {
                     }
                     .accessibilityHint("The settings button accesses the settings menu")
                 }
+                
+                Section {
+                    if #available(iOS 26.0, *) {
+                        
+                    } else {
+                        HStack {
+                            Spacer()
+                            Link("View Our Privacy Policy", destination: privacyURL)
+                            Spacer()
+                        }
+                        .padding(.vertical, 8)
+                    }
+                }
             }
             .listSectionSpacing(.compact)
-            .navigationTitle("Settings")
+            .navigationTitle("Help")
             .navigationBarTitleDisplayMode(.inline)
         }
     }
