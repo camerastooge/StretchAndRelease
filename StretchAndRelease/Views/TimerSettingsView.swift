@@ -43,7 +43,7 @@ struct SettingsView: View {
                             Section("Stretch Time") {
                                 dynamicLayout {
                                     Picker("Stretch Duration", selection: $stretch) {
-                                        ForEach(1...30, id:\.self) {
+                                        ForEach(1...60, id:\.self) {
                                             Text("\($0)")
                                                 .font(.title2)
                                         }
@@ -70,7 +70,7 @@ struct SettingsView: View {
                             Section("Rest Time") {
                                 dynamicLayout {
                                     Picker("Rest Duration", selection: $rest) {
-                                        ForEach(1...10, id:\.self) {
+                                        ForEach(1...30, id:\.self) {
                                             Text("\($0)")
                                                 .font(.title2)
                                         }

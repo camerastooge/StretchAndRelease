@@ -96,7 +96,7 @@ struct WatchAppSettingsView: View {
                 Text("Stretch Duration")
                     .font(.headline)
                 Picker("Stretch Duration", selection: $stretch) {
-                    ForEach(1...30, id:\.self) {
+                    ForEach(1...60, id:\.self) {
                         Text("\($0) sec")
                     }
                 }
@@ -116,7 +116,7 @@ struct WatchAppSettingsView: View {
             NavigationLink(destination: VStack {
                 Text("Rest Duration")
                     .font(.headline)
-                Picker("Stretch Duration", selection: $rest) {
+                Picker("Rest Duration", selection: $rest) {
                     ForEach(1...30, id:\.self) {
                         Text("\($0) sec")
                     }
@@ -137,8 +137,8 @@ struct WatchAppSettingsView: View {
             NavigationLink(destination: VStack {
                 Text("Repetitions")
                     .font(.headline)
-                Picker("Stretch Duration", selection: $reps) {
-                    ForEach(1...30, id:\.self) {
+                Picker("Number of Repetitions to Complete", selection: $reps) {
+                    ForEach(1...20, id:\.self) {
                         Text("\($0) repetitions")
                     }
                 }
