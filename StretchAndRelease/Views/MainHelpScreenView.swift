@@ -6,13 +6,12 @@
 //
 
 import SwiftUI
-import WebKit
 
 struct MainHelpScreenView: View {
     var deviceType: DeviceType = .phone
     var buttonRole: ButtonRoles = .play
     
-    let privacyURL = URL(filePath: "https://camerastooge.github.io/sar-privacy-policy")
+    let privacyURL: URL = URL(string: "https://camerastooge.github.io/sar-privacy-policy/") ?? URL(string: "https://camerastooge.github.io")!
     
     var body: some View {
         NavigationStack {
