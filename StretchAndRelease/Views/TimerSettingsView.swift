@@ -76,8 +76,8 @@ struct SettingsView: View {
                     .accessibilityValue(String(promptVolume))
                     .accessibilityAdjustableAction { direction in
                         switch direction {
-                        case .increment: promptVolume += 1
-                        case .decrement: promptVolume -= 1
+                        case .increment: promptVolume += 0.1
+                        case .decrement: promptVolume -= 0.1
                         @unknown default: print("not handled")
                         }
                     }

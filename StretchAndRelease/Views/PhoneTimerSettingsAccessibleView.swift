@@ -16,71 +16,80 @@ struct PhoneTimerSettingsAccessibleView: View {
         VStack {
             NavigationStack {
                 List {
-                    HStack {
-                        Spacer()
-                        Picker("Stretch", selection: $stretch) {
-                            ForEach(1...60, id:\.self) {
-                                Text("\($0)")
-                                    .font(.largeTitle)
+                    Section {
+                        HStack {
+                            Spacer()
+                            Picker("Stretch", selection: $stretch) {
+                                ForEach(1...60, id:\.self) {
+                                    Text("\($0)")
+                                        .font(.largeTitle)
+                                }
                             }
+                            .pickerStyle(.menu)
+                            Spacer()
                         }
-                        .pickerStyle(.menu)
-                        .accessibilityValue(String(stretch))
-                        .accessibilityAdjustableAction { direction in
-                            switch direction {
-                            case .increment: stretch += 1
-                            case .decrement: stretch -= 1
-                            @unknown default: print("not handled")
-                            }
-                        }
-                        Spacer()
                     }
-                    .accessibilityElement(children: .combine)
+                    .accessibilityElement(children: .ignore)
+                    .accessibilityLabel("Stretch duration \(stretch) seconds")
                     .accessibilityHint("Adjust how long you want to hold each stretch")
-                    
-                    HStack {
-                        Spacer()
-                        Picker("Rest", selection: $rest) {
-                            ForEach(1...30, id:\.self) {
-                                Text("\($0)")
-                                    .font(.largeTitle)
-                            }
+                    .accessibilityValue(String(stretch))
+                    .accessibilityAdjustableAction { direction in
+                        switch direction {
+                        case .increment: stretch += 1
+                        case .decrement: stretch -= 1
+                        @unknown default: print("not handled")
                         }
-                        .pickerStyle(.menu)
-                        .accessibilityValue(String(rest))
-                        .accessibilityAdjustableAction { direction in
-                            switch direction {
-                            case .increment: rest += 1
-                            case .decrement: rest -= 1
-                            @unknown default: print("not handled")
-                            }
-                        }
-                        Spacer()
                     }
-                    .accessibilityElement(children: .combine)
+                    
+                    Section {
+                        HStack {
+                            Spacer()
+                            Picker("Rest", selection: $rest) {
+                                ForEach(1...30, id:\.self) {
+                                    Text("\($0)")
+                                        .font(.largeTitle)
+                                }
+                            }
+                            .pickerStyle(.menu)
+                            Spacer()
+                        }
+                    }
+                    .accessibilityElement(children: .ignore)
+                    .accessibilityLabel("Rest duration \(rest) seconds")
                     .accessibilityHint("Adjust how long you want to rest between stretches")
-                    
-                    HStack {
-                        Spacer()
-                        Picker("Reps", selection: $reps) {
-                            ForEach(1...20, id:\.self) {
-                                Text("\($0)")
-                                    .font(.largeTitle)
-                            }
+                    .accessibilityValue(String(rest))
+                    .accessibilityAdjustableAction { direction in
+                        switch direction {
+                        case .increment: rest += 1
+                        case .decrement: rest -= 1
+                        @unknown default: print("not handled")
                         }
-                        .pickerStyle(.menu)
-                        .accessibilityValue(String(reps))
-                        .accessibilityAdjustableAction { direction in
-                            switch direction {
-                            case .increment: reps += 1
-                            case .decrement: reps -= 1
-                            @unknown default: print("not handled")
-                            }
-                        }
-                        Spacer()
                     }
-                    .accessibilityElement(children: .combine)
+                    
+                    Section {
+                        HStack {
+                            Spacer()
+                            Picker("Reps", selection: $reps) {
+                                ForEach(1...20, id:\.self) {
+                                    Text("\($0)")
+                                        .font(.largeTitle)
+                                }
+                            }
+                            .pickerStyle(.menu)
+                            Spacer()
+                        }
+                    }
+                    .accessibilityElement(children: .ignore)
+                    .accessibilityLabel("Repetition count \(stretch)")
                     .accessibilityHint("Adjust how many times to perform the stretch")
+                    .accessibilityValue(String(reps))
+                    .accessibilityAdjustableAction { direction in
+                        switch direction {
+                        case .increment: reps += 1
+                        case .decrement: reps -= 1
+                        @unknown default: print("not handled")
+                        }
+                    }
                 }
             }
             .padding(.horizontal)

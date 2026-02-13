@@ -31,8 +31,9 @@ struct PhoneTimerSettingsTypicalView: View {
                     .font(.headline)
                     .frame(height: 40)
                 }
-                .accessibilityElement(children: .combine)
-                .accessibilityHint("Adjust how long you want to hold each strecth")
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel("Stretch duration \(stretch) seconds")
+                .accessibilityHint("Adjust how long you want to hold each stretch")
                 .accessibilityValue(String(stretch))
                 .accessibilityAdjustableAction { direction in
                     switch direction {
@@ -57,7 +58,8 @@ struct PhoneTimerSettingsTypicalView: View {
                     }
                     .font(.subheadline)
                     .frame(height: 40)
-                }                        .accessibilityElement(children: .combine)
+                    .accessibilityElement(children: .ignore)
+                    .accessibilityLabel("Rest duration \(rest) seconds")
                     .accessibilityHint("Adjust how long you want to rest between stretches")
                     .accessibilityValue(String(rest))
                     .accessibilityAdjustableAction { direction in
@@ -67,22 +69,24 @@ struct PhoneTimerSettingsTypicalView: View {
                         @unknown default: print("not handled")
                         }
                     }
-                
-                Section("Repetitions") {
-                    HStack {
-                        Picker("Number of Repetitions to Complete", selection: $reps) {
-                            ForEach(1...20, id:\.self) {
-                                Text("\($0)").font(.headline)
+                }
+                    
+                    Section("Repetitions") {
+                        HStack {
+                            Picker("Number of Repetitions to Complete", selection: $reps) {
+                                ForEach(1...20, id:\.self) {
+                                    Text("\($0)").font(.headline)
+                                }
                             }
+                            .pickerStyle(.wheel)
+                            Text("reps")
+                                .font(.headline)
                         }
-                        .pickerStyle(.wheel)
-                        Text("reps")
-                            .font(.headline)
-                            .accessibilityLabel("repetitions")
+                        .font(.subheadline)
+                        .frame(height: 40)
                     }
-                    .font(.subheadline)
-                    .frame(height: 40)
-                }                        .accessibilityElement(children: .combine)
+                    .accessibilityElement(children: .ignore)
+                    .accessibilityLabel("Repetition count \(stretch)")
                     .accessibilityHint("Set the number of times you want to perform this stretch")
                     .accessibilityValue(String(reps))
                     .accessibilityAdjustableAction { direction in
@@ -92,12 +96,11 @@ struct PhoneTimerSettingsTypicalView: View {
                         default: print("not handled")
                         }
                     }
+                }
+                .padding(.horizontal)
             }
-            .padding(.horizontal)
         }
     }
-}
-
 
 #Preview {
     @Previewable @State var stretch = 10
