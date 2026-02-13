@@ -30,193 +30,119 @@ struct SettingsView: View {
     @State private var reps = 0
     @State private var isEditing = false
     
-    var dynamicLayout: AnyLayout {
-        dynamicTypeSize.isAccessibilitySize ? AnyLayout(VStackLayout()) : AnyLayout(HStackLayout())
-    }
-    
     @ScaledMetric var buttonWidth = 100
-
+    
     var body: some View {
-            NavigationStack {
-                    VStack {
-                        List {
-                            Section("Stretch Time") {
-                                dynamicLayout {
-                                    Picker("Stretch Duration", selection: $stretch) {
-                                        ForEach(1...60, id:\.self) {
-                                            Text("\($0)")
-                                                .font(.title2)
-                                        }
-                                    }
-                                    .pickerStyle(.wheel)
-                                    Text("sec.")
-                                        .font(.title2)
-                                        .accessibilityLabel("seconds")
-                                }
-                                .font(.headline)
-                                .frame(height: 40)
-                            }
-                            .accessibilityElement(children: .combine)
-                            .accessibilityHint("Adjust how long you want to hold each strecth")
-                            .accessibilityValue(String(stretch))
-                            .accessibilityAdjustableAction { direction in
-                                switch direction {
-                                case .increment: stretch += 1
-                                case .decrement: stretch -= 1
-                                @unknown default: print("not handled")
-                                }
-                            }
-                            
-                            Section("Rest Time") {
-                                dynamicLayout {
-                                    Picker("Rest Duration", selection: $rest) {
-                                        ForEach(1...30, id:\.self) {
-                                            Text("\($0)")
-                                                .font(.title2)
-                                        }
-                                    }
-                                    .pickerStyle(.wheel)
-                                    Text("sec.")
-                                        .font(.title2)
-                                        .accessibilityLabel("seconds")
-                                }
-                                .font(.subheadline)
-                                .frame(height: 40)
-                            }                        .accessibilityElement(children: .combine)
-                            .accessibilityHint("Adjust how long you want to rest between stretches")
-                            .accessibilityValue(String(rest))
-                            .accessibilityAdjustableAction { direction in
-                                switch direction {
-                                case .increment: rest += 1
-                                case .decrement: rest -= 1
-                                @unknown default: print("not handled")
-                                }
-                             }
-                            
-                            Section("Repetitions") {
-                                dynamicLayout {
-                                    Picker("Number of Repetitions to Complete", selection: $reps) {
-                                        ForEach(1...20, id:\.self) {
-                                            Text("\($0)").font(.title2)
-                                        }
-                                    }
-                                    .pickerStyle(.wheel)
-                                    Text("reps")
-                                        .font(.title2)
-                                        .accessibilityLabel("repetitions")
-                                }
-                                .font(.subheadline)
-                                .frame(height: 40)
-                            }                        .accessibilityElement(children: .combine)
-                            .accessibilityHint("Set the number of times you want to perform this stretch")
-                            .accessibilityValue(String(reps))
-                            .accessibilityAdjustableAction { direction in
-                                switch direction {
-                                case .increment: reps += 1
-                                case .decrement: reps -= 1
-                                default: print("not handled")
-                                }
-                             }
-                        }
-                        .padding(.horizontal)
-                        .dynamicTypeSize(...DynamicTypeSize.xxLarge)
-                    }
+        Group {
+            if !dynamicTypeSize.isAccessibilitySize {
+                PhoneTimerSettingsTypicalView(stretch: $stretch, rest: $rest, reps: $reps, isEditing: $isEditing)
                     .scrollDisabled(true)
                     .containerRelativeFrame(.vertical) { height, _ in
                         height * 0.69
                     }
-                    .toolbar {
-                        ToolbarItem {
-                            Button(role: .cancel) {
-                                dismiss()
-                            } label: {
-                                if #available(iOS 26.0, *) {
-                                    Image(systemName: "x.circle.fill")
-                                        .glassEffect()
-                                        .tint(.red)
-                                        .accessibilityLabel("Return to main screen")
-                                        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
-                                } else {
-                                    Image(systemName: "x.circle.fill")
-                                        .tint(.red)
-                                        .accessibilityLabel("Return to main screen")
-                                        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
-                                }
-                            }
-                        }
+            } else {
+                PhoneTimerSettingsAccessibleView(stretch: $stretch, rest: $rest, reps: $reps, isEditing: $isEditing)
+                    .scrollDisabled(false)
+                    .containerRelativeFrame(.vertical) { height, _ in
+                        height * 0.69
                     }
-                    
-                    Group {
-                        Section {
-                            HStack {
-                                Toggle("Haptic feedback: \(haptics ? "on" : "off")", isOn: $haptics)
-                                    .accessibilityHint("Turn haptic feedback on or off")
-                            }
-                            HStack {
-                                Toggle("Audio cues: \(audio ? "on" : "off")", isOn: $audio)
-                                    .accessibilityHint("Turn audio cues on or off")
-                            }
-                            HStack {
-                                Slider(
-                                    value: $promptVolume,
-                                    in: 0.0...1.0
-                                ) {
-                                    Text("Prompt Volume")
-                                } minimumValueLabel: {
-                                    Image(systemName: "speaker.slash.fill")
-                                } maximumValueLabel: {
-                                    Image(systemName: "speaker.wave.3")
-                                } onEditingChanged: { editing in
-                                    isEditing = editing
-                                }
-                                .accessibilityHint("Adjust volume of voice prompts")
-                                .accessibilityValue(String(promptVolume))
-                                .accessibilityAdjustableAction { direction in
-                                    switch direction {
-                                    case .increment: promptVolume += 1
-                                    case .decrement: promptVolume -= 1
-                                    @unknown default: print("not handled")
-                                    }
-                                }
-                            }
-                        }
-                            .padding(.horizontal)
-                            .dynamicTypeSize(...DynamicTypeSize.xxLarge)
-
-                        
-                        Section {
-                            Button {
-                                totalStretch = stretch
-                                totalRest = rest
-                                totalReps = reps
-                                SoundManager.instance.volume = promptVolume
-                                didSettingsChange = true
-                                dismiss()
-                            } label: {
-                                Text("SAVE")
-                                    .frame(width: buttonWidth, height: 50)
-                                    .font(.headline)
-                                    .fontWeight(.bold)
-                                    .foregroundStyle(.white)
-                                    .background(.green)
-                                    .clipShape(.capsule)
-                                    .padding(.bottom, 5)
-                                    .dynamicTypeSize(...DynamicTypeSize.accessibility2)
-                            }
-                            .accessibilityLabel("Save")
-                            .accessibilityHint("Save your settings and return to the main screen")
-                        }
+            }
+        }
+        
+        Group {
+            Section {
+                HStack {
+                    Toggle("Haptic feedback: \(haptics ? "on" : "off")", isOn: $haptics)
+                        .accessibilityHint("Turn haptic feedback on or off")
+                }
+                HStack {
+                    Toggle("Audio cues: \(audio ? "on" : "off")", isOn: $audio)
+                        .accessibilityHint("Turn audio cues on or off")
+                }
+                HStack {
+                    Slider(
+                        value: $promptVolume,
+                        in: 0.0...1.0
+                    ) {
+                        Text("Prompt Volume")
+                    } minimumValueLabel: {
+                        Image(systemName: "speaker.slash.fill")
+                    } maximumValueLabel: {
+                        Image(systemName: "speaker.wave.3")
+                    } onEditingChanged: { editing in
+                        isEditing = editing
                     }
-                    .navigationTitle("Settings")
-                    .navigationBarTitleDisplayMode(.inline)
-                    .onAppear {
-                        stretch = totalStretch
-                        rest = totalRest
-                        reps = totalReps
+                    .accessibilityHint("Adjust volume of voice prompts")
+                    .accessibilityValue(String(promptVolume))
+                    .accessibilityAdjustableAction { direction in
+                        switch direction {
+                        case .increment: promptVolume += 1
+                        case .decrement: promptVolume -= 1
+                        @unknown default: print("not handled")
+                        }
                     }
                 }
+            }
+            .padding(.horizontal)
+            .dynamicTypeSize(...DynamicTypeSize.xxLarge)
+            
+            
+            Section {
+                Button {
+                    totalStretch = stretch
+                    totalRest = rest
+                    totalReps = reps
+                    SoundManager.instance.volume = promptVolume
+                    didSettingsChange = true
+                    dismiss()
+                } label: {
+                    Text("SAVE")
+                        .frame(width: buttonWidth, height: 50)
+                        .font(.headline)
+                        .fontWeight(.bold)
+                        .foregroundStyle(.white)
+                        .background(.green)
+                        .clipShape(.capsule)
+                        .padding(.bottom, 5)
+                        .dynamicTypeSize(...DynamicTypeSize.accessibility2)
+                }
+                .accessibilityLabel("Save")
+                .accessibilityHint("Save your settings and return to the main screen")
+            }
+        }
+        .navigationTitle("Settings")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem {
+                Button(role: .cancel) {
+                    dismiss()
+                } label: {
+                    if #available(iOS 26.0, *) {
+                        Image(systemName: "x.circle.fill")
+                            .glassEffect()
+                            .tint(.red)
+                            .accessibilityLabel("Return to main screen")
+                            .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                    } else {
+                        Image(systemName: "x.circle.fill")
+                            .tint(.red)
+                            .accessibilityLabel("Return to main screen")
+                            .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                    }
+                }
+            }
+        }
+        .onAppear {
+            stretch = totalStretch
+            rest = totalRest
+            reps = totalReps
+        }
     }
 }
+
+
+
+
 
 #Preview {
     @Previewable @State var didSettingsChange: Bool = false
