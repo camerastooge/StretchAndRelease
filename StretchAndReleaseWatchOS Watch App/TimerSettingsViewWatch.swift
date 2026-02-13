@@ -60,13 +60,17 @@ struct TimerSettingsViewWatch: View {
                         } label: {
                             if #available(watchOS 26.0, *) {
                                 ButtonView(buttonRoles: buttonRoles, deviceType: deviceType)
+                                    .accessibilityHint("Save your settings and return to the main screen")
+                                    .accessibilityLabel("Save")
                                     .glassEffect()
+                                    .buttonStyle(.plain)
                             } else {
                                 ButtonView(buttonRoles: buttonRoles, deviceType: deviceType)
+                                    .accessibilityHint("Save your settings and return to the main screen")
+                                    .accessibilityLabel("Save")
+                                    .buttonStyle(.plain)
                             }
                         }
-                        .accessibilityHint("Save your settings and return to the main screen")
-                        .buttonStyle(.plain)
                     }
                 }
                 .onAppear {
@@ -95,6 +99,7 @@ struct WatchAppSettingsView: View {
             NavigationLink(destination: VStack {
                 Text("Stretch Duration")
                     .font(.headline)
+                    .accessibilityLabel("Stretch")
                 Picker("Stretch Duration", selection: $stretch) {
                     ForEach(1...60, id:\.self) {
                         Text("\($0) sec")
@@ -102,6 +107,16 @@ struct WatchAppSettingsView: View {
                 }
                 .pickerStyle(.wheel)
                 .labelsHidden()
+                .accessibilityElement(children: .combine)
+                .accessibilityHint("Adjust how long you want to hold each strecth")
+                .accessibilityValue(String(stretch))
+                .accessibilityAdjustableAction { direction in
+                    switch direction {
+                    case .increment: stretch += 1
+                    case .decrement: stretch -= 1
+                    @unknown default: print("not handled")
+                    }
+                }
             }
             ) {
                 HStack {
@@ -111,11 +126,14 @@ struct WatchAppSettingsView: View {
                     Text("\(stretch) sec")
                         .foregroundColor(.white)
                 }
+                .accessibilityElement(children: .combine)
+                .accessibilityHint("Change the length of the time you hold each stretch")
             }
             
             NavigationLink(destination: VStack {
                 Text("Rest Duration")
                     .font(.headline)
+                    .accessibilityLabel("Rest")
                 Picker("Rest Duration", selection: $rest) {
                     ForEach(1...30, id:\.self) {
                         Text("\($0) sec")
@@ -123,6 +141,16 @@ struct WatchAppSettingsView: View {
                 }
                 .pickerStyle(.wheel)
                 .labelsHidden()
+                .accessibilityElement(children: .combine)
+                .accessibilityHint("Adjust rest period between stretches")
+                .accessibilityValue(String(rest))
+                .accessibilityAdjustableAction { direction in
+                    switch direction {
+                    case .increment: rest += 1
+                    case .decrement: rest -= 1
+                    @unknown default: print("not handled")
+                    }
+                }
             }
             ) {
                 HStack {
@@ -132,11 +160,14 @@ struct WatchAppSettingsView: View {
                     Text("\(rest) sec")
                         .foregroundColor(.white)
                 }
+                .accessibilityElement(children: .combine)
+                .accessibilityHint("Change the length of the rest period between stretches")
             }
             
             NavigationLink(destination: VStack {
                 Text("Repetitions")
                     .font(.headline)
+                    .accessibilityLabel("Repetitions")
                 Picker("Number of Repetitions to Complete", selection: $reps) {
                     ForEach(1...20, id:\.self) {
                         Text("\($0) repetitions")
@@ -144,6 +175,16 @@ struct WatchAppSettingsView: View {
                 }
                 .pickerStyle(.wheel)
                 .labelsHidden()
+                .accessibilityElement(children: .combine)
+                .accessibilityHint("Adjust how many times to perform the stretch")
+                .accessibilityValue(String(reps))
+                .accessibilityAdjustableAction { direction in
+                    switch direction {
+                    case .increment: reps += 1
+                    case .decrement: reps -= 1
+                    @unknown default: print("not handled")
+                    }
+                }
             }
             ) {
                 HStack {
@@ -153,91 +194,13 @@ struct WatchAppSettingsView: View {
                     Text("\(reps) reps")
                         .foregroundColor(.white)
                 }
+                .accessibilityElement(children: .combine)
+                .accessibilityHint("Change the number of repetitions to perform")
             }
         }
         .onDisappear {
             subviewIsToggled = true
         }
-//        VStack {
-//            HStack {
-//                Text("Stretch")
-//                    .font(.caption2)
-//                
-//                Spacer()
-//                
-//                Picker("Stretch Duration", selection: $stretch) {
-//                    ForEach(1...30, id:\.self) {
-//                        Text("\($0)")
-//                    }
-//                }
-//                .pickerStyle(.wheel)
-//                .labelsHidden()
-//            }
-//            .accessibilityElement(children: .combine)
-//            .accessibilityHint("Adjust how long you want to hold each stretch")
-//            .accessibilityValue(String(stretch))
-//            .accessibilityAdjustableAction { direction in
-//                switch direction {
-//                case .increment: stretch += 1
-//                case .decrement: stretch -= 1
-//                @unknown default:
-//                    print("not handled")
-//                }
-//            }
-//            .padding([.horizontal, .vertical])
-//            
-//            HStack {
-//                Text("Rest")
-//                    .font(.caption2)
-//                
-//                Spacer()
-//                
-//                Picker("Rest Duration", selection: $rest) {
-//                    ForEach(1...30, id:\.self) {
-//                        Text("\($0)")
-//                    }
-//                }
-//                .pickerStyle(.wheel)
-//                .labelsHidden()
-//            }
-//            .accessibilityElement(children: .combine)
-//            .accessibilityHint("Adjust how long you want to rest between stretches")
-//            .accessibilityValue(String(rest))
-//            .accessibilityAdjustableAction { direction in
-//                switch direction {
-//                case .increment: rest += 1
-//                case .decrement: rest -= 1
-//                default: print("not handled")
-//                }
-//            }
-//            .padding([.horizontal, .vertical])
-//            
-//            HStack {
-//                Text("Reps")
-//                    .font(.caption2)
-//                
-//                Spacer()
-//                
-//                Picker("Number of Repetitions", selection: $reps) {
-//                    ForEach(1...30, id:\.self) {
-//                        Text("\($0)")
-//                    }
-//                }
-//                .pickerStyle(.wheel)
-//                .labelsHidden()
-//            }
-//            .accessibilityElement(children: .combine)
-//            .accessibilityHint("Set the number of times you want to perform this stretch")
-//            .accessibilityValue(String(reps))
-//            .accessibilityAdjustableAction { direction in
-//                switch direction {
-//                case .increment: reps += 1
-//                case .decrement: reps -= 1
-//                default: print("not handled")
-//                }
-//            }
-//            .padding([.horizontal, .vertical])
-//        }
     }
 }
 
@@ -270,9 +233,10 @@ struct WatchDeviceSettingsView: View {
                 } onEditingChanged: { editing in
                     isEditing = editing
                 }
+                .accessibilityLabel("Volume: \(promptVolume.formatted(.percent))")
             }
         }
-        .padding(.horizontal)
+        .padding([.horizontal, .vertical])
     }
 }
 

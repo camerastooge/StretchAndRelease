@@ -119,6 +119,7 @@ struct SettingsView: View {
                              }
                         }
                         .padding(.horizontal)
+                        .dynamicTypeSize(...DynamicTypeSize.xxLarge)
                     }
                     .scrollDisabled(true)
                     .containerRelativeFrame(.vertical) { height, _ in
@@ -132,12 +133,16 @@ struct SettingsView: View {
                                 if #available(iOS 26.0, *) {
                                     Image(systemName: "x.circle.fill")
                                         .glassEffect()
+                                        .tint(.red)
+                                        .accessibilityLabel("Return to main screen")
+                                        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
                                 } else {
                                     Image(systemName: "x.circle.fill")
+                                        .tint(.red)
+                                        .accessibilityLabel("Return to main screen")
+                                        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
                                 }
                             }
-                            .tint(.red)
-                            .accessibilityLabel("Return to main screen")
                         }
                     }
                     
@@ -160,7 +165,7 @@ struct SettingsView: View {
                                 } minimumValueLabel: {
                                     Image(systemName: "speaker.slash.fill")
                                 } maximumValueLabel: {
-                                    Image(systemName: "speaker.fill")
+                                    Image(systemName: "speaker.wave.3")
                                 } onEditingChanged: { editing in
                                     isEditing = editing
                                 }
@@ -176,6 +181,7 @@ struct SettingsView: View {
                             }
                         }
                             .padding(.horizontal)
+                            .dynamicTypeSize(...DynamicTypeSize.xxLarge)
 
                         
                         Section {
@@ -195,7 +201,9 @@ struct SettingsView: View {
                                     .background(.green)
                                     .clipShape(.capsule)
                                     .padding(.bottom, 5)
+                                    .dynamicTypeSize(...DynamicTypeSize.accessibility2)
                             }
+                            .accessibilityLabel("Save")
                             .accessibilityHint("Save your settings and return to the main screen")
                         }
                     }

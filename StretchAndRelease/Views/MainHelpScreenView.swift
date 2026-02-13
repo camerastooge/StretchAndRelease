@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct MainHelpScreenView: View {
+    @Environment(\.dynamicTypeSize) var sizeCategory
+    
     var deviceType: DeviceType = .phone
     var buttonRole: ButtonRoles = .play
     
@@ -25,7 +27,7 @@ struct MainHelpScreenView: View {
                         .padding(.trailing, 25)
                         Text("Starts or pauses the timer")
                     }
-                    .accessibilityHint("The play button starts the timer, then pauses when tapped again")
+                    .accessibilityHint("This graphic shows the play and pause icons.")
                  }
                 
                 Section {
@@ -34,7 +36,7 @@ struct MainHelpScreenView: View {
                             .padding(.trailing, 25)
                         Text("Resets the timer to your starting point")
                     }
-                    .accessibilityHint("The reset button resets the timer to your starting values")
+                    .accessibilityHint("The graphic shows the button to reset the timer.")
                 }
                 
                 Section {
@@ -53,11 +55,14 @@ struct MainHelpScreenView: View {
                         Spacer()
                     }
                     .padding(.vertical, 8)
+                    .accessibilityLabel("View our privacy policy.")
+                    .accessibilityHint("The text links to an external web site.")
                 }
             }
             .listSectionSpacing(.compact)
             .navigationTitle("Help")
             .navigationBarTitleDisplayMode(.inline)
+            .dynamicTypeSize(...DynamicTypeSize.accessibility1)
         }
     }
 }

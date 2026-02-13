@@ -11,7 +11,7 @@ struct ContentView: View {
     //Environment properties
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.accessibilityDifferentiateWithoutColor) var differentiateWithoutColor
-    @Environment(\.sizeCategory) var sizeCategory
+    @Environment(\.dynamicTypeSize) var sizeCategory
     
     // Properties stored in UserDefaults
     @AppStorage("stretch") private var totalStretch = 10
@@ -43,6 +43,15 @@ struct ContentView: View {
     // variables for button view
     var buttonRoles: ButtonRoles = .play
     var deviceType: DeviceType = .phone
+    
+    //variable for navigation title
+    var navigationBarTitleString: String {
+        switch sizeCategory {
+        case .xSmall, .small, .medium, .large, .xLarge, .xxLarge, .xxxLarge: "Stretch & Release"
+        case .accessibility1, .accessibility2, .accessibility3, .accessibility4, .accessibility5: "S & R"
+        default: "S & R"
+        }
+    }
 
     var body: some View {
         NavigationStack {
@@ -99,8 +108,7 @@ struct ContentView: View {
                             } label: {
                                 ButtonView(buttonRoles: !isTimerActive ? .play : .pause, deviceType: deviceType)
                             }
-                            .accessibilityInputLabels(["Start", "Pause", "Start Timer", "Pause Timer"])
-                            .accessibilityLabel("Start or Pause Timer")
+                            .accessibilityLabel(!isTimerActive ? "Start Timer" : "Pause Timer")
                             
                             Spacer()
                             
@@ -116,7 +124,6 @@ struct ContentView: View {
                             } label: {
                                 ButtonView(buttonRoles: .reset, deviceType: .phone)
                             }
-                            .accessibilityInputLabels(["Reset", "Reset Timer"])
                             .accessibilityLabel("Reset Timer")
                             
                             Spacer()
@@ -125,7 +132,8 @@ struct ContentView: View {
                     }
                 }
             }
-            .navigationTitle("Stretch & Release")
+            .navigationTitle(navigationBarTitleString)
+            .navigationBarTitleDisplayMode(.automatic)
             .toolbar {
                 ToolbarItem {
                     Button {
@@ -135,10 +143,13 @@ struct ContentView: View {
                             Image(systemName: "questionmark.circle.fill")
                                 .foregroundStyle(.blue)
                                 .glassEffect()
+                                .accessibilityLabel("Show Help")
+
                         } else {
                             Image(systemName: "questionmark.circle.fill")
-                        }
-                    }
+                                .accessibilityLabel("Show Help")
+
+                        }                    }
                 }
                 
                 if #available(iOS 26.0, *) {
@@ -157,7 +168,6 @@ struct ContentView: View {
                             Image(systemName: "gear")
                         }
                     }
-                    .accessibilityInputLabels(["Settings"])
                     .accessibilityLabel("Show Settings")
                 }
             }

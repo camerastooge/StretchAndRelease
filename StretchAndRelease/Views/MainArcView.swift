@@ -11,7 +11,7 @@ struct MainArcView: View {
     //Environment properties
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.accessibilityDifferentiateWithoutColor) var differentiateWithoutColor
-    @Environment(\.sizeCategory) var sizeCategory
+    @Environment(\.dynamicTypeSize) var sizeCategory
     
     //Bindings from parent view
     @Binding var stretchPhase: StretchPhase
@@ -52,9 +52,9 @@ struct MainArcView: View {
                 Spacer()
             }
             .font(.largeTitle)
-            .dynamicTypeSize(DynamicTypeSize.xxxLarge...)
             .foregroundStyle(differentiateWithoutColor ? .black : isTimerPaused ? .gray : stretchPhase.phaseColor)
             .fontWeight(.bold)
+            .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
             .sensoryFeedback(.impact(intensity: stretchPhase.phaseIntensity), trigger: endAngle) { oldValue, newValue in
                     return haptics
             }
