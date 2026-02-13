@@ -107,7 +107,8 @@ struct WatchAppSettingsView: View {
                 }
                 .pickerStyle(.wheel)
                 .labelsHidden()
-                .accessibilityElement(children: .combine)
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel("Stretch duration \(stretch) seconds")
                 .accessibilityHint("Adjust how long you want to hold each strecth")
                 .accessibilityValue(String(stretch))
                 .accessibilityAdjustableAction { direction in
@@ -141,7 +142,8 @@ struct WatchAppSettingsView: View {
                 }
                 .pickerStyle(.wheel)
                 .labelsHidden()
-                .accessibilityElement(children: .combine)
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel("Rest period \(rest) seconds")
                 .accessibilityHint("Adjust rest period between stretches")
                 .accessibilityValue(String(rest))
                 .accessibilityAdjustableAction { direction in
@@ -175,7 +177,8 @@ struct WatchAppSettingsView: View {
                 }
                 .pickerStyle(.wheel)
                 .labelsHidden()
-                .accessibilityElement(children: .combine)
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel("Repetition count \(reps)")
                 .accessibilityHint("Adjust how many times to perform the stretch")
                 .accessibilityValue(String(reps))
                 .accessibilityAdjustableAction { direction in
@@ -233,7 +236,16 @@ struct WatchDeviceSettingsView: View {
                 } onEditingChanged: { editing in
                     isEditing = editing
                 }
-                .accessibilityLabel("Volume: \(promptVolume.formatted(.percent))")
+                .accessibilityLabel("Volume")
+                .accessibilityHint("Adjust volume of voice prompts")
+                .accessibilityValue(String(promptVolume.formatted(.percent)))
+                .accessibilityAdjustableAction { direction in
+                    switch direction {
+                    case .increment: promptVolume += 0.1
+                    case .decrement: promptVolume -= 0.1
+                    @unknown default: print("not handled")
+                    }
+                }
             }
         }
         .padding([.horizontal, .vertical])

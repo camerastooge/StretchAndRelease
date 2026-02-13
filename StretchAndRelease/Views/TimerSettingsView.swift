@@ -93,8 +93,9 @@ struct SettingsView: View {
                         } onEditingChanged: { editing in
                             isEditing = editing
                         }
+                        .accessibilityLabel("Volume")
                         .accessibilityHint("Adjust volume of voice prompts")
-                        .accessibilityValue(String(promptVolume))
+                        .accessibilityValue(String(promptVolume.formatted(.percent)))
                         .accessibilityAdjustableAction { direction in
                             switch direction {
                             case .increment: promptVolume += 0.1
