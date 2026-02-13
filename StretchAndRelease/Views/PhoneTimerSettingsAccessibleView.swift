@@ -80,7 +80,7 @@ struct PhoneTimerSettingsAccessibleView: View {
                         }
                     }
                     .accessibilityElement(children: .ignore)
-                    .accessibilityLabel("Repetition count \(stretch)")
+                    .accessibilityLabel("Repetition count \(reps)")
                     .accessibilityHint("Adjust how many times to perform the stretch")
                     .accessibilityValue(String(reps))
                     .accessibilityAdjustableAction { direction in
