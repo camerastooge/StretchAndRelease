@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 
 @main
 struct StretchAndReleaseApp: App {
@@ -13,5 +14,6 @@ struct StretchAndReleaseApp: App {
         WindowGroup {
             ContentView()
         }
+        .modelContainer(for: PlaylistItem.self)
     }
 }
