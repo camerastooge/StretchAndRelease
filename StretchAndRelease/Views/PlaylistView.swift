@@ -22,7 +22,7 @@ struct PlaylistView: View {
     @AppStorage("reps") private var totalReps = 3
     
     //SwiftData property
-    @Query var playlist: [PlaylistItem]
+    @Query(sort: \PlaylistItem.index) var playlist: [PlaylistItem]
     
     //State properties
     @State private var isShowingAddExercise = false
@@ -39,6 +39,7 @@ struct PlaylistView: View {
                 ForEach(playlist) { exercise in
                     PlaylistRowView(item: exercise)
                 }
+                .onMove(perform: move)
             }
             .navigationTitle("Playlist")
             .navigationBarTitleDisplayMode(.large)
@@ -88,6 +89,21 @@ struct PlaylistView: View {
             .sheet(isPresented: $isShowingAddExercise) {
                 AddExerciseToPlaylistView()
             }
+        }
+    }
+}
+
+extension PlaylistView {
+    private func move(from source: IndexSet, to destination: Int) {
+        //creates mutable version of the playlist array
+        var mutableList = playlist
+        
+        //moves the item from source to destination in the list
+        mutableList.move(fromOffsets: source, toOffset: destination)
+        
+        //updates the index poperty of the item to persist position in array
+        for(index, item) in mutableList.enumerated() {
+            item.index = index
         }
     }
 }
