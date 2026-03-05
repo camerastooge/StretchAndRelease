@@ -38,6 +38,18 @@ struct PlaylistView: View {
             List {
                 ForEach(playlist) { exercise in
                     PlaylistRowView(item: exercise)
+                        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                            Button(role: .destructive) {
+                                modelContext.delete(exercise)
+                            } label: {
+                                Label("Delete", systemImage: "trash")
+                            }
+                            NavigationLink {
+                                EditExerciseView(playlistItem: exercise)
+                            } label: {
+                                Label("Edit", systemImage: "pencil")
+                            }
+                        }
                 }
                 .onMove(perform: move)
             }
@@ -46,7 +58,7 @@ struct PlaylistView: View {
             .toolbar {
                 ToolbarItem {
                     Button {
-                        isShowingAddExercise.toggle()
+                        isShowingAddExercise = true
                     } label: {
                         if #available(iOS 26.0, *) {
                             Image(systemName: "plus.circle")
@@ -87,7 +99,8 @@ struct PlaylistView: View {
                 }
             }
             .sheet(isPresented: $isShowingAddExercise) {
-                AddExerciseToPlaylistView()
+                EditExerciseView(playlistItem: PlaylistItem.emptyExercise)
+                presentationDetents([.medium])
             }
         }
     }

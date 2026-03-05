@@ -38,6 +38,10 @@ extension PlaylistItem {
             PlaylistItem(index: 3, name: "Downward reach", stretchDuration: 6, restDuration: 4, repsToComplete: 5)
         ]
     }
+    
+    static var emptyExercise: PlaylistItem {
+        PlaylistItem(index: 0, name: "", stretchDuration: 0, restDuration: 0, repsToComplete: 0)
+    }
 }
 
 @MainActor

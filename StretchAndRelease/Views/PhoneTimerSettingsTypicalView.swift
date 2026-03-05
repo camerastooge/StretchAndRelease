@@ -84,16 +84,16 @@ struct PhoneTimerSettingsTypicalView: View {
                         }
                         .font(.subheadline)
                         .frame(height: 40)
-                    }
-                    .accessibilityElement(children: .ignore)
-                    .accessibilityLabel("Repetition count \(stretch)")
-                    .accessibilityHint("Set the number of times you want to perform this stretch")
-                    .accessibilityValue(String(reps))
-                    .accessibilityAdjustableAction { direction in
-                        switch direction {
-                        case .increment: reps += 1
-                        case .decrement: reps -= 1
-                        default: print("not handled")
+                        .accessibilityElement(children: .ignore)
+                        .accessibilityLabel("Repetition count \(stretch)")
+                        .accessibilityHint("Set the number of times you want to perform this stretch")
+                        .accessibilityValue(String(reps))
+                        .accessibilityAdjustableAction { direction in
+                            switch direction {
+                            case .increment: reps += 1
+                            case .decrement: reps -= 1
+                            default: print("not handled")
+                            }
                         }
                     }
                 }
