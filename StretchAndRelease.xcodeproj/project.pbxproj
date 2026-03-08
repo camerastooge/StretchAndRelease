@@ -63,8 +63,8 @@
 				"Models and Settings/SoundManager.swift",
 				"Models and Settings/StretchPhase.swift",
 				"Models and Settings/View Modifiers.swift",
-				Views/Arc.swift,
 				Views/ButtonView.swift,
+				"Views/Info Display Views/Arc.swift",
 			);
 			target = E4F1C1972DFE0AAB00114B7C /* StretchAndReleaseWatchOS Watch App */;
 		};

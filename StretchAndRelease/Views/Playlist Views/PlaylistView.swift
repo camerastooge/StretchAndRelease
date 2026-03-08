@@ -43,12 +43,19 @@ struct PlaylistView: View {
                                 modelContext.delete(exercise)
                             } label: {
                                 Label("Delete", systemImage: "trash")
+                                    .accessibilityLabel("Delete \(exercise.name)")
+                                    .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
                             }
+                        }
+                        .swipeActions(edge: .leading, allowsFullSwipe: true) {
                             NavigationLink {
                                 EditExerciseView(playlistItem: exercise)
                             } label: {
                                 Label("Edit", systemImage: "pencil")
+                                    .accessibilityLabel("Change settings for \(exercise.name)")
+                                    .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
                             }
+                            .tint(.blue)
                         }
                 }
                 .onMove(perform: move)
@@ -57,8 +64,8 @@ struct PlaylistView: View {
             .navigationBarTitleDisplayMode(.large)
             .toolbar {
                 ToolbarItem {
-                    Button {
-                        isShowingAddExercise = true
+                    NavigationLink {
+                        AddExerciseView()
                     } label: {
                         if #available(iOS 26.0, *) {
                             Image(systemName: "plus.circle")
@@ -97,10 +104,6 @@ struct PlaylistView: View {
                         }
                     }
                 }
-            }
-            .sheet(isPresented: $isShowingAddExercise) {
-                EditExerciseView(playlistItem: PlaylistItem.emptyExercise)
-                presentationDetents([.medium])
             }
         }
     }
