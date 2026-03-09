@@ -139,16 +139,30 @@ struct AddExerciseView: View {
                     }
                     
                 } label: {
-                    Text("SAVE")
-                        .frame(width: buttonWidth, height: 50)
-                        .font(.headline)
-                        .fontWeight(.bold)
-                        .foregroundStyle(.white)
-                        .background(.green)
-                        .clipShape(.capsule)
-                        .padding(.top, 25)
-                        .padding(.bottom, 25)
-                        .dynamicTypeSize(...DynamicTypeSize.accessibility2)
+                    if #available(iOS 26.0, *) {
+                        Text("SAVE")
+                            .frame(width: buttonWidth, height: 50)
+                            .font(.headline)
+                            .fontWeight(.bold)
+                            .foregroundStyle(.white)
+                            .background(.green)
+                            .clipShape(.capsule)
+                            .glassEffect()
+                            .padding(.top, 25)
+                            .padding(.bottom, 25)
+                            .dynamicTypeSize(...DynamicTypeSize.accessibility2)
+                    } else {
+                        Text("SAVE")
+                            .frame(width: buttonWidth, height: 50)
+                            .font(.headline)
+                            .fontWeight(.bold)
+                            .foregroundStyle(.white)
+                            .background(.green)
+                            .clipShape(.capsule)
+                            .padding(.top, 25)
+                            .padding(.bottom, 25)
+                            .dynamicTypeSize(...DynamicTypeSize.accessibility2)
+                    }
                 }
 
             }

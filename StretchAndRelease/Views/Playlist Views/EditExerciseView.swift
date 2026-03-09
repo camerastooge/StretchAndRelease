@@ -18,23 +18,25 @@ struct EditExerciseView: View {
     
     @Bindable var playlistItem: PlaylistItem
     
-    @State private var name = ""
-    @State private var stretch = 10
-    @State private var rest = 5
-    @State private var reps = 5
+//    @State private var name = ""
+//    @State private var stretch = 10
+//    @State private var rest = 5
+//    @State private var reps = 5
+    
+    @ScaledMetric var buttonWidth = 100
     
     var body: some View {
         NavigationStack {
             VStack {
                 Form {
                     Section("Stretch name") {
-                        TextField("Name your stretch", text: $name)
+                        TextField("\(playlistItem.name)", text: $playlistItem.name)
                     }
                     .padding(.bottom)
                     
                     Section("Stretch duration") {
                         HStack {
-                            Picker("Stretch", selection: $stretch) {
+                            Picker("Stretch", selection: $playlistItem.stretchDuration) {
                                 ForEach(1...60, id:\.self) {
                                     Text("\($0)")
                                         .font(.headline)
@@ -48,13 +50,13 @@ struct EditExerciseView: View {
                         .font(.headline)
                         .frame(height: 40)
                         .accessibilityElement(children: .ignore)
-                        .accessibilityLabel("Stretch duration \(stretch) seconds")
+                        .accessibilityLabel("Stretch duration \(playlistItem.stretchDuration) seconds")
                         .accessibilityHint("Adjust how long you want to hold each stretch")
-                        .accessibilityValue(String(stretch))
+                        .accessibilityValue(String(playlistItem.stretchDuration))
                         .accessibilityAdjustableAction { direction in
                             switch direction {
-                            case .increment: stretch += 1
-                            case .decrement: stretch -= 1
+                            case .increment: playlistItem.stretchDuration += 1
+                            case .decrement: playlistItem.stretchDuration -= 1
                             @unknown default: print("not handled")
                             }
                         }
@@ -63,7 +65,7 @@ struct EditExerciseView: View {
                     
                     Section("Rest duration") {
                         HStack {
-                            Picker("Rest Duration", selection: $rest) {
+                            Picker("Rest Duration", selection: $playlistItem.restDuration) {
                                 ForEach(1...30, id:\.self) {
                                     Text("\($0)")
                                         .font(.headline)
@@ -77,13 +79,13 @@ struct EditExerciseView: View {
                         .font(.subheadline)
                         .frame(height: 40)
                         .accessibilityElement(children: .ignore)
-                        .accessibilityLabel("Rest duration \(rest) seconds")
+                        .accessibilityLabel("Rest duration \(playlistItem.restDuration) seconds")
                         .accessibilityHint("Adjust how long you want to rest between stretches")
-                        .accessibilityValue(String(rest))
+                        .accessibilityValue(String(playlistItem.restDuration))
                         .accessibilityAdjustableAction { direction in
                             switch direction {
-                            case .increment: rest += 1
-                            case .decrement: rest -= 1
+                            case .increment: playlistItem.restDuration += 1
+                            case .decrement: playlistItem.restDuration -= 1
                             @unknown default: print("not handled")
                             }
                         }
@@ -93,7 +95,7 @@ struct EditExerciseView: View {
                     
                     Section("Number of repetitions") {
                         HStack {
-                            Picker("Number of Repetitions to Complete", selection: $reps) {
+                            Picker("Number of Repetitions to Complete", selection: $playlistItem.repsToComplete) {
                                 ForEach(1...20, id:\.self) {
                                     Text("\($0)").font(.headline)
                                 }
@@ -105,23 +107,70 @@ struct EditExerciseView: View {
                         .font(.subheadline)
                         .frame(height: 40)
                         .accessibilityElement(children: .ignore)
-                        .accessibilityLabel("Repetition count \(stretch)")
+                        .accessibilityLabel("Repetition count \(playlistItem.repsToComplete)")
                         .accessibilityHint("Set the number of times you want to perform this stretch")
-                        .accessibilityValue(String(reps))
+                        .accessibilityValue(String(playlistItem.repsToComplete))
                         .accessibilityAdjustableAction { direction in
                             switch direction {
-                            case .increment: reps += 1
-                            case .decrement: reps -= 1
+                            case .increment: playlistItem.repsToComplete += 1
+                            case .decrement: playlistItem.repsToComplete -= 1
                             default: print("not handled")
                             }
                         }
 
                     }
                 }
+                
+                Spacer()
+                
+                Button {
+//                    playlistItem.name = name
+//                    playlistItem.stretchDuration = stretch
+//                    playlistItem.restDuration = rest
+//                    playlistItem.repsToComplete = reps
+//                    modelContext.insert(playlistItem)
+                    do {
+                        try modelContext.save()
+                    } catch {
+                        print("Error: \(error.localizedDescription)")
+                    }
+                    dismiss()
+                } label: {
+                    if #available(iOS 26.0, *) {
+                        Text("SAVE")
+                            .frame(width: buttonWidth, height: 50)
+                            .font(.headline)
+                            .fontWeight(.bold)
+                            .foregroundStyle(.white)
+                            .background(.green)
+                            .clipShape(.capsule)
+                            .glassEffect()
+                            .padding(.top, 25)
+                            .padding(.bottom, 25)
+                            .dynamicTypeSize(...DynamicTypeSize.accessibility2)
+                    } else {
+                        Text("SAVE")
+                            .frame(width: buttonWidth, height: 50)
+                            .font(.headline)
+                            .fontWeight(.bold)
+                            .foregroundStyle(.white)
+                            .background(.green)
+                            .clipShape(.capsule)
+                            .padding(.top, 25)
+                            .padding(.bottom, 25)
+                            .dynamicTypeSize(...DynamicTypeSize.accessibility2)
+                    }
+                }
             }
-            .navigationTitle("Add or Edit Exercise")
+            .navigationTitle("Edit Exercise")
             .navigationBarTitleDisplayMode(.inline)
         }
+//        .onAppear {
+//            name = playlistItem.name
+//            stretch  = playlistItem.stretchDuration
+//            rest = playlistItem.restDuration
+//            reps = playlistItem.repsToComplete
+//        }
     }
 }
 
