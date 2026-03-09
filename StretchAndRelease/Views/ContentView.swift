@@ -35,7 +35,7 @@ struct ContentView: View {
     // state variables only used on main view
     @State private var isShowingSettings = false
     @State private var didSettingsChange = false
-    @State private var isShowingHelp = false
+    @State private var isShowingPlaylistView = false
     @State private var isResetToggled = false
     
     // Connectivity class for communication with Apple Watch
@@ -138,17 +138,17 @@ struct ContentView: View {
             .toolbar {
                 ToolbarItem {
                     Button {
-                        isShowingHelp.toggle()
+                        isShowingPlaylistView.toggle()
                     } label: {
                         if #available(iOS 26.0, *) {
-                            Image(systemName: "questionmark.circle.fill")
+                            Image(systemName: "list.bullet")
                                 .foregroundStyle(.blue)
                                 .glassEffect()
-                                .accessibilityLabel("Show Help")
+                                .accessibilityLabel("Show playlist")
 
                         } else {
-                            Image(systemName: "questionmark.circle.fill")
-                                .accessibilityLabel("Show Help")
+                            Image(systemName: "list.bullet")
+                                .accessibilityLabel("Show playlist")
 
                         }                    }
                 }
@@ -177,14 +177,14 @@ struct ContentView: View {
         .sheet(isPresented: $isShowingSettings) {
             SettingsView(totalStretch: $totalStretch, totalRest: $totalRest, totalReps: $totalReps, didSettingsChange: $didSettingsChange, audio: $audio, haptics: $haptics, promptVolume: $promptVolume)
         }
-        .sheet(isPresented: $isShowingHelp) {
-            MainHelpScreenView()
+        .sheet(isPresented: $isShowingPlaylistView) {
+            PlaylistView()
                 .presentationDetents([.large])
                 .presentationDragIndicator(.visible)
         }
         
         //stops and resets tiner when either settings or help views are toggled
-        .onChange(of: isShowingSettings || isShowingHelp) {
+        .onChange(of: isShowingSettings || isShowingPlaylistView) {
             withAnimation(.smooth(duration: 0.25)) {
                 stretchPhase = .stop
                 timeRemaining = totalStretch
@@ -306,4 +306,5 @@ struct ContentView: View {
 
 #Preview {
     ContentView()
+        .modelContainer(previewContainer)
 }
