@@ -13,16 +13,18 @@ struct SettingsView: View {
     @Environment(\.accessibilityDifferentiateWithoutColor) var differentiateWithoutColor
     @Environment(\.dismiss) var dismiss
     @Environment(\.dynamicTypeSize) var dynamicTypeSize
+    @Environment(Managers.self) var managers
     
-    // Binding settings passed from Timer Main view
-    @Binding var totalStretch: Int
-    @Binding var totalRest: Int
-    @Binding var totalReps: Int
+    // Properties stored in UserDefaults
+    @AppStorage("stretch") private var totalStretch = 10
+    @AppStorage("rest") private var totalRest = 5
+    @AppStorage("reps") private var totalReps = 3
     
-    @Binding var didSettingsChange: Bool
-    @Binding var audio: Bool
-    @Binding var haptics: Bool
-    @Binding var promptVolume: Double
+    @AppStorage("audio") private var audio = true
+    @AppStorage("haptics") private var haptics = true
+    @AppStorage("promptVolume") private var promptVolume = 1.0
+    
+    @AppStorage("playlist") private var playlist = false
     
     //local variables
     @State private var stretch = 0
@@ -72,68 +74,73 @@ struct SettingsView: View {
             
             Group {
                 Section {
-                    HStack {
-                        Toggle("Haptic feedback: \(haptics ? "on" : "off")", isOn: $haptics)
-                            .accessibilityHint("Turn haptic feedback on or off")
-                    }
-                    HStack {
-                        Toggle("Audio cues: \(audio ? "on" : "off")", isOn: $audio)
-                            .accessibilityHint("Turn audio cues on or off")
-                    }
-                    HStack {
-                        Slider(
-                            value: $promptVolume,
-                            in: 0.0...1.0
-                        ) {
-                            Text("Prompt Volume")
-                        } minimumValueLabel: {
-                            Image(systemName: "speaker.slash.fill")
-                        } maximumValueLabel: {
-                            Image(systemName: "speaker.wave.3")
-                        } onEditingChanged: { editing in
-                            isEditing = editing
+                    VStack(spacing: 25) {
+                        HStack {
+                            Toggle("Use playlist", isOn: $playlist)
+                                .accessibilityHint("Turn playlist on or off")
                         }
-                        .accessibilityLabel("Volume")
-                        .accessibilityHint("Adjust volume of voice prompts")
-                        .accessibilityValue(String(promptVolume.formatted(.percent)))
-                        .accessibilityAdjustableAction { direction in
-                            switch direction {
-                            case .increment: promptVolume += 0.1
-                            case .decrement: promptVolume -= 0.1
-                            @unknown default: print("not handled")
+                        HStack {
+                            Toggle("Haptic feedback", isOn: $haptics)
+                                .accessibilityHint("Turn haptic feedback on or off")
+                        }
+                        HStack {
+                            Toggle("Audio cues", isOn: $audio)
+                                .accessibilityHint("Turn audio cues on or off")
+                        }
+                        HStack {
+                            Slider(
+                                value: $promptVolume,
+                                in: 0.0...1.0
+                            ) {
+                                Text("Prompt Volume")
+                            } minimumValueLabel: {
+                                Image(systemName: "speaker.slash.fill")
+                            } maximumValueLabel: {
+                                Image(systemName: "speaker.wave.3")
+                            } onEditingChanged: { editing in
+                                isEditing = editing
+                            }
+                            .accessibilityLabel("Volume")
+                            .accessibilityHint("Adjust volume of voice prompts")
+                            .accessibilityValue(String(promptVolume.formatted(.percent)))
+                            .accessibilityAdjustableAction { direction in
+                                switch direction {
+                                case .increment: promptVolume += 0.1
+                                case .decrement: promptVolume -= 0.1
+                                @unknown default: print("not handled")
+                                }
                             }
                         }
                     }
                 }
                 .padding(.horizontal)
                 .dynamicTypeSize(...DynamicTypeSize.xxLarge)
-                
-                
-                Section {
-                    Button {
-                        totalStretch = stretch
-                        totalRest = rest
-                        totalReps = reps
-                        SoundManager.instance.volume = promptVolume
-                        didSettingsChange = true
-                        dismiss()
-                    } label: {
-                        Text("SAVE")
-                            .frame(width: buttonWidth, height: 50)
-                            .font(.headline)
-                            .fontWeight(.bold)
-                            .foregroundStyle(.white)
-                            .background(.green)
-                            .clipShape(.capsule)
-                            .padding(.bottom, 5)
-                            .dynamicTypeSize(...DynamicTypeSize.accessibility2)
-                    }
-                    .accessibilityLabel("Save")
-                    .accessibilityHint("Save your settings and return to the main screen")
-                }
             }
             .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.inline)
+            
+            Spacer()
+        }
+        .safeAreaInset(edge: .bottom) {
+            Button {
+                totalStretch = stretch
+                totalRest = rest
+                totalReps = reps
+                SoundManager.instance.volume = promptVolume
+                managers.didStatusChange = true
+                dismiss()
+            } label: {
+                Text("SAVE")
+                    .frame(width: buttonWidth, height: 50)
+                    .font(.headline)
+                    .fontWeight(.bold)
+                    .foregroundStyle(.white)
+                    .background(.green)
+                    .clipShape(.capsule)
+                    .dynamicTypeSize(...DynamicTypeSize.accessibility2)
+            }
+            .accessibilityLabel("Save")
+            .accessibilityHint("Save your settings and return to the main screen")
         }
         .onAppear {
             stretch = totalStretch
@@ -148,13 +155,6 @@ struct SettingsView: View {
 
 
 #Preview {
-    @Previewable @State var didSettingsChange: Bool = false
-    @Previewable @State var totalStretch = 10
-    @Previewable @State var totalRest = 5
-    @Previewable @State var totalReps = 3
-    @Previewable @State var audio = true
-    @Previewable @State var haptics = true
-    @Previewable @State var promptVolume = 1.0
-    
-    SettingsView(totalStretch: $totalStretch, totalRest: $totalRest, totalReps: $totalReps, didSettingsChange: $didSettingsChange, audio: $audio, haptics: $haptics, promptVolume: $promptVolume)
+    SettingsView()
+        .environment(Managers())
 }

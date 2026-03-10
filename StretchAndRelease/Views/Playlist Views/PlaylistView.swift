@@ -25,7 +25,6 @@ struct PlaylistView: View {
     @Query(sort: \PlaylistItem.index) var playlist: [PlaylistItem]
     
     //State properties
-    @State private var isShowingAddExercise = false
     @State private var name: String = ""
     @State private var stretchDuration: Int = 0
     @State private var restDuration: Int = 0
@@ -35,76 +34,83 @@ struct PlaylistView: View {
     
     var body: some View {
         NavigationStack {
-            List {
-                ForEach(playlist) { exercise in
-                    PlaylistRowView(item: exercise)
-                        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                            Button(role: .destructive) {
-                                modelContext.delete(exercise)
-                            } label: {
-                                Label("Delete", systemImage: "trash")
-                                    .accessibilityLabel("Delete \(exercise.name)")
-                                    .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
-                            }
-                        }
-                        .swipeActions(edge: .leading, allowsFullSwipe: true) {
+            ZStack {
+                Color.clear.gradientBackground()
+                
+                if !playlist.isEmpty {
+                    List {
+                        ForEach(playlist) { exercise in
                             NavigationLink {
                                 EditExerciseView(playlistItem: exercise)
                             } label: {
-                                Label("Edit", systemImage: "pencil")
-                                    .accessibilityLabel("Change settings for \(exercise.name)")
-                                    .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                                PlaylistRowView(item: exercise)
+                                    .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                                        Button {
+                                            modelContext.delete(exercise)
+                                        } label: {
+                                            Label("Delete", systemImage: "trash")
+                                                .tint(.red)
+                                                .accessibilityLabel("Delete \(exercise.name)")
+                                                .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                                        }
+                                    }
                             }
-                            .tint(.blue)
+                            .accessibilityLabel("Edit \(exercise.name)")
+                            .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
                         }
+                        .onMove(perform: move)
+                    }
+                    .scrollContentBackground(.hidden)
+                    .padding(.top)
+                    .safeAreaInset(edge: .bottom) {
+                        NavigationLink {
+                            AddExerciseView()
+                        } label: {
+                            Text("ADD")
+                                .frame(width: 200, height: 65)
+                                .font(.system(size: 32))
+                                .fontWeight(.bold)
+                                .foregroundStyle(.white)
+                                .background(.green)
+                                .clipShape(.capsule)
+                                .padding(.bottom, 5)
+                                .dynamicTypeSize(...DynamicTypeSize.accessibility2)
+                        }
+                        .accessibilityLabel("Add exercise")
+                        .accessibilityHint("Add an exercise to the playlist")
+                    }
+                } else {
+                    ContentUnavailableView {
+                        Label("Playlist is Empty", systemImage: "plus.circle")
+                            .font(.largeTitle)
+                            .padding(.bottom)
+                    } description: {
+                        Text("Press ADD to add a stretch to your playlist")
+                            .font(.system(size: 24))
+                            .foregroundStyle(colorScheme == .dark ? .white : .black)
+                    }
+                    .safeAreaInset(edge: .bottom) {
+                        NavigationLink {
+                            AddExerciseView()
+                        } label: {
+                            Text("ADD")
+                                .frame(width: 200, height: 65)
+                                .font(.system(size: 32))
+                                .fontWeight(.bold)
+                                .foregroundStyle(.white)
+                                .background(.green)
+                                .clipShape(.capsule)
+                                .padding(.bottom, 5)
+                                .dynamicTypeSize(...DynamicTypeSize.accessibility2)
+                        }
+                        .accessibilityLabel("Add exercise")
+                        .accessibilityHint("Add an exercise to the playlist")
+                    }
                 }
-                .onMove(perform: move)
+
             }
             .navigationTitle("Playlist")
-            .navigationBarTitleDisplayMode(.large)
-            .toolbar {
-                ToolbarItem {
-                    NavigationLink {
-                        AddExerciseView()
-                    } label: {
-                        if #available(iOS 26.0, *) {
-                            Image(systemName: "plus.circle")
-                                .glassEffect()
-                                .foregroundStyle(.blue)
-                                .accessibilityLabel("Add new exercise to playlist")
-                                .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
-                        } else {
-                            Image(systemName: "plus.circle")
-                                .foregroundStyle(.blue)
-                                .accessibilityLabel("Add new exercise to playlist")
-                                .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
-                        }
-                    }
-                }
-                
-                if #available(iOS 26.0, *) {
-                    ToolbarSpacer()
-                }
-                
-                ToolbarItem {
-                    Button(role: .cancel) {
-                        dismiss()
-                    } label: {
-                        if #available(iOS 26.0, *) {
-                            Image(systemName: "x.circle")
-                                .glassEffect()
-                                .foregroundStyle(.red)
-                                .accessibilityLabel("Return to main screen")
-                                .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
-                        } else {
-                            Image(systemName: "x.circle.fill")
-                                .tint(.red)
-                                .accessibilityLabel("Return to main screen")
-                                .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
-                        }
-                    }
-                }
-            }
+            .navigationBarTitleDisplayMode(.inline)
         }
     }
 }

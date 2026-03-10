@@ -12,12 +12,13 @@ struct MainArcView: View {
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.accessibilityDifferentiateWithoutColor) var differentiateWithoutColor
     @Environment(\.dynamicTypeSize) var sizeCategory
+    @Environment(Managers.self) private var managers
+    
+    //Properties from AppStorage
+    
+    @AppStorage("haptics") private var haptics = true
     
     //Bindings from parent view
-    @Binding var stretchPhase: StretchPhase
-    @Binding var haptics: Bool
-    @Binding var isTimerActive: Bool
-    @Binding var isTimerPaused: Bool
     @Binding var endAngle: Angle
     @Binding var timeRemaining: Int
     @Binding var totalReps: Int
@@ -27,7 +28,7 @@ struct MainArcView: View {
         ZStack {
             if !differentiateWithoutColor {
                 Arc(endAngle: endAngle)
-                    .stroke(stretchPhase.phaseColor, style: StrokeStyle(lineWidth: 25, lineCap: .round))
+                    .stroke(managers.stretchPhase.phaseColor, style: StrokeStyle(lineWidth: 25, lineCap: .round))
                     .rotationEffect(Angle(degrees: 90))
                     .shadow(color: colorScheme == .dark ? .gray.opacity(0) : .black.opacity(0.35), radius: 5, x: 8, y: 5)
                     .padding(.bottom)
@@ -44,18 +45,18 @@ struct MainArcView: View {
                     .kerning(2)
                     .contentTransition(.numericText(countsDown: true))
                     .accessibilityLabel("\(timeRemaining) seconds remaining")
-                Text(!isTimerPaused ? stretchPhase.phaseText : "PAUSED")
+                Text(!managers.isTimerPaused ? managers.stretchPhase.phaseText : "PAUSED")
                     .scaleEffect(0.75)
-                    .accessibilityLabel(!isTimerPaused ? stretchPhase.phaseText : "WORKOUT PAUSED")
+                    .accessibilityLabel(!managers.isTimerPaused ? managers.stretchPhase.phaseText : "WORKOUT PAUSED")
                 Text("Reps: \(repsCompleted)/\(totalReps)")
                     .accessibilityLabel("Repetitions Completed \(repsCompleted) of \(totalReps)")
                 Spacer()
             }
             .font(.largeTitle)
-            .foregroundStyle(differentiateWithoutColor ? .black : isTimerPaused ? .gray : stretchPhase.phaseColor)
+            .foregroundStyle(differentiateWithoutColor ? .black : managers.isTimerPaused ? .gray : managers.stretchPhase.phaseColor)
             .fontWeight(.bold)
             .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
-            .sensoryFeedback(.impact(intensity: stretchPhase.phaseIntensity), trigger: endAngle) { oldValue, newValue in
+            .sensoryFeedback(.impact(intensity: managers.stretchPhase.phaseIntensity), trigger: endAngle) { oldValue, newValue in
                     return haptics
             }
             .padding(.bottom)
@@ -67,13 +68,9 @@ struct MainArcView: View {
 }
 
 #Preview {
-    @Previewable @State var stretchPhase: StretchPhase = .stretch
-    @Previewable @State var haptics = true
-    @Previewable @State var isTimerActive = true
-    @Previewable @State var isTimerPaused = false
     @Previewable @State var endAngle = Angle(degrees: 340.0)
     @Previewable @State var timeRemaining = 8
     @Previewable @State var totalReps = 5
     @Previewable @State var repsCompleted = 2
-    MainArcView(stretchPhase: $stretchPhase, haptics: $haptics, isTimerActive: $isTimerActive, isTimerPaused: $isTimerPaused, endAngle: $endAngle, timeRemaining: $timeRemaining, totalReps: $totalReps, repsCompleted: $repsCompleted)
+    MainArcView(endAngle: $endAngle, timeRemaining: $timeRemaining, totalReps: $totalReps, repsCompleted: $repsCompleted)
 }

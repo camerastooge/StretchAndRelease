@@ -10,9 +10,12 @@ import SwiftData
 
 @main
 struct StretchAndReleaseApp: App {
+    @State private var managers = Managers()
+    
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environment(managers)
         }
         .modelContainer(for: PlaylistItem.self)
     }
