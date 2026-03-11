@@ -30,6 +30,14 @@ struct PlaylistView: View {
     @State private var restDuration: Int = 0
     @State private var repsNumber: Int = 0
     
+    //Define columns for LazyVGrid
+    private let playlistColumns: [GridItem] = [
+        GridItem(.flexible(minimum: 150), alignment: .leading), // name
+        GridItem(.fixed(60), alignment: .center),               // stretch
+        GridItem(.fixed(60), alignment: .center),               // rest
+        GridItem(.fixed(70), alignment: .center),               // reps
+    ]
+    
     @State private var isShowingActive = false
     
     var body: some View {
@@ -39,11 +47,33 @@ struct PlaylistView: View {
                 
                 if !playlist.isEmpty {
                     List {
+                        LazyVGrid(columns: playlistColumns) {
+                            Text("Name")
+                                .font(.caption)
+                                .fontWeight(.semibold)
+                                .lineLimit(1)
+                                .padding(.leading, 5)
+                            
+                            Text("Stretch")
+                                .font(.caption)
+                                .fontWeight(.semibold)
+                                .lineLimit(1)
+                            
+                            Text("Rest")
+                                .font(.caption)
+                                .fontWeight(.semibold)
+                                .lineLimit(1)
+                            
+                            Text("Reps")
+                                .font(.caption)
+                                .fontWeight(.semibold)
+                                .lineLimit(1)
+                        }
                         ForEach(playlist) { exercise in
                             NavigationLink {
                                 EditExerciseView(playlistItem: exercise)
                             } label: {
-                                PlaylistRowView(item: exercise)
+                                PlaylistRowView(item: exercise, columns: playlistColumns)
                                     .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                                         Button {
                                             modelContext.delete(exercise)
@@ -55,6 +85,7 @@ struct PlaylistView: View {
                                         }
                                     }
                             }
+                            .navigationLinkIndicatorVisibility(.hidden)
                             .accessibilityLabel("Edit \(exercise.name)")
                             .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
                         }

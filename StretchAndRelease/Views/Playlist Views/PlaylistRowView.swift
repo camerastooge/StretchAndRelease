@@ -9,39 +9,40 @@ import SwiftUI
 
 struct PlaylistRowView: View {
     @Bindable var item: PlaylistItem
-    
-    private let columns: [GridItem] = [
-        GridItem(.flexible(minimum: 150), alignment: .leading), //name
-        GridItem(.fixed(40), alignment: .center),               //stretch
-        GridItem(.fixed(40), alignment: .center),               //rest
-        GridItem(.fixed(40), alignment: .center)                //reps
-    ]
+    let columns: [GridItem]
     
     var body: some View {
-        LazyVGrid(columns: columns, alignment: .leading) {
+        LazyVGrid(columns: columns) {
             Text(item.name)
-                .font(.headline)
+                .font(.caption)
                 .fontWeight(.bold)
                 .lineLimit(1)
                 .layoutPriority(1)
+                .padding(.leading, 5)
             
             Text("\(item.stretchDuration)")
-                .font(.headline)
+                .font(.caption)
                 .fontWeight(.bold)
             
             Text("\(item.restDuration)")
-                .font(.headline)
+                .font(.caption)
                 .fontWeight(.bold)
             
             Text("\(item.repsToComplete)")
-                .font(.headline)
+                .font(.caption)
                 .fontWeight(.bold)
         }
+        .padding(.vertical, 4)
     }
 }
 
 #Preview {
     @Previewable @State var item = PlaylistItem.sampleData[0]
-    
-    PlaylistRowView(item: item)
+    let playlistColumns: [GridItem] = [
+        GridItem(.flexible(minimum: 150), alignment: .leading), //name
+        GridItem(.fixed(40), alignment: .center),               //stretch
+        GridItem(.fixed(40), alignment: .center),               //rest
+        GridItem(.fixed(40), alignment: .center),                //reps
+    ]
+    PlaylistRowView(item: item, columns: playlistColumns)
 }
