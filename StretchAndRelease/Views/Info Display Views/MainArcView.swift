@@ -17,12 +17,23 @@ struct MainArcView: View {
     //Properties from AppStorage
     
     @AppStorage("haptics") private var haptics = true
+    @AppStorage("playlist") private var playlist = false
     
     //Bindings from parent view
     @Binding var endAngle: Angle
     @Binding var timeRemaining: Int
     @Binding var totalReps: Int
     @Binding var repsCompleted: Int
+    @Binding var playlistItemName: String?
+    
+    //label for timer text view
+    var timerTextLabel: String {
+        if let playlistItemName {
+            return playlistItemName
+        } else {
+            return managers.stretchPhase.phaseText
+        }
+    }
     
     var body: some View {
         ZStack {
@@ -45,9 +56,9 @@ struct MainArcView: View {
                     .kerning(2)
                     .contentTransition(.numericText(countsDown: true))
                     .accessibilityLabel("\(timeRemaining) seconds remaining")
-                Text(!managers.isTimerPaused ? managers.stretchPhase.phaseText : "PAUSED")
+                Text(!managers.isTimerPaused ? timerTextLabel : "PAUSED")
                     .scaleEffect(0.75)
-                    .accessibilityLabel(!managers.isTimerPaused ? managers.stretchPhase.phaseText : "WORKOUT PAUSED")
+                    .accessibilityLabel(!managers.isTimerPaused ? timerTextLabel : "WORKOUT PAUSED")
                 Text("Reps: \(repsCompleted)/\(totalReps)")
                     .accessibilityLabel("Repetitions Completed \(repsCompleted) of \(totalReps)")
                 Spacer()
@@ -72,5 +83,6 @@ struct MainArcView: View {
     @Previewable @State var timeRemaining = 8
     @Previewable @State var totalReps = 5
     @Previewable @State var repsCompleted = 2
-    MainArcView(endAngle: $endAngle, timeRemaining: $timeRemaining, totalReps: $totalReps, repsCompleted: $repsCompleted)
+    @Previewable @State var playlistItemName: String? = "Test"
+    MainArcView(endAngle: $endAngle, timeRemaining: $timeRemaining, totalReps: $totalReps, repsCompleted: $repsCompleted, playlistItemName: $playlistItemName)
 }

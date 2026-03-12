@@ -46,53 +46,40 @@ struct PlaylistView: View {
                 Color.clear.gradientBackground()
                 
                 if !playlist.isEmpty {
-                    List {
-                        LazyVGrid(columns: playlistColumns) {
-                            Text("Name")
-                                .font(.caption)
-                                .fontWeight(.semibold)
-                                .lineLimit(1)
-                                .padding(.leading, 5)
-                            
-                            Text("Stretch")
-                                .font(.caption)
-                                .fontWeight(.semibold)
-                                .lineLimit(1)
-                            
-                            Text("Rest")
-                                .font(.caption)
-                                .fontWeight(.semibold)
-                                .lineLimit(1)
-                            
-                            Text("Reps")
-                                .font(.caption)
-                                .fontWeight(.semibold)
-                                .lineLimit(1)
-                        }
-                        ForEach(playlist) { exercise in
-                            NavigationLink {
-                                EditExerciseView(playlistItem: exercise)
-                            } label: {
-                                PlaylistRowView(item: exercise, columns: playlistColumns)
-                                    .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                                        Button {
-                                            modelContext.delete(exercise)
-                                        } label: {
-                                            Label("Delete", systemImage: "trash")
-                                                .tint(.red)
-                                                .accessibilityLabel("Delete \(exercise.name)")
-                                                .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
-                                        }
+                    ScrollView {
+                        LazyVStack(pinnedViews: .sectionHeaders) {
+                            Section{
+                                ForEach(playlist) { exercise in
+                                    NavigationLink {
+                                        EditExerciseView(playlistItem: exercise)
+                                    } label: {
+                                        PlaylistRowView(item: exercise, columns: playlistColumns)
+                                            .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                                                Button {
+                                                    modelContext.delete(exercise)
+                                                } label: {
+                                                    Label("Delete", systemImage: "trash")
+                                                        .tint(.red)
+                                                        .accessibilityLabel("Delete \(exercise.name)")
+                                                        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                                                }
+                                            }
                                     }
+                                    .navigationLinkIndicatorVisibility(.hidden)
+                                    .accessibilityLabel("Edit \(exercise.name)")
+                                    .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                                }
+                                .onMove(perform: move)
                             }
-                            .navigationLinkIndicatorVisibility(.hidden)
-                            .accessibilityLabel("Edit \(exercise.name)")
-                            .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
                         }
-                        .onMove(perform: move)
+                        .safeAreaPadding(10)
                     }
                     .scrollContentBackground(.hidden)
+                    .scrollClipDisabled(true)
                     .padding(.top)
+                    .safeAreaInset(edge: .top, content: {
+                        playlistHeaderView(columns: playlistColumns)
+                    })
                     .safeAreaInset(edge: .bottom) {
                         NavigationLink {
                             AddExerciseView()
@@ -158,6 +145,36 @@ extension PlaylistView {
         for(index, item) in mutableList.enumerated() {
             item.index = index
         }
+    }
+}
+
+struct playlistHeaderView: View {
+    var columns: [GridItem]
+    
+    var body: some View {
+        LazyVGrid(columns: columns) {
+            Text("Name")
+                .font(.caption)
+                .fontWeight(.semibold)
+                .lineLimit(1)
+                .padding(.leading, 5)
+            
+            Text("Stretch")
+                .font(.caption)
+                .fontWeight(.semibold)
+                .lineLimit(1)
+            
+            Text("Rest")
+                .font(.caption)
+                .fontWeight(.semibold)
+                .lineLimit(1)
+            
+            Text("Reps")
+                .font(.caption)
+                .fontWeight(.semibold)
+                .lineLimit(1)
+        }
+
     }
 }
 

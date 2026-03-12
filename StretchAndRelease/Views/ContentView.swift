@@ -24,8 +24,6 @@ struct ContentView: View {
     @AppStorage("haptics") private var haptics = true
     @AppStorage("promptVolume") private var promptVolume = 1.0
     
-    @AppStorage("playlist") private var isUsingPlaylist = false
-    
     //State properties
     @State private var isShowingHelpView: Bool = false
     @State private var isShowingSettings: Bool = false

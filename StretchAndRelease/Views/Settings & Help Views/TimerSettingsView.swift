@@ -23,7 +23,6 @@ struct SettingsView: View {
     @AppStorage("audio") private var audio = true
     @AppStorage("haptics") private var haptics = true
     @AppStorage("promptVolume") private var promptVolume = 1.0
-    
     @AppStorage("playlist") private var playlist = false
     
     //local variables

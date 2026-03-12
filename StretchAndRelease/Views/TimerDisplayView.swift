@@ -23,12 +23,18 @@ struct TimerDisplayView: View {
     @AppStorage("audio") private var audio = true
     @AppStorage("haptics") private var haptics = true
     @AppStorage("promptVolume") private var promptVolume = 1.0
+    @AppStorage("playlist") private var playlistIsActive = false
+
     
     // state variables used across views
     @State private var timeRemaining: Int = 0
     @State private var repsCompleted: Int = 0
     @State private var endAngle = Angle(degrees: 340)
     @State private var timer = Timer.publish(every: 1.0, on: .main, in: .common).autoconnect()
+    
+    // SwiftData model and item for current playlist item
+    @Query(sort: \PlaylistItem.index) var playlist: [PlaylistItem]
+    var playlistItem: PlaylistItem?
     
     // variables for button view
     var buttonRoles: ButtonRoles = .play
@@ -40,7 +46,7 @@ struct TimerDisplayView: View {
             
             VStack(spacing: 0) {
                 ZStack {
-                    MainArcView(endAngle: $endAngle, timeRemaining: $timeRemaining, totalReps: $totalReps, repsCompleted: $repsCompleted)
+                    MainArcView(endAngle: $endAngle, timeRemaining: $timeRemaining, totalReps: $totalReps, repsCompleted: $repsCompleted, playlistItemName: )
                         
                 }
                 .containerRelativeFrame(.horizontal, alignment: .center) { length, _ in
@@ -199,6 +205,10 @@ struct TimerDisplayView: View {
         case .stop:
             endAngle = Angle(degrees: 340)
         }
+    }
+    
+    func playlistAdvanceMechanism() {
+        
     }
 }
 
