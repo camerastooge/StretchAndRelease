@@ -23,9 +23,8 @@ struct TimerDisplayView: View {
     @AppStorage("audio") private var audio = true
     @AppStorage("haptics") private var haptics = true
     @AppStorage("promptVolume") private var promptVolume = 1.0
-    @AppStorage("playlist") private var playlistIsActive = false
+    @AppStorage("playlist") private var isPlaylistActive = false
 
-    
     // state variables used across views
     @State private var timeRemaining: Int = 0
     @State private var repsCompleted: Int = 0
@@ -35,6 +34,16 @@ struct TimerDisplayView: View {
     // SwiftData model and item for current playlist item
     @Query(sort: \PlaylistItem.index) var playlist: [PlaylistItem]
     var playlistItem: PlaylistItem?
+    
+    // computed properties
+    var timerTextLabel: String {
+        if isPlaylistActive {
+            if let name = playlistItem?.name {
+                return name
+            }
+        }
+        return managers.stretchPhase.phaseText
+    }
     
     // variables for button view
     var buttonRoles: ButtonRoles = .play
@@ -46,7 +55,7 @@ struct TimerDisplayView: View {
             
             VStack(spacing: 0) {
                 ZStack {
-                    MainArcView(endAngle: $endAngle, timeRemaining: $timeRemaining, totalReps: $totalReps, repsCompleted: $repsCompleted, playlistItemName: )
+                    MainArcView(endAngle: $endAngle, timeRemaining: $timeRemaining, totalReps: $totalReps, repsCompleted: $repsCompleted, timerTextLabel: timerTextLabel)
                         
                 }
                 .containerRelativeFrame(.horizontal, alignment: .center) { length, _ in
@@ -61,54 +70,15 @@ struct TimerDisplayView: View {
                     HStack {
                         Spacer()
                         
-                        Button {
-                            withAnimation {
-                                if managers.stretchPhase == .stop {
-                                    if audio {
-                                        SoundManager.instance.playPrompt(sound: .countdownExpanded)
-                                    }
-                                    DispatchQueue.main.asyncAfter(deadline: audio ? .now() + 3.0 : .now() + 0.5) {
-                                        withAnimation(.linear(duration: 0.25)) {
-                                            managers.isTimerActive = true
-                                            managers.isTimerPaused = false
-                                            managers.stretchPhase = .stretch
-                                            repsCompleted = 0
-                                        }
-                                    }
-                                } else if !managers.isTimerPaused {
-                                    managers.isTimerPaused = true
-                                    managers.isTimerActive = false
-                                } else {
-                                    if audio {
-                                        SoundManager.instance.playPrompt(sound: .countdown)
-                                    }
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                                        withAnimation(.linear(duration: 0.25)) {
-                                            managers.isTimerPaused = false
-                                            managers.isTimerActive = true
-                                        }
-                                    }
-                                }
-                            }
-                        } label: {
-                            ButtonView(buttonRoles: !managers.isTimerActive ? .play : .pause, deviceType: deviceType)
-                        }
+                        //START - PAUSE BUTTON
+                        StartPauseButtonView(repsCompleted: $repsCompleted)
                         .accessibilityLabel(!managers.isTimerActive ? "Start Timer" : "Pause Timer")
                         
                         Spacer()
                         
-                        Button {
-                            managers.isTimerActive = false
-                            managers.isTimerPaused = false
-                            repsCompleted = 0
-                            managers.stretchPhase = .stop
-                            timeRemaining = totalStretch
-                            withAnimation(.easeInOut(duration: 0.5)) {
-                                updateEndAngle()
-                            }
-                        } label: {
-                            ButtonView(buttonRoles: .reset, deviceType: .phone)
-                        }
+                        //RESET BUTTON
+                        
+                        ResetButtonView(timeRemaining: $timeRemaining, repsCompleted: $repsCompleted)
                         .accessibilityLabel("Reset Timer")
                         
                         Spacer()
@@ -174,6 +144,10 @@ struct TimerDisplayView: View {
                         updateEndAngle()
                     }()
                     }
+                } else if managers.stretchPhase == .stop {
+                    withAnimation(.easeOut(duration: 0.25)) {
+                        updateEndAngle()
+                    }
                 }
             }
             
@@ -205,10 +179,6 @@ struct TimerDisplayView: View {
         case .stop:
             endAngle = Angle(degrees: 340)
         }
-    }
-    
-    func playlistAdvanceMechanism() {
-        
     }
 }
 

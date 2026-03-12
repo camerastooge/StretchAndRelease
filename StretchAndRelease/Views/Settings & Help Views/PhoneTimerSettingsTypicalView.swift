@@ -14,7 +14,7 @@ struct PhoneTimerSettingsTypicalView: View {
     
     var body: some View {
         NavigationStack {
-            List {
+            VStack {
                 Section("Stretch Time") {
                     HStack {
                         Picker("Stretch", selection: $stretch) {

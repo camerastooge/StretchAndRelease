@@ -16,6 +16,12 @@ class Managers {
     var didStatusChange = false
     var stretchPhase: StretchPhase = .stop
     
+    func startTimer() {
+        stretchPhase = .stretch
+        isTimerActive = true
+        isTimerPaused = false
+    }
+    
     func stopTimer() {
         stretchPhase = .stop
         isTimerActive = false

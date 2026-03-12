@@ -35,90 +35,93 @@ struct SettingsView: View {
     
     var body: some View {
         NavigationStack {
-            Group {
-                if !dynamicTypeSize.isAccessibilitySize {
-                    PhoneTimerSettingsTypicalView(stretch: $stretch, rest: $rest, reps: $reps, isEditing: $isEditing)
-                        .scrollDisabled(true)
-                        .containerRelativeFrame(.vertical) { height, _ in
-                            height * 0.69
-                        }
-                } else {
-                    PhoneTimerSettingsAccessibleView(stretch: $stretch, rest: $rest, reps: $reps, isEditing: $isEditing)
-                        .scrollDisabled(false)
-                        .containerRelativeFrame(.vertical) { height, _ in
-                            height * 0.69
-                        }
-                }
-            }
-            .toolbar {
-                ToolbarItem {
-                    Button(role: .cancel) {
-                        dismiss()
-                    } label: {
-                        if #available(iOS 26.0, *) {
-                            Image(systemName: "x.circle.fill")
-                                .glassEffect()
-                                .tint(.red)
-                                .accessibilityLabel("Return to main screen")
-                                .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
-                        } else {
-                            Image(systemName: "x.circle.fill")
-                                .tint(.red)
-                                .accessibilityLabel("Return to main screen")
-                                .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
-                        }
+            ScrollView {
+                Section {
+                    if !dynamicTypeSize.isAccessibilitySize {
+                        PhoneTimerSettingsTypicalView(stretch: $stretch, rest: $rest, reps: $reps, isEditing: $isEditing)
+                            .scrollDisabled(true)
+                            .containerRelativeFrame(.vertical) { height, _ in
+                                height * 0.55
+                            }
+                    } else {
+                        PhoneTimerSettingsAccessibleView(stretch: $stretch, rest: $rest, reps: $reps, isEditing: $isEditing)
+                            .scrollDisabled(false)
+                            .containerRelativeFrame(.vertical) { height, _ in
+                                height * 0.55
+                            }
                     }
                 }
-            }
-            
-            Group {
+                
+                            
                 Section {
-                    VStack(spacing: 25) {
-                        HStack {
-                            Toggle("Use playlist", isOn: $playlist)
-                                .accessibilityHint("Turn playlist on or off")
-                        }
-                        HStack {
-                            Toggle("Haptic feedback", isOn: $haptics)
-                                .accessibilityHint("Turn haptic feedback on or off")
-                        }
-                        HStack {
-                            Toggle("Audio cues", isOn: $audio)
-                                .accessibilityHint("Turn audio cues on or off")
-                        }
-                        HStack {
-                            Slider(
-                                value: $promptVolume,
-                                in: 0.0...1.0
-                            ) {
-                                Text("Prompt Volume")
-                            } minimumValueLabel: {
-                                Image(systemName: "speaker.slash.fill")
-                            } maximumValueLabel: {
-                                Image(systemName: "speaker.wave.3")
-                            } onEditingChanged: { editing in
-                                isEditing = editing
+                    Section {
+                        VStack(spacing: 25) {
+                            HStack {
+                                Toggle("Use playlist", isOn: $playlist)
+                                    .accessibilityHint("Turn playlist on or off")
                             }
-                            .accessibilityLabel("Volume")
-                            .accessibilityHint("Adjust volume of voice prompts")
-                            .accessibilityValue(String(promptVolume.formatted(.percent)))
-                            .accessibilityAdjustableAction { direction in
-                                switch direction {
-                                case .increment: promptVolume += 0.1
-                                case .decrement: promptVolume -= 0.1
-                                @unknown default: print("not handled")
+                            HStack {
+                                Toggle("Haptic feedback", isOn: $haptics)
+                                    .accessibilityHint("Turn haptic feedback on or off")
+                            }
+                            HStack {
+                                Toggle("Audio cues", isOn: $audio)
+                                    .accessibilityHint("Turn audio cues on or off")
+                            }
+                            HStack {
+                                Slider(
+                                    value: $promptVolume,
+                                    in: 0.0...1.0
+                                ) {
+                                    Text("Prompt Volume")
+                                } minimumValueLabel: {
+                                    Image(systemName: "speaker.slash.fill")
+                                } maximumValueLabel: {
+                                    Image(systemName: "speaker.wave.3")
+                                } onEditingChanged: { editing in
+                                    isEditing = editing
+                                }
+                                .accessibilityLabel("Volume")
+                                .accessibilityHint("Adjust volume of voice prompts")
+                                .accessibilityValue(String(promptVolume.formatted(.percent)))
+                                .accessibilityAdjustableAction { direction in
+                                    switch direction {
+                                    case .increment: promptVolume += 0.1
+                                    case .decrement: promptVolume -= 0.1
+                                    @unknown default: print("not handled")
+                                    }
                                 }
                             }
                         }
                     }
+                    .padding(.horizontal)
+                    .dynamicTypeSize(...DynamicTypeSize.xxLarge)
                 }
-                .padding(.horizontal)
-                .dynamicTypeSize(...DynamicTypeSize.xxLarge)
+                .padding(.bottom)
+                .navigationTitle("Settings")
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItem {
+                        Button(role: .cancel) {
+                            dismiss()
+                        } label: {
+                            if #available(iOS 26.0, *) {
+                                Image(systemName: "x.circle.fill")
+                                    .glassEffect()
+                                    .tint(.red)
+                                    .accessibilityLabel("Return to main screen")
+                                    .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                            } else {
+                                Image(systemName: "x.circle.fill")
+                                    .tint(.red)
+                                    .accessibilityLabel("Return to main screen")
+                                    .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                            }
+                        }
+                    }
+                }
             }
-            .navigationTitle("Settings")
-            .navigationBarTitleDisplayMode(.inline)
-            
-            Spacer()
+            .scrollDisabled(true)
         }
         .safeAreaInset(edge: .bottom) {
             Button {

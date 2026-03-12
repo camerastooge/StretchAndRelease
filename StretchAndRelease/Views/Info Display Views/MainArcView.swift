@@ -19,21 +19,14 @@ struct MainArcView: View {
     @AppStorage("haptics") private var haptics = true
     @AppStorage("playlist") private var playlist = false
     
-    //Bindings from parent view
+    //Properties from parent view
     @Binding var endAngle: Angle
     @Binding var timeRemaining: Int
     @Binding var totalReps: Int
     @Binding var repsCompleted: Int
-    @Binding var playlistItemName: String?
     
-    //label for timer text view
-    var timerTextLabel: String {
-        if let playlistItemName {
-            return playlistItemName
-        } else {
-            return managers.stretchPhase.phaseText
-        }
-    }
+    var timerTextLabel: String
+
     
     var body: some View {
         ZStack {
@@ -83,6 +76,8 @@ struct MainArcView: View {
     @Previewable @State var timeRemaining = 8
     @Previewable @State var totalReps = 5
     @Previewable @State var repsCompleted = 2
-    @Previewable @State var playlistItemName: String? = "Test"
-    MainArcView(endAngle: $endAngle, timeRemaining: $timeRemaining, totalReps: $totalReps, repsCompleted: $repsCompleted, playlistItemName: $playlistItemName)
+    @Previewable @State var timerTextLabel = "TEST"
+    
+    MainArcView(endAngle: $endAngle, timeRemaining: $timeRemaining, totalReps: $totalReps, repsCompleted: $repsCompleted, timerTextLabel: timerTextLabel)
+        .environment(Managers())
 }

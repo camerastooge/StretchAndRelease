@@ -58,6 +58,7 @@ class SoundManager: NSObject {
     func playTick(sound: SoundOption) {
         guard let player = tickPlayer else { return }
         player.currentTime = 0.0
+        player.volume = Float(volume)
         player.play()
     }
     

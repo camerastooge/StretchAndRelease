@@ -15,10 +15,12 @@ struct PhoneTimerSettingsAccessibleView: View {
     var body: some View {
         VStack {
             NavigationStack {
-                List {
+                VStack {
                     Section {
                         HStack {
                             Spacer()
+                            Text("Stretch")
+                                .font(.largeTitle)
                             Picker("Stretch", selection: $stretch) {
                                 ForEach(1...60, id:\.self) {
                                     Text("\($0)")
@@ -44,6 +46,8 @@ struct PhoneTimerSettingsAccessibleView: View {
                     Section {
                         HStack {
                             Spacer()
+                            Text("Rest")
+                                .font(.largeTitle)
                             Picker("Rest", selection: $rest) {
                                 ForEach(1...30, id:\.self) {
                                     Text("\($0)")
@@ -69,6 +73,8 @@ struct PhoneTimerSettingsAccessibleView: View {
                     Section {
                         HStack {
                             Spacer()
+                            Text("Reps")
+                                .font(.largeTitle)
                             Picker("Reps", selection: $reps) {
                                 ForEach(1...20, id:\.self) {
                                     Text("\($0)")
