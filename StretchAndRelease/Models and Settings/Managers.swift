@@ -21,10 +21,4 @@ class Managers {
         isTimerActive = true
         isTimerPaused = false
     }
-    
-    func stopTimer() {
-        stretchPhase = .stop
-        isTimerActive = false
-        isTimerPaused = false
-    }
 }

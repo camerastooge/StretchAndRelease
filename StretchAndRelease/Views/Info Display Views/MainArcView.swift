@@ -17,7 +17,6 @@ struct MainArcView: View {
     //Properties from AppStorage
     
     @AppStorage("haptics") private var haptics = true
-    @AppStorage("playlist") private var playlist = false
     
     //Properties from parent view
     @Binding var endAngle: Angle

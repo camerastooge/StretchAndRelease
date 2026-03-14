@@ -133,6 +133,7 @@ struct AddExerciseView: View {
                         } catch {
                             print("Error: \(error.localizedDescription)")
                         }
+                        print(playlistItem.name)
                         dismiss()
                     } else {
                         isShowingEmptyNameField = true

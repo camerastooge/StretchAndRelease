@@ -23,7 +23,7 @@ struct SettingsView: View {
     @AppStorage("audio") private var audio = true
     @AppStorage("haptics") private var haptics = true
     @AppStorage("promptVolume") private var promptVolume = 1.0
-    @AppStorage("playlist") private var playlist = false
+    @AppStorage("playlist") private var isPlaylistActive = false
     
     //local variables
     @State private var stretch = 0
@@ -57,7 +57,7 @@ struct SettingsView: View {
                     Section {
                         VStack(spacing: 25) {
                             HStack {
-                                Toggle("Use playlist", isOn: $playlist)
+                                Toggle("Use playlist", isOn: $isPlaylistActive)
                                     .accessibilityHint("Turn playlist on or off")
                             }
                             HStack {

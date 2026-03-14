@@ -23,11 +23,11 @@ struct ContentView: View {
     @AppStorage("audio") private var audio = true
     @AppStorage("haptics") private var haptics = true
     @AppStorage("promptVolume") private var promptVolume = 1.0
+    @AppStorage("playlist") private var isPlaylistActive = false
     
     //State properties
     @State private var isShowingHelpView: Bool = false
     @State private var isShowingSettings: Bool = false
-    
     
     // Connectivity class for communication with Apple Watch
     @State private var connectivity = Connectivity()
@@ -52,7 +52,7 @@ struct ContentView: View {
                     TimerDisplayView()
                 }
                 
-                Tab("Playlist", systemImage: "list.bullet") {
+                Tab("Set list", systemImage: "list.bullet") {
                     PlaylistView()
                 }
             }
@@ -119,7 +119,9 @@ struct ContentView: View {
         
         //when settings change, updates main display and sends updated settings to Apple Watch app
         .onChange(of: managers.didStatusChange) {
-            managers.stopTimer()
+            managers.stretchPhase = .stop
+            managers.isTimerActive = false
+            managers.isTimerPaused = false
             sendContext(stretch: totalStretch, rest: totalRest, reps: totalReps)
             managers.didStatusChange = false
         }
@@ -136,6 +138,7 @@ struct ContentView: View {
         let settingsUpdate = ["stretch" : stretch, "rest" : rest, "reps" : reps]
         connectivity.setContext(to: settingsUpdate)
     }
+
 }
         
 
