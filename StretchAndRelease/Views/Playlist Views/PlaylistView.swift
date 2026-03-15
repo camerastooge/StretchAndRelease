@@ -46,40 +46,34 @@ struct PlaylistView: View {
                 Color.clear.gradientBackground()
                 
                 if !playlist.isEmpty {
-                    ScrollView {
-                        LazyVStack(pinnedViews: .sectionHeaders) {
-                            Section{
-                                ForEach(playlist) { exercise in
-                                    NavigationLink {
-                                        EditExerciseView(playlistItem: exercise)
-                                    } label: {
-                                        PlaylistRowView(item: exercise, columns: playlistColumns)
-                                            .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                                                Button {
-                                                    modelContext.delete(exercise)
-                                                } label: {
-                                                    Label("Delete", systemImage: "trash")
-                                                        .tint(.red)
-                                                        .accessibilityLabel("Delete \(exercise.name)")
-                                                        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
-                                                }
+                    List {
+                        Section(header: playlistHeaderView(columns: playlistColumns)) {
+                            ForEach(playlist) { exercise in
+                                NavigationLink {
+                                    EditExerciseView(playlistItem: exercise)
+                                } label: {
+                                    PlaylistRowView(item: exercise, columns: playlistColumns)
+                                        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                                            Button {
+                                                modelContext.delete(exercise)
+                                            } label: {
+                                                Label("Delete", systemImage: "trash")
+                                                    .tint(.red)
+                                                    .accessibilityLabel("Delete \(exercise.name)")
+                                                    .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
                                             }
-                                    }
-                                    .navigationLinkIndicatorVisibility(.hidden)
-                                    .accessibilityLabel("Edit \(exercise.name)")
-                                    .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                                        }
                                 }
-                                .onMove(perform: move)
+                                .navigationLinkIndicatorVisibility(.hidden)
+                                .accessibilityLabel("Edit \(exercise.name)")
+                                .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+//                                .listRowBackground(Color.clear)
                             }
+                            .onMove(perform: move)
                         }
-                        .safeAreaPadding(10)
                     }
-                    .scrollContentBackground(.hidden)
-                    .scrollClipDisabled(true)
-                    .padding(.top)
-                    .safeAreaInset(edge: .top, content: {
-                        playlistHeaderView(columns: playlistColumns)
-                    })
+                    .listStyle(.plain)
+//                    .scrollContentBackground(.hidden)
                     .safeAreaInset(edge: .bottom) {
                         NavigationLink {
                             AddExerciseView()

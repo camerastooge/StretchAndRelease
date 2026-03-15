@@ -57,9 +57,52 @@ struct TimerDisplayView: View {
                 .frame(minHeight: 0, maxHeight: .infinity)
                 .layoutPriority(1)
                 
-                //Button Row
+                // playlist button row
+                if isPlaylistActive {
+                    ZStack {
+                        Color.gray.opacity(differentiateWithoutColor ? 0 : 0.25)
+                        HStack {
+                            Spacer()
+                            
+                            //PREVIOUS EXERCISE BUTTON
+                            Button {
+                                currentIndex -= 1
+                                if currentIndex < 0 {
+                                    currentIndex = playlist.count - 1
+                                }
+                                loadPlaylistItem(currentIndex)
+                            } label: {
+                                ButtonView(buttonRoles: .previousItem, deviceType: deviceType)
+                                    .opacity(0.75)
+                            }
+                            .accessibilityLabel("Go to previous item in set list")
+                            
+                            Spacer()
+                            
+                            //NEXT EXERCISE BUTTON
+                            Button {
+                                currentIndex += 1
+                                if currentIndex == playlist.count {
+                                    currentIndex = 0
+                                }
+                                loadPlaylistItem(currentIndex)
+                            } label: {
+                                ButtonView(buttonRoles: .nextItem, deviceType: deviceType)
+                                    .opacity(0.75)
+                            }
+                            .accessibilityLabel("Go to next item in set list")
+
+                            Spacer()
+                        }
+                        .padding(.horizontal)
+                        .padding(.vertical, 5)
+                    }
+                    .padding(.bottom, 5)
+                }
+                
+                //Normal Button Row
                 ZStack {
-                    Color.gray.opacity(differentiateWithoutColor ? 0.0 : 0.25)
+                    Color.black.opacity(differentiateWithoutColor ? 0.0 : 0.25)
                     HStack {
                         Spacer()
                         
@@ -122,9 +165,11 @@ struct TimerDisplayView: View {
                         
                         Spacer()
                     }
-                    .padding([.horizontal, .vertical])
+                    .padding(.horizontal)
+                    .padding(.vertical, 5)
                 }
                 .padding(.bottom, 5)
+                
             }
             
             //this modifier runs when the timer publishes

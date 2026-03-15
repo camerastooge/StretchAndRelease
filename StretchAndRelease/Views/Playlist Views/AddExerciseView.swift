@@ -24,6 +24,10 @@ struct AddExerciseView: View {
     @State private var rest = 5
     @State private var reps = 5
     @State private var isShowingEmptyNameField = false
+    @State private var isExerciseAddedToEmptyPlaylist = false
+    
+    //check if playlist is active
+    @AppStorage("playlist") private var isPlaylistActive = false
     
     @ScaledMetric var buttonWidth = 100
     
@@ -93,7 +97,7 @@ struct AddExerciseView: View {
                         }
                     }
                     .padding(.bottom)
-
+                    
                     Section("Number of repetitions") {
                         HStack {
                             Picker("Number of Repetitions to Complete", selection: $reps) {
@@ -118,7 +122,7 @@ struct AddExerciseView: View {
                             default: print("not handled")
                             }
                         }
-
+                        
                     }
                 }
                 
@@ -126,6 +130,11 @@ struct AddExerciseView: View {
                 
                 Button {
                     if !name.isEmpty {
+                        if !isPlaylistActive {
+                            if playlist.isEmpty {
+                                isExerciseAddedToEmptyPlaylist = true
+                            }
+                        }
                         let playlistItem = PlaylistItem(index: playlist.count + 1, name: name, stretchDuration: stretch, restDuration: rest, repsToComplete: reps)
                         modelContext.insert(playlistItem)
                         do {
@@ -133,7 +142,6 @@ struct AddExerciseView: View {
                         } catch {
                             print("Error: \(error.localizedDescription)")
                         }
-                        print(playlistItem.name)
                         dismiss()
                     } else {
                         isShowingEmptyNameField = true
@@ -165,7 +173,7 @@ struct AddExerciseView: View {
                             .dynamicTypeSize(...DynamicTypeSize.accessibility2)
                     }
                 }
-
+                
             }
             .navigationTitle("Add Exercise")
             .navigationBarTitleDisplayMode(.inline)
@@ -176,6 +184,32 @@ struct AddExerciseView: View {
             } message: {
                 Text("You must name your exercise.")
             }
+            .alert("Set List is Not Active", isPresented: $isExerciseAddedToEmptyPlaylist) {
+                if #available(iOS 26.0, *) {
+                    Button("OK", role: .confirm) {
+                        isPlaylistActive = true
+                    }
+                    
+                    Button("Cancel", role: .cancel) {
+                        isExerciseAddedToEmptyPlaylist = false
+                    }
+                    .backgroundStyle(Color.red)
+                } else {
+                    Button("OK") {
+                        isPlaylistActive = true
+                    }
+                    
+                    Button(role: .cancel) {
+                        isExerciseAddedToEmptyPlaylist = false
+                    } label: {
+                        Text("Cancel")
+                            .backgroundStyle(Color.red)
+                    }
+                }
+            } message: {
+                Text("Do you want to turn the set list on?")
+            }
+            
         }
     }
 }

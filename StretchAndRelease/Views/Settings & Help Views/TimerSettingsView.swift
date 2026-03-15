@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct SettingsView: View {
     // Environment variables
@@ -25,11 +26,15 @@ struct SettingsView: View {
     @AppStorage("promptVolume") private var promptVolume = 1.0
     @AppStorage("playlist") private var isPlaylistActive = false
     
+    //SwiftData query
+    @Query(sort: \PlaylistItem.index) var playlist: [PlaylistItem]
+    
     //local variables
     @State private var stretch = 0
     @State private var rest = 0
     @State private var reps = 0
     @State private var isEditing = false
+    @State private var isPlaylistEmpty = false
     
     @ScaledMetric var buttonWidth = 100
     
@@ -120,6 +125,13 @@ struct SettingsView: View {
                         }
                     }
                 }
+                .alert("Empty Setlists", isPresented: $isPlaylistEmpty) {
+                    //add code to bring up add exercise view?
+                } message: {
+                    Text("There is nothing in the set list. \n Please add some exercises.")
+                }
+
+                
             }
             .scrollDisabled(true)
         }
@@ -149,6 +161,14 @@ struct SettingsView: View {
             rest = totalRest
             reps = totalReps
         }
+        .onChange(of: isPlaylistActive) {
+            if isPlaylistActive {
+                if playlist.isEmpty {
+                    isPlaylistEmpty = true
+                    isPlaylistActive = false
+                }
+            }
+        }
     }
 }
 
@@ -159,4 +179,5 @@ struct SettingsView: View {
 #Preview {
     SettingsView()
         .environment(Managers())
+//        .modelContainer(previewContainer)
 }
