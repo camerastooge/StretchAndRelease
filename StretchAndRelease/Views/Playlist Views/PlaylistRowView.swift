@@ -14,22 +14,22 @@ struct PlaylistRowView: View {
     var body: some View {
         LazyVGrid(columns: columns) {
             Text(item.name)
-                .font(.caption)
+                .font(.headline)
                 .fontWeight(.bold)
                 .lineLimit(1)
                 .layoutPriority(1)
                 .padding(.leading, 5)
             
             Text("\(item.stretchDuration)")
-                .font(.caption)
+                .font(.headline)
                 .fontWeight(.bold)
             
             Text("\(item.restDuration)")
-                .font(.caption)
+                .font(.headline)
                 .fontWeight(.bold)
             
             Text("\(item.repsToComplete)")
-                .font(.caption)
+                .font(.headline)
                 .fontWeight(.bold)
         }
         .padding(.vertical, 4)

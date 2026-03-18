@@ -23,7 +23,7 @@ struct TimerDisplayView: View {
     @AppStorage("audio") private var audio = true
     @AppStorage("haptics") private var haptics = true
     @AppStorage("promptVolume") private var promptVolume = 1.0
-    @AppStorage("playlist") private var isPlaylistActive = true
+    @AppStorage("playlist") private var isPlaylistActive = false
 
     // state variables used across views
     @State private var timeRemaining: Int = 0
@@ -218,7 +218,7 @@ struct TimerDisplayView: View {
             }
             
             .onAppear {
-                if isPlaylistActive {
+                if isPlaylistActive && !playlist.isEmpty {
                     loadPlaylistItem(currentIndex)
                 } else {
                     playlistItem = nil

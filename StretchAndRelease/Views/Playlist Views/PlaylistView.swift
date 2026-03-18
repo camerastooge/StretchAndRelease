@@ -20,6 +20,7 @@ struct PlaylistView: View {
     @AppStorage("stretch") private var totalStretch = 10
     @AppStorage("rest") private var totalRest = 5
     @AppStorage("reps") private var totalReps = 3
+    @AppStorage("playlist") private var isPlaylistActive = false
     
     //SwiftData property
     @Query(sort: \PlaylistItem.index) var playlist: [PlaylistItem]
@@ -29,6 +30,10 @@ struct PlaylistView: View {
     @State private var stretchDuration: Int = 0
     @State private var restDuration: Int = 0
     @State private var repsNumber: Int = 0
+    
+    //Checks for determining playlist status
+    @State private var isPlaylistInactive = false
+    @State private var playlistHasBeenEmptied = false
     
     //Define columns for LazyVGrid
     private let playlistColumns: [GridItem] = [
@@ -67,13 +72,13 @@ struct PlaylistView: View {
                                 .navigationLinkIndicatorVisibility(.hidden)
                                 .accessibilityLabel("Edit \(exercise.name)")
                                 .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
-//                                .listRowBackground(Color.clear)
+                                .listRowBackground(Color.clear)
                             }
                             .onMove(perform: move)
                         }
                     }
                     .listStyle(.plain)
-//                    .scrollContentBackground(.hidden)
+                    .scrollContentBackground(.hidden)
                     .safeAreaInset(edge: .bottom) {
                         NavigationLink {
                             AddExerciseView()
@@ -82,12 +87,14 @@ struct PlaylistView: View {
                                 .frame(width: 200, height: 65)
                                 .font(.system(size: 32))
                                 .fontWeight(.bold)
+                                .shadow(color: .gray, radius: 0.2, x: 0.5, y: 1)
                                 .foregroundStyle(.white)
                                 .background(.green)
                                 .clipShape(.capsule)
                                 .padding(.bottom, 5)
                                 .dynamicTypeSize(...DynamicTypeSize.accessibility2)
                         }
+                        .shadow(color: .gray, radius: 0.2, x: 0.5, y: 1)
                         .accessibilityLabel("Add exercise")
                         .accessibilityHint("Add an exercise to the playlist")
                     }
@@ -123,6 +130,50 @@ struct PlaylistView: View {
             }
             .navigationTitle("Playlist")
             .navigationBarTitleDisplayMode(.inline)
+            .onChange(of: playlist) {
+                if playlist.isEmpty {
+                    playlistHasBeenEmptied = true
+                    isPlaylistActive = false
+                } else {
+                    if !isPlaylistActive {
+                        isPlaylistInactive = true
+                    }
+                }
+            }
+            .alert("Set List is Not Active", isPresented: $isPlaylistInactive) {
+                if #available(iOS 26.0, *) {
+                    Button("OK", role: .confirm) {
+                        isPlaylistActive = true
+                    }
+                    
+                    Button("Cancel", role: .cancel) { }
+                    .backgroundStyle(Color.red)
+                } else {
+                    Button("OK") {
+                        isPlaylistActive = true
+                    }
+                    
+                    Button(role: .cancel) { } label: {
+                        Text("Cancel")
+                            .backgroundStyle(Color.red)
+                    }
+                }
+            } message: {
+                Text("Do you want to turn the set list on?")
+            }
+            .alert("Set list has been turned off", isPresented: $playlistHasBeenEmptied) {
+                if #available(iOS 26.0, *) {
+                    Button("OK", role: .confirm) {
+                        isPlaylistActive = false
+                    }
+                } else {
+                    Button("OK") {
+                        isPlaylistActive = false
+                    }
+                }
+            } message: {
+                Text("The set list has been turned off since it is empty.")
+            }
         }
     }
 }
@@ -148,24 +199,32 @@ struct playlistHeaderView: View {
     var body: some View {
         LazyVGrid(columns: columns) {
             Text("Name")
-                .font(.caption)
-                .fontWeight(.semibold)
+                .font(.headline)
+                .fontWeight(.bold)
+                .foregroundStyle(Color.secondary)
+                .shadow(color: .black, radius: 0.2, x: 0.5, y: 1)
                 .lineLimit(1)
                 .padding(.leading, 5)
             
             Text("Stretch")
-                .font(.caption)
+                .font(.headline)
                 .fontWeight(.semibold)
+                .foregroundStyle(Color.green)
+                .shadow(color: .black, radius: 0.2, x: 0.5, y: 1)
                 .lineLimit(1)
             
             Text("Rest")
-                .font(.caption)
+                .font(.headline)
                 .fontWeight(.semibold)
+                .foregroundStyle(Color.yellow)
+                .shadow(color: .black, radius: 0.2, x: 0.5, y: 1)
                 .lineLimit(1)
             
             Text("Reps")
-                .font(.caption)
+                .font(.headline)
                 .fontWeight(.semibold)
+                .foregroundStyle(Color.red)
+                .shadow(color: .black, radius: 0.2, x: 0.5, y: 1)
                 .lineLimit(1)
         }
 

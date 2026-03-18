@@ -130,11 +130,13 @@ struct AddExerciseView: View {
                 
                 Button {
                     if !name.isEmpty {
-                        if !isPlaylistActive {
-                            if playlist.isEmpty {
-                                isExerciseAddedToEmptyPlaylist = true
-                            }
-                        }
+//                        if !isPlaylistActive {
+//                            if playlist.isEmpty {
+//                                Task {
+//                                    await emptyPlaylistAlert()
+//                                }
+//                            }
+//                        }
                         let playlistItem = PlaylistItem(index: playlist.count + 1, name: name, stretchDuration: stretch, restDuration: rest, repsToComplete: reps)
                         modelContext.insert(playlistItem)
                         do {
@@ -184,33 +186,11 @@ struct AddExerciseView: View {
             } message: {
                 Text("You must name your exercise.")
             }
-            .alert("Set List is Not Active", isPresented: $isExerciseAddedToEmptyPlaylist) {
-                if #available(iOS 26.0, *) {
-                    Button("OK", role: .confirm) {
-                        isPlaylistActive = true
-                    }
-                    
-                    Button("Cancel", role: .cancel) {
-                        isExerciseAddedToEmptyPlaylist = false
-                    }
-                    .backgroundStyle(Color.red)
-                } else {
-                    Button("OK") {
-                        isPlaylistActive = true
-                    }
-                    
-                    Button(role: .cancel) {
-                        isExerciseAddedToEmptyPlaylist = false
-                    } label: {
-                        Text("Cancel")
-                            .backgroundStyle(Color.red)
-                    }
-                }
-            } message: {
-                Text("Do you want to turn the set list on?")
-            }
-            
         }
+    }
+    
+    func emptyPlaylistAlert() async {
+        isExerciseAddedToEmptyPlaylist = true
     }
 }
 
