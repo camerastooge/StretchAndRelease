@@ -37,10 +37,10 @@ struct PlaylistView: View {
     
     //Define columns for LazyVGrid
     private let playlistColumns: [GridItem] = [
-        GridItem(.flexible(minimum: 150), alignment: .leading), // name
-        GridItem(.fixed(60), alignment: .center),               // stretch
-        GridItem(.fixed(60), alignment: .center),               // rest
-        GridItem(.fixed(70), alignment: .center),               // reps
+        GridItem(.flexible(minimum: 150), alignment: .leading),
+        GridItem(.fixed(60), alignment: .center),
+        GridItem(.fixed(60), alignment: .center),
+        GridItem(.fixed(70), alignment: .center),
     ]
     
     @State private var isShowingActive = false
@@ -71,7 +71,6 @@ struct PlaylistView: View {
                                 }
                                 .navigationLinkIndicatorVisibility(.hidden)
                                 .accessibilityLabel("Edit \(exercise.name)")
-                                .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
                                 .listRowBackground(Color.clear)
                             }
                             .onMove(perform: move)
@@ -94,7 +93,6 @@ struct PlaylistView: View {
                                 .padding(.bottom, 5)
                                 .dynamicTypeSize(...DynamicTypeSize.accessibility2)
                         }
-                        .shadow(color: .gray, radius: 0.2, x: 0.5, y: 1)
                         .accessibilityLabel("Add exercise")
                         .accessibilityHint("Add an exercise to the playlist")
                     }
@@ -194,6 +192,11 @@ extension PlaylistView {
 }
 
 struct playlistHeaderView: View {
+    //Environment properties
+    @Environment(\.colorScheme) var colorScheme
+    @Environment(\.accessibilityDifferentiateWithoutColor) var differentiateWithoutColor
+    @Environment(\.dynamicTypeSize) var sizeCategory
+    
     var columns: [GridItem]
     
     var body: some View {
@@ -201,31 +204,35 @@ struct playlistHeaderView: View {
             Text("Name")
                 .font(.headline)
                 .fontWeight(.bold)
-                .foregroundStyle(Color.secondary)
-                .shadow(color: .black, radius: 0.2, x: 0.5, y: 1)
+                .foregroundStyle(colorScheme == .dark ? .secondary : Color.white.opacity(0.7))
                 .lineLimit(1)
                 .padding(.leading, 5)
+                .accessibilityLabel("Name")
+                .accessibilityHint("The name of the selected sretch")
             
-            Text("Stretch")
+            Text(sizeCategory >= .xLarge ? "S" : "Stretch")
                 .font(.headline)
                 .fontWeight(.semibold)
                 .foregroundStyle(Color.green)
-                .shadow(color: .black, radius: 0.2, x: 0.5, y: 1)
                 .lineLimit(1)
+                .accessibilityLabel("Stretch Duration")
+                .accessibilityHint("The length of time to hold the selected stretch")
             
-            Text("Rest")
+            Text(sizeCategory >= .xLarge ? "R" : "Rest")
                 .font(.headline)
                 .fontWeight(.semibold)
                 .foregroundStyle(Color.yellow)
-                .shadow(color: .black, radius: 0.2, x: 0.5, y: 1)
                 .lineLimit(1)
+                .accessibilityLabel("Rest Duration")
+                .accessibilityHint("The length of time to rest between stretches")
             
-            Text("Reps")
+            Text(sizeCategory >= .xLarge ? "R" : "Reps")
                 .font(.headline)
                 .fontWeight(.semibold)
                 .foregroundStyle(Color.red)
-                .shadow(color: .black, radius: 0.2, x: 0.5, y: 1)
                 .lineLimit(1)
+                .accessibilityLabel("Number of repetitions")
+                .accessibilityHint("How many times to perform this stretch in the set")
         }
 
     }
