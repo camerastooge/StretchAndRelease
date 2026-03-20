@@ -12,13 +12,13 @@ import SwiftData
 class PlaylistItem {
     //system defined properties
     var id = UUID()
-    var index: Int
+    var index: Int?
     
     //user defined properties
-    var name: String
-    var stretchDuration: Int
-    var restDuration: Int
-    var repsToComplete: Int
+    var name: String?
+    var stretchDuration: Int?
+    var restDuration: Int?
+    var repsToComplete: Int?
     
     init(index: Int, name: String, stretchDuration: Int, restDuration: Int, repsToComplete: Int) {
         self.index = index

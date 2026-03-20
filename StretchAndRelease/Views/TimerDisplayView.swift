@@ -241,9 +241,9 @@ struct TimerDisplayView: View {
     func loadPlaylistItem(_ index: Int) {
         playlistItem = playlist[index]
         if let playlistItem {
-            totalStretch = playlistItem.stretchDuration
-            totalRest = playlistItem.restDuration
-            totalReps = playlistItem.repsToComplete
+            totalStretch = playlistItem.stretchDuration ?? 10
+            totalRest = playlistItem.restDuration ?? 5
+            totalReps = playlistItem.repsToComplete ?? 3
         }
     }
     

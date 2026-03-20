@@ -64,13 +64,13 @@ struct PlaylistView: View {
                                             } label: {
                                                 Label("Delete", systemImage: "trash")
                                                     .tint(.red)
-                                                    .accessibilityLabel("Delete \(exercise.name)")
+                                                    .accessibilityLabel("Delete \(exercise.name ?? "exercise")")
                                                     .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
                                             }
                                         }
                                 }
                                 .navigationLinkIndicatorVisibility(.hidden)
-                                .accessibilityLabel("Edit \(exercise.name)")
+                                .accessibilityLabel("Edit \(exercise.name ?? "exercise")")
                                 .listRowBackground(Color.clear)
                             }
                             .onMove(perform: move)
