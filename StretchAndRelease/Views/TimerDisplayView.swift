@@ -37,6 +37,7 @@ struct TimerDisplayView: View {
     // local properties
     @State var playlistItem: PlaylistItem?
     @State private var currentIndex = 0
+    @State private var isPlaylistInactive = false
     
     // variables for button view
     var buttonRoles: ButtonRoles = .play
@@ -218,12 +219,15 @@ struct TimerDisplayView: View {
             }
             
             .onAppear {
-                if isPlaylistActive && !playlist.isEmpty {
-                    loadPlaylistItem(currentIndex)
+                if !playlist.isEmpty {
+                    if !isPlaylistActive {
+                        isPlaylistInactive = true
+                    } else {
+                        loadPlaylistItem(currentIndex)
+                    }
                 } else {
                     playlistItem = nil
-                }
-            }
+                }            }
             
             .onDisappear {
                 withAnimation(.linear(duration: 0.25)) {
@@ -233,6 +237,30 @@ struct TimerDisplayView: View {
                 managers.isTimerActive = false
                 managers.isTimerPaused = false
                 timeRemaining = totalStretch
+            }
+            
+            .alert("Set List is Not Active", isPresented: $isPlaylistInactive) {
+                if #available(iOS 26.0, *) {
+                    Button("OK", role: .confirm) {
+                        isPlaylistActive = true
+                        loadPlaylistItem(currentIndex)
+                    }
+                    
+                    Button("Cancel", role: .cancel) { }
+                    .backgroundStyle(Color.red)
+                } else {
+                    Button("OK") {
+                        isPlaylistActive = true
+                        loadPlaylistItem(currentIndex)
+                    }
+                    
+                    Button(role: .cancel) { } label: {
+                        Text("Cancel")
+                            .backgroundStyle(Color.red)
+                    }
+                }
+            } message: {
+                Text("Do you want to turn the set list on?")
             }
         }
     }
