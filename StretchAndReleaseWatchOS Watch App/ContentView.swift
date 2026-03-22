@@ -6,12 +6,14 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct ContentView: View {
     //Environment properties
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.accessibilityDifferentiateWithoutColor) var differentiateWithoutColor
     @Environment(\.scenePhase) var scenePhase
+    @Environment(Managers.self) var managers
     
     @StateObject var stretchSession = StretchSession()
     
@@ -23,19 +25,18 @@ struct ContentView: View {
     @AppStorage("audio") private var audio = true
     @AppStorage("haptics") private var haptics = true
     @AppStorage("promptVolume") private var promptVolume = 1.0
+    @AppStorage("playlist") private var isPlaylistActive = true
+    
+    //SwiftData models
+    @Query(sort: \PlaylistItem.index) var playlist: [PlaylistItem]
     
     // state variables used across views
     @State private var timeRemaining: Int = 0
     @State private var repsCompleted: Int = 0
-    @State private var isTimerActive = false
-    @State private var isTimerPaused = false
-    @State private var stretchPhase: StretchPhase = .stop
     @State private var endAngle = Angle(degrees: 340)
-    let timer = Timer.publish(every: 1.0, on: .main, in: .common).autoconnect()
-    
-    // state variables only used on main view
     @State private var isShowingSettings = false
     @State private var didSettingsChange = false
+    @State private var currentIndex = 0
     
     //Connectivity class for communication with phone
     @State private var connectivity = Connectivity()
@@ -52,137 +53,27 @@ struct ContentView: View {
                     .gradientBackground()
                 
                 //Screen area for TimerActionViewWatch
-                VStack {
-                    ZStack {
-                        VStack {
-                            Color.gray.opacity(0)
-                            
-                            ZStack {
-                                Color.gray.opacity(0)
+                GeometryReader { proxy in
+                    TabView {
+                            VStack {
+                                TimerDisplayViewWatch(timeRemaining: $timeRemaining, repsCompleted: $repsCompleted, isShowingSettings: $isShowingSettings, didSettingsChange: $didSettingsChange)
+                                    .padding(.vertical)
                                 
-                                ZStack {
-                                    Arc(endAngle: endAngle)
-                                        .stroke(stretchPhase.phaseColor, style: StrokeStyle(lineWidth: 10, lineCap: .round))
-                                        .rotationEffect(Angle(degrees: 90))
-                                        .sensoryFeedback(.impact(intensity: stretchPhase.phaseIntensity), trigger: endAngle) { oldValue, newValue in
-                                                return haptics
-                                        }
-                                    
-                                    VStack {
-                                        Text("\(String(format: "%02d", Int(timeRemaining)))")
-                                            .font(.largeTitle)
-                                            .kerning(2)
-                                            .contentTransition(.numericText(countsDown: true))
-                                            .accessibilityLabel("\(timeRemaining) seconds remaining")
-                                        Text(!isTimerPaused ? stretchPhase.phaseText : "PAUSED")
-                                            .scaleEffect(0.75)
-                                            .accessibilityLabel(!isTimerPaused ? stretchPhase.phaseText : "WORKOUT PAUSED")
-                                        Text("Reps: \(repsCompleted)/\(totalReps)")
-                                            .accessibilityLabel("Repetitions Completed \(repsCompleted) of \(totalReps)")
-                                    }
-                                    .font(.caption)
-                                    .fontWeight(.bold)
-                                    .foregroundStyle(!isTimerPaused ? stretchPhase.phaseColor : .gray)
-                                }
+                                Spacer()
                                 
+                                TimerButtonRowViewWatch(stretchSession: stretchSession, timeRemaining: $timeRemaining, repsCompleted: $repsCompleted, isShowingSettings: $isShowingSettings, didSettingsChange: $didSettingsChange, currentIndex: $currentIndex, endAngle: $endAngle)
                             }
-                            .containerRelativeFrame(.horizontal, alignment: .center) { length, _ in
-                                length * 0.9
-                            }
-                            .containerRelativeFrame(.vertical, alignment: .center) { length, _ in
-                                length * 0.96
-                            }
-                            
-                            //Button Row
-                            HStack {
-                                Button {
-                                    withAnimation {
-                                        if stretchPhase == .stop {
-                                            withAnimation(.linear(duration: 0.5)) {
-                                                stretchPhase = .stretch
-                                            }
-                                            
-                                            stretchSession.start()
-                                            
-                                            if audio {
-                                                SoundManager.instance.playPrompt(sound: .countdownExpanded)
-                                            }
-                                            
-                                            DispatchQueue.main.asyncAfter(deadline: audio ? .now() + 3 : .now() + 0.5) {
-                                                isTimerActive = true
-                                                isTimerPaused = false
-                                                repsCompleted = 0
-                                                
-                                            }
-                                        } else if !isTimerPaused {
-                                            withAnimation(.linear(duration: 0.25)) {
-                                                isTimerPaused = true
-                                                isTimerActive = false
-                                            }
-                                        } else {
-                                            if audio {
-                                                SoundManager.instance.playPrompt(sound: .countdownExpanded)
-                                            }
-                                            DispatchQueue.main.asyncAfter(deadline: audio ? .now() + 3 : .now() + 0.5) {
-                                                withAnimation(.linear(duration: 0.25)) {
-                                                    isTimerPaused = false
-                                                    isTimerActive = true
-                                                }
-                                            }
-                                        }
-                                    }
-                                } label: {
-                                    ButtonView(buttonRoles: !isTimerActive ? .play : .pause, deviceType: deviceType)
-                                    
-                                }
-                                .buttonStyle(.plain)
-                                .padding(.trailing)
-                                .accessibilityInputLabels(["Start", "Pause", "Start Timer", "Pause Timer"])
-                                .accessibilityLabel(stretchPhase != .stretch ? "Start the Timer" : "Pause the Timer")
-                                
-                                Button {
-                                    withAnimation(.linear(duration: 0.25)) {
-                                        isTimerActive = false
-                                        isTimerPaused = false
-                                        repsCompleted = 0
-                                        stretchPhase = .stop
-                                        timeRemaining = totalStretch
-                                        stretchSession.stop()
-                                    }
-                                    withAnimation(.easeInOut(duration: 0.5)) {
-                                        updateEndAngle()
-                                    }
-                                } label: {
-                                    ButtonView(buttonRoles: .reset, deviceType: deviceType)
-                                }
-                                .buttonStyle(.plain)
-                                .padding(.trailing)
-                                .accessibilityInputLabels(["Reset", "Reset Timer"])
-                                .accessibilityLabel("Reset Timer")
-                                
-                                Button {
-                                    isShowingSettings.toggle()
-                                } label: {
-                                    ButtonView(buttonRoles: .settings, deviceType: deviceType)
-                                }
-                                .buttonStyle(.plain)
-                                .accessibilityInputLabels(["Settings"])
-                                .accessibilityLabel("Show Settings")
-                            }
-                            .dynamicTypeSize(DynamicTypeSize.xxxLarge)
-                            .containerRelativeFrame(.vertical) { length, _ in
-                                length * 0.35
-                            }                    }
+                        
                     }
                 }
                 .sheet(isPresented: $isShowingSettings) {
-                    TimerSettingsViewWatch(totalStretch: $totalStretch, totalRest: $totalRest, totalReps: $totalReps, didSettingsChange: $didSettingsChange, audio: $audio, haptics: $haptics, promptVolume: $promptVolume)
+                    TimerSettingsViewWatch(totalStretch: $totalStretch, totalRest: $totalRest, totalReps: $totalReps, audio: $audio, haptics: $haptics, promptVolume: $promptVolume, didSettingsChange: $didSettingsChange)
                 }
                 
                 //stops and resets tiner when settings view is toggled
                 .onChange(of: isShowingSettings) {
                     withAnimation(.smooth(duration: 0.25)) {
-                        stretchPhase = .stop
+                        managers.stretchPhase = .stop
                         stretchSession.stop()
                         timeRemaining = totalStretch
                         repsCompleted = 0
@@ -212,7 +103,7 @@ struct ContentView: View {
                 //stop timer if application is fully backgrounded
                 .onChange(of: scenePhase) {
                     if scenePhase == .background {
-                        stretchPhase = .stop
+                        managers.stretchPhase = .stop
                         stretchSession.stop()
                     }
                 }
@@ -227,83 +118,9 @@ struct ContentView: View {
                     SoundManager.instance.prepareTick(sound: .tick)
                     SoundManager.instance.volume = promptVolume
                 }
-                
-                //this modifier runs when the timer publishes
-                .onReceive(timer) { _ in
-                    if isTimerActive && !isTimerPaused {
-                        switch stretchPhase {
-                        case .stretch: return {
-                            if timeRemaining > 0 {
-                                timeRemaining -= 1
-                                withAnimation(.linear(duration: 1.0)) {
-                                    updateEndAngle()
-                                }
-                                if audio {
-                                    SoundManager.instance.playTick(sound: .tick)
-                                }
-                            } else {
-                                repsCompleted += 1
-                                if repsCompleted < totalReps {
-                                    withAnimation(.linear(duration: 0.5)) {
-                                        stretchPhase = .rest
-                                    }
-                                    if audio {
-                                        SoundManager.instance.playPrompt(sound: .rest)
-                                    }
-                                } else {
-                                    withAnimation(.easeOut(duration: 0.25)) {
-                                        stretchPhase = .stop
-                                    }
-                                    timeRemaining = totalStretch
-                                    withAnimation(.easeOut(duration: 1.0)) {
-                                        updateEndAngle()
-                                    }
-                                    if audio {
-                                        SoundManager.instance.playPrompt(sound: .relax)
-                                    }
-                                }
-                            }
-                        }()
-                            
-                        case .rest: return {
-                            if timeRemaining < totalRest {
-                                timeRemaining += 1
-                                withAnimation(.easeOut(duration: 1.0)) {
-                                    updateEndAngle()
-                                }
-                            } else {
-                                withAnimation(.easeOut(duration: 0.5)) {
-                                    stretchPhase = .stretch
-                                }
-                                timeRemaining = totalStretch
-                                if audio {
-                                    SoundManager.instance.playPrompt(sound: .stretch)
-                                }
-                            }
-                        }()
-                            
-                        case .stop: return {
-                            isTimerActive = false
-                            stretchSession.stop()
-                        }()
-                        }
-                    }
-                }
             }
         }
         ._statusBarHidden()
-    }
-    
-    //function to set end angle of arc
-    func updateEndAngle() {
-        switch stretchPhase {
-        case .stretch:
-            endAngle = Angle(degrees: Double(timeRemaining) / Double(totalStretch) * 320 + 20)
-        case .rest:
-            endAngle = Angle(degrees: Double(timeRemaining) / Double(totalRest) * 320 + 20)
-        case .stop:
-            endAngle = Angle(degrees: 340)
-        }
     }
     
     //sends updated settings to iPhone
@@ -315,5 +132,7 @@ struct ContentView: View {
 
 #Preview {
     ContentView()
+        .modelContainer(previewContainer)
+        .environment(Managers())
 }
 

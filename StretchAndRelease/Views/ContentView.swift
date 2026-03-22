@@ -109,6 +109,12 @@ struct ContentView: View {
                 .presentationDragIndicator(.visible)
         }
         
+        //prep tick audio player when app launches
+        .onAppear() {
+            SoundManager.instance.prepareTick(sound: .tick)
+            SoundManager.instance.volume = promptVolume
+        }
+        
         .onChange(of: connectivity.didStatusChange) {
         //receives changed settings from Apple Watch app
             totalStretch = connectivity.statusContext["stretch"] as? Int ?? 10
@@ -124,12 +130,6 @@ struct ContentView: View {
             managers.isTimerPaused = false
             sendContext(stretch: totalStretch, rest: totalRest, reps: totalReps)
             managers.didStatusChange = false
-        }
-        
-        //prep tick audio player when app launches
-        .onAppear() {
-            SoundManager.instance.prepareTick(sound: .tick)
-            SoundManager.instance.volume = promptVolume
         }
     }
     

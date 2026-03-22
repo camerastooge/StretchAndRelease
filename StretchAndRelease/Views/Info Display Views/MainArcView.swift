@@ -67,6 +67,7 @@ struct MainArcView: View {
                 length / 1.15
             }
         }
+        .frame(maxWidth: .infinity)
     }
 }
 

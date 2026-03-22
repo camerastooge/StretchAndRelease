@@ -6,13 +6,17 @@
 //
 
 import SwiftUI
+import SwiftData
 
 @main
 struct StretchAndReleaseWatchOS_Watch_AppApp: App {
+    @State private var managers = Managers()
     
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environment(managers)
         }
+        .modelContainer(for: PlaylistItem.self)
     }
 }

@@ -10,16 +10,18 @@ import SwiftUI
 struct TimerSettingsViewWatch: View {
     // Environment variables
     @Environment(\.dismiss) var dismiss
+    @Environment(Managers.self) var managers
     
     // Binding settings passed from Timer Main view
     @Binding var totalStretch: Int
     @Binding var totalRest: Int
     @Binding var totalReps: Int
     
-    @Binding var didSettingsChange: Bool
     @Binding var audio: Bool
     @Binding var haptics: Bool
     @Binding var promptVolume: Double
+    
+    @Binding var didSettingsChange: Bool
     
     // Local variables
     @State private var stretch = 0
@@ -262,5 +264,6 @@ struct WatchDeviceSettingsView: View {
     @Previewable @State var haptics = true
     @Previewable @State var promptVolume = 1.0
     
-    TimerSettingsViewWatch(totalStretch: $totalStretch, totalRest: $totalRest, totalReps: $totalReps, didSettingsChange: $didSettingsChange, audio: $audio, haptics: $haptics, promptVolume: $promptVolume)
+    TimerSettingsViewWatch(totalStretch: $totalStretch, totalRest: $totalRest, totalReps: $totalReps, audio: $audio, haptics: $haptics, promptVolume: $promptVolume, didSettingsChange: $didSettingsChange)
+        .environment(Managers())
 }
