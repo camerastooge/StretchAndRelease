@@ -55,19 +55,42 @@ struct ContentView: View {
                 //Screen area for TimerActionViewWatch
                 GeometryReader { proxy in
                     TabView {
-                            VStack {
-                                TimerDisplayViewWatch(timeRemaining: $timeRemaining, repsCompleted: $repsCompleted, isShowingSettings: $isShowingSettings, didSettingsChange: $didSettingsChange)
-                                    .padding(.vertical)
-                                
-                                Spacer()
-                                
-                                TimerButtonRowViewWatch(stretchSession: stretchSession, timeRemaining: $timeRemaining, repsCompleted: $repsCompleted, isShowingSettings: $isShowingSettings, didSettingsChange: $didSettingsChange, currentIndex: $currentIndex, endAngle: $endAngle)
+                        Tab {
+                                VStack {
+                                    TimerDisplayViewWatch(timeRemaining: $timeRemaining, repsCompleted: $repsCompleted, didSettingsChange: $didSettingsChange)
+                                        .padding(.horizontal)
+                                        .padding(.bottom, 20)
+                                        .containerRelativeFrame(.vertical, alignment: .leading) { length, _ in
+                                            length * 0.8
+                                        }
+                                    
+                                    TimerButtonRowViewWatch(stretchSession: stretchSession, timeRemaining: $timeRemaining, repsCompleted: $repsCompleted, didSettingsChange: $didSettingsChange, currentIndex: $currentIndex, endAngle: $endAngle)
+                                        .containerRelativeFrame(.vertical, alignment: .trailing) { length, _ in
+                                            length * 0.6
+                                        }
+                                }
                             }
+                        Tab {
+                            Text("Hello world")
+                        }
                         
                     }
                 }
                 .sheet(isPresented: $isShowingSettings) {
                     TimerSettingsViewWatch(totalStretch: $totalStretch, totalRest: $totalRest, totalReps: $totalReps, audio: $audio, haptics: $haptics, promptVolume: $promptVolume, didSettingsChange: $didSettingsChange)
+                }
+                
+                .toolbar {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button {
+                            isShowingSettings.toggle()
+                        } label: {
+                            ButtonView(buttonRoles: .settings, deviceType: deviceType)
+                                .tint(Color.blue)
+                            
+                        }
+                        .buttonStyle(.plain)
+                    }
                 }
                 
                 //stops and resets tiner when settings view is toggled

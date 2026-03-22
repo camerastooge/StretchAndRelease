@@ -36,7 +36,6 @@ struct TimerDisplayViewWatch: View {
     
     @Binding var timeRemaining: Int
     @Binding var repsCompleted: Int
-    @Binding var isShowingSettings: Bool
     @Binding var didSettingsChange: Bool
     
     
@@ -73,6 +72,7 @@ struct TimerDisplayViewWatch: View {
                         .accessibilityLabel("Repetitions Completed \(repsCompleted) of \(totalReps)")
                 }
             }
+            .containerRelativeFrame(.horizontal)
             
             //this modifier runs when the timer publishes
             .onReceive(timer) { _ in
@@ -145,7 +145,7 @@ struct TimerDisplayViewWatch: View {
     @Previewable @State var isShowingSettings = false
     @Previewable @State var didSettingsChange = false
     
-    TimerDisplayViewWatch(timeRemaining: $timeRemaining, repsCompleted: $repsCompleted, isShowingSettings: $isShowingSettings, didSettingsChange: $didSettingsChange)
+    TimerDisplayViewWatch(timeRemaining: $timeRemaining, repsCompleted: $repsCompleted, didSettingsChange: $didSettingsChange)
         .environment(Managers())
         .modelContainer(previewContainer)
 }

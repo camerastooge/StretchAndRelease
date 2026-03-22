@@ -30,7 +30,6 @@ struct TimerButtonRowViewWatch: View {
     //Binding properties
     @Binding var timeRemaining: Int
     @Binding var repsCompleted: Int
-    @Binding var isShowingSettings: Bool
     @Binding var didSettingsChange: Bool
     @Binding var currentIndex: Int
     @Binding var endAngle: Angle
@@ -44,131 +43,117 @@ struct TimerButtonRowViewWatch: View {
 
     
     var body: some View {
-        
-        
         //Button row
-        VStack {
-            Spacer()
-            
-            HStack {
-                //Play/pause button
-                Button {
-                    withAnimation {
-                        if managers.stretchPhase == .stop {
-                            withAnimation(.linear(duration: 0.5)) {
-                                managers.stretchPhase = .stretch
+        ScrollView {
+            VStack {
+                //top row
+                HStack {
+                    //Either reset button or previous exercise
+                    if isPlaylistActive {
+                        Button {
+                            currentIndex -= 1
+                            if currentIndex < 0 {
+                                currentIndex = playlist.count - 1
                             }
-                            
-                            stretchSession.start()
-                            
-                            if audio {
-                                SoundManager.instance.playPrompt(sound: .countdownExpanded)
-                            }
-                            
-                            DispatchQueue.main.asyncAfter(deadline: audio ? .now() + 3 : .now() + 0.5) {
-                                managers.isTimerActive = true
+                        } label: {
+                            ButtonView(buttonRoles: .previousItem, deviceType: deviceType)
+                                .opacity(0.75)
+                        }
+                        .buttonStyle(.plain)
+                        .padding(.trailing)
+                        .accessibilityInputLabels(["Previous Stretch"])
+                        .accessibilityLabel("Go to the previous stretch on the set list")
+                    } else {
+                        Button {
+                            withAnimation(.linear(duration: 0.25)) {
+                                managers.isTimerActive = false
                                 managers.isTimerPaused = false
                                 repsCompleted = 0
+                                managers.stretchPhase = .stop
+                                timeRemaining = totalStretch
+                                stretchSession.stop()
+                            }
+                            withAnimation(.easeInOut(duration: 0.5)) {
+                                endAngle = managers.updateEndAngle(timeRemaining: timeRemaining, totalTime: totalStretch)
+                            }
+                        } label: {
+                            ButtonView(buttonRoles: .reset, deviceType: deviceType)
+                        }
+                        .buttonStyle(.plain)
+                        .padding(.trailing)
+                        .accessibilityInputLabels(["Reset", "Reset Timer"])
+                        .accessibilityLabel("Reset Timer")
+                    }
+                    
+                    //Play-pause button
+                    Button {
+                        withAnimation {
+                            if managers.stretchPhase == .stop {
+                                withAnimation(.linear(duration: 0.5)) {
+                                    managers.stretchPhase = .stretch
+                                }
                                 
-                            }
-                        } else if !managers.isTimerPaused {
-                            withAnimation(.linear(duration: 0.25)) {
-                                managers.isTimerPaused = true
-                                managers.isTimerActive = false
-                            }
-                        } else {
-                            if audio {
-                                SoundManager.instance.playPrompt(sound: .countdownExpanded)
-                            }
-                            DispatchQueue.main.asyncAfter(deadline: audio ? .now() + 3 : .now() + 0.5) {
-                                withAnimation(.linear(duration: 0.25)) {
-                                    managers.isTimerPaused = false
+                                stretchSession.start()
+                                
+                                if audio {
+                                    SoundManager.instance.playPrompt(sound: .countdownExpanded)
+                                }
+                                
+                                DispatchQueue.main.asyncAfter(deadline: audio ? .now() + 3 : .now() + 0.5) {
                                     managers.isTimerActive = true
+                                    managers.isTimerPaused = false
+                                    repsCompleted = 0
+                                    
+                                }
+                            } else if !managers.isTimerPaused {
+                                withAnimation(.linear(duration: 0.25)) {
+                                    managers.isTimerPaused = true
+                                    managers.isTimerActive = false
+                                }
+                            } else {
+                                if audio {
+                                    SoundManager.instance.playPrompt(sound: .countdownExpanded)
+                                }
+                                DispatchQueue.main.asyncAfter(deadline: audio ? .now() + 3 : .now() + 0.5) {
+                                    withAnimation(.linear(duration: 0.25)) {
+                                        managers.isTimerPaused = false
+                                        managers.isTimerActive = true
+                                    }
                                 }
                             }
                         }
-                    }
-                } label: {
-                    ButtonView(buttonRoles: !managers.isTimerActive ? .play : .pause, deviceType: deviceType)
-                    
-                }
-                .buttonStyle(.plain)
-                .padding(.trailing)
-                .accessibilityInputLabels(["Start", "Pause", "Start Timer", "Pause Timer"])
-                .accessibilityLabel(managers.stretchPhase != .stretch ? "Start the Timer" : "Pause the Timer")
-                
-                //Previous Exercise Button
-                if isPlaylistActive {
-                    Button {
-                        currentIndex -= 1
-                        if currentIndex < 0 {
-                            currentIndex = playlist.count - 1
-                        }
                     } label: {
-                        ButtonView(buttonRoles: .previousItem, deviceType: deviceType)
-                            .opacity(0.75)
+                        ButtonView(buttonRoles: !managers.isTimerActive ? .play : .pause, deviceType: deviceType)
+                        
                     }
                     .buttonStyle(.plain)
                     .padding(.trailing)
-                    .accessibilityInputLabels(["Previous Stretch"])
-                    .accessibilityLabel("Go to the previous stretch on the set list")
-                } else {
-                    Spacer()
-                }
-                
-                
-                //Reset button
-                Button {
-                    withAnimation(.linear(duration: 0.25)) {
-                        managers.isTimerActive = false
-                        managers.isTimerPaused = false
-                        repsCompleted = 0
-                        managers.stretchPhase = .stop
-                        timeRemaining = totalStretch
-                        stretchSession.stop()
-                    }
-                    withAnimation(.easeInOut(duration: 0.5)) {
-                        endAngle = managers.updateEndAngle(timeRemaining: timeRemaining, totalTime: totalStretch)
-                    }
-                } label: {
-                    ButtonView(buttonRoles: .reset, deviceType: deviceType)
-                }
-                .buttonStyle(.plain)
-                .padding(.trailing)
-                .accessibilityInputLabels(["Reset", "Reset Timer"])
-                .accessibilityLabel("Reset Timer")
-                
-                //Next exercise button
-                if isPlaylistActive {
-                    Button {
-                        currentIndex += 1
-                        if currentIndex == playlist.count {
-                            currentIndex = 0
+                    .accessibilityInputLabels(["Start", "Pause", "Start Timer", "Pause Timer"])
+                    .accessibilityLabel(managers.stretchPhase != .stretch ? "Start the Timer" : "Pause the Timer")
+                    
+                    //Next exercise button
+                    if isPlaylistActive {
+                        Button {
+                            currentIndex += 1
+                            if currentIndex == playlist.count {
+                                currentIndex = 0
+                            }
+                        } label: {
+                            ButtonView(buttonRoles: .nextItem, deviceType: deviceType)
+                                .opacity(0.75)
                         }
-                    } label: {
-                        ButtonView(buttonRoles: .nextItem, deviceType: deviceType)
-                            .opacity(0.75)
+                        .buttonStyle(.plain)
+                        .accessibilityInputLabels(["Next Stretch"])
+                        .accessibilityLabel("Go to the next stretch on the set list")
                     }
-                    .buttonStyle(.plain)
-                    .accessibilityInputLabels(["Next Stretch"])
-                    .accessibilityLabel("Go to the next stretch on the set list")
-                } else {
-                    Spacer()
-                }
-                
-                //Settings button
-                Button {
-                    isShowingSettings.toggle()
-                } label: {
-                    ButtonView(buttonRoles: .settings, deviceType: deviceType)
-                }
-                .buttonStyle(.plain)
-                .accessibilityInputLabels(["Settings"])
-                .accessibilityLabel("Show Settings")
+                 }
             }
             .padding([.horizontal, .top])
+            .containerRelativeFrame(.horizontal)
             .dynamicTypeSize(DynamicTypeSize.xxxLarge)
         }
+        .scrollDisabled(true)
+        .containerRelativeFrame(.horizontal)
     }
 }
 
@@ -180,6 +165,6 @@ struct TimerButtonRowViewWatch: View {
     @Previewable @State var currentIndex = 0
     @Previewable @State var endAngle = Angle(degrees: 340)
     
-    TimerButtonRowViewWatch(stretchSession: StretchSession(), timeRemaining: $timeRemaining, repsCompleted: $repsCompleted, isShowingSettings: $isShowingSettings, didSettingsChange: $didSettingsChange, currentIndex: $currentIndex, endAngle: $endAngle)
+    TimerButtonRowViewWatch(stretchSession: StretchSession(), timeRemaining: $timeRemaining, repsCompleted: $repsCompleted, didSettingsChange: $didSettingsChange, currentIndex: $currentIndex, endAngle: $endAngle)
         .environment(Managers())
 }
