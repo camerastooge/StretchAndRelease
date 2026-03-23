@@ -58,16 +58,8 @@ struct ContentView: View {
                         Tab {
                                 VStack {
                                     TimerDisplayViewWatch(timeRemaining: $timeRemaining, repsCompleted: $repsCompleted, didSettingsChange: $didSettingsChange)
-                                        .padding(.horizontal)
-                                        .padding(.bottom, 20)
-                                        .containerRelativeFrame(.vertical, alignment: .leading) { length, _ in
-                                            length * 0.8
-                                        }
                                     
                                     TimerButtonRowViewWatch(stretchSession: stretchSession, timeRemaining: $timeRemaining, repsCompleted: $repsCompleted, didSettingsChange: $didSettingsChange, currentIndex: $currentIndex, endAngle: $endAngle)
-                                        .containerRelativeFrame(.vertical, alignment: .trailing) { length, _ in
-                                            length * 0.6
-                                        }
                                 }
                             }
                         Tab {

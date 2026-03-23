@@ -72,7 +72,13 @@ struct TimerDisplayViewWatch: View {
                         .accessibilityLabel("Repetitions Completed \(repsCompleted) of \(totalReps)")
                 }
             }
-            .containerRelativeFrame(.horizontal)
+            .containerRelativeFrame([.horizontal, .vertical]) { length, axis in
+                if axis == .vertical {
+                    return length * 0.8
+                } else {
+                    return length * 0.95
+                }
+            }
             
             //this modifier runs when the timer publishes
             .onReceive(timer) { _ in

@@ -40,6 +40,9 @@ struct TimerButtonRowViewWatch: View {
     // variables for button view
     var buttonRoles: ButtonRoles = .play
     var deviceType: DeviceType = .watch
+    
+    //Local State properties
+    @State private var isResetToggled: Bool
 
     
     var body: some View {
@@ -84,6 +87,8 @@ struct TimerButtonRowViewWatch: View {
                         .accessibilityInputLabels(["Reset", "Reset Timer"])
                         .accessibilityLabel("Reset Timer")
                     }
+                    
+                    Spacer()
                     
                     //Play-pause button
                     Button {
@@ -130,6 +135,18 @@ struct TimerButtonRowViewWatch: View {
                     .padding(.trailing)
                     .accessibilityInputLabels(["Start", "Pause", "Start Timer", "Pause Timer"])
                     .accessibilityLabel(managers.stretchPhase != .stretch ? "Start the Timer" : "Pause the Timer")
+                    .accessibilityHint("Press to start or pause the timer.  Long press to reset the timer to its starting point.")
+                    .onLongPressGesture(minimumDuration: 0.5) {
+                        if managers.isTimerPaused {
+                            withAnimation(.linear(duration: 0.25)) {
+                                managers.isTimerPaused = true
+                                managers.isTimerActive = false
+                            }
+                        }
+                        isResetToggled.toggle()
+                    }
+                    
+                    Spacer()
                     
                     //Next exercise button
                     if isPlaylistActive {
@@ -154,6 +171,51 @@ struct TimerButtonRowViewWatch: View {
         }
         .scrollDisabled(true)
         .containerRelativeFrame(.horizontal)
+        .alert("Reset Timer?", isPresented: $isResetToggled) {
+            if #available(watchOS 26.0, *) {
+                Button("OK", role: .confirm) {
+                    resetTimer()
+                }
+            } else {
+                Button("OK") {
+                    resetTimer()
+                }
+            }
+            
+            Button("Cancel", role: .cancel) {
+                if managers.isTimerPaused {
+                    unPauseTimer()
+                }
+            }
+        } message: {
+            Text("Stop the timer and reset your stretch?")
+        }
+    }
+    
+    func resetTimer() {
+        withAnimation(.linear(duration: 0.25)) {
+            managers.isTimerActive = false
+            managers.isTimerPaused = false
+            repsCompleted = 0
+            managers.stretchPhase = .stop
+            timeRemaining = totalStretch
+            stretchSession.stop()
+        }
+        withAnimation(.easeInOut(duration: 0.5)) {
+            endAngle = managers.updateEndAngle(timeRemaining: timeRemaining, totalTime: totalStretch)
+        }
+    }
+    
+    func unPauseTimer() {
+        if audio {
+            SoundManager.instance.playPrompt(sound: .countdownExpanded)
+        }
+        DispatchQueue.main.asyncAfter(deadline: audio ? .now() + 3 : .now() + 0.5) {
+            withAnimation(.linear(duration: 0.25)) {
+                managers.isTimerPaused = false
+                managers.isTimerActive = true
+            }
+        }
     }
 }
 
@@ -164,7 +226,8 @@ struct TimerButtonRowViewWatch: View {
     @Previewable @State var didSettingsChange = false
     @Previewable @State var currentIndex = 0
     @Previewable @State var endAngle = Angle(degrees: 340)
+    @Previewable @State var isResetToggled = false
     
-    TimerButtonRowViewWatch(stretchSession: StretchSession(), timeRemaining: $timeRemaining, repsCompleted: $repsCompleted, didSettingsChange: $didSettingsChange, currentIndex: $currentIndex, endAngle: $endAngle)
+    TimerButtonRowViewWatch(stretchSession: StretchSession(), timeRemaining: $timeRemaining, repsCompleted: $repsCompleted, didSettingsChange: $didSettingsChange, currentIndex: $currentIndex, endAngle: $endAngle, isResetToggled: isResetToggled)
         .environment(Managers())
 }
