@@ -15,6 +15,9 @@ struct TimerButtonRowViewWatch: View {
     @Environment(\.scenePhase) var scenePhase
     @Environment(Managers.self) var managers
     
+    //Local State properties
+    @State private var isResetToggled: Bool = false
+    
     //Stretch session
     @ObservedObject var stretchSession: StretchSession
     
@@ -40,11 +43,7 @@ struct TimerButtonRowViewWatch: View {
     // variables for button view
     var buttonRoles: ButtonRoles = .play
     var deviceType: DeviceType = .watch
-    
-    //Local State properties
-    @State private var isResetToggled: Bool
 
-    
     var body: some View {
         //Button row
         ScrollView {
@@ -228,6 +227,6 @@ struct TimerButtonRowViewWatch: View {
     @Previewable @State var endAngle = Angle(degrees: 340)
     @Previewable @State var isResetToggled = false
     
-    TimerButtonRowViewWatch(stretchSession: StretchSession(), timeRemaining: $timeRemaining, repsCompleted: $repsCompleted, didSettingsChange: $didSettingsChange, currentIndex: $currentIndex, endAngle: $endAngle, isResetToggled: isResetToggled)
+    TimerButtonRowViewWatch(stretchSession: StretchSession(), timeRemaining: $timeRemaining, repsCompleted: $repsCompleted, didSettingsChange: $didSettingsChange, currentIndex: $currentIndex, endAngle: $endAngle)
         .environment(Managers())
 }

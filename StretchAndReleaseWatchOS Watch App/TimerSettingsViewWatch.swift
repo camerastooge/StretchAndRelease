@@ -38,7 +38,6 @@ struct TimerSettingsViewWatch: View {
         NavigationStack{
             ZStack(alignment: .center) {
                 Color.clear
-                    .watchSettingsGradientBackground()
                 
                 VStack {
                     TabView {
@@ -48,7 +47,7 @@ struct TimerSettingsViewWatch: View {
                         WatchDeviceSettingsView(audio: $audio, haptics: $haptics, promptVolume: $promptVolume, isEditing: $isEditing)
                             .tag(1)
                     }
-                    .tabViewStyle(.page)
+                    .tabViewStyle(.verticalPage(transitionStyle: .blur))
                 }
                 .toolbar {
                     ToolbarItem(placement: .topBarTrailing) {
@@ -73,6 +72,7 @@ struct TimerSettingsViewWatch: View {
                                     .buttonStyle(.plain)
                             }
                         }
+                        .buttonStyle(.plain)
                     }
                 }
                 .onAppear {
@@ -85,6 +85,8 @@ struct TimerSettingsViewWatch: View {
                     }
                 }
             }
+            .navigationTitle("Settings")
+            .navigationBarTitleDisplayMode(.inline)
         }
     }
 }

@@ -63,25 +63,12 @@ struct ContentView: View {
                                 }
                             }
                         Tab {
+                            TimerSettingsViewWatch(totalStretch: $totalStretch, totalRest: $totalRest, totalReps: $totalReps, audio: $audio, haptics: $haptics, promptVolume: $promptVolume, didSettingsChange: $didSettingsChange)
+                        }
+                        Tab {
+                            //play list view goes here
                             Text("Hello world")
                         }
-                        
-                    }
-                }
-                .sheet(isPresented: $isShowingSettings) {
-                    TimerSettingsViewWatch(totalStretch: $totalStretch, totalRest: $totalRest, totalReps: $totalReps, audio: $audio, haptics: $haptics, promptVolume: $promptVolume, didSettingsChange: $didSettingsChange)
-                }
-                
-                .toolbar {
-                    ToolbarItem(placement: .topBarTrailing) {
-                        Button {
-                            isShowingSettings.toggle()
-                        } label: {
-                            ButtonView(buttonRoles: .settings, deviceType: deviceType)
-                                .tint(Color.blue)
-                            
-                        }
-                        .buttonStyle(.plain)
                     }
                 }
                 
