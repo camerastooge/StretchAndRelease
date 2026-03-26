@@ -67,8 +67,7 @@ struct ContentView: View {
 							TimerSettingsViewWatch(totalStretch: $totalStretch, totalRest: $totalRest, totalReps: $totalReps, audio: $audio, haptics: $haptics, promptVolume: $promptVolume, didSettingsChange: $didSettingsChange, selectedTab: $selectedTab)
                         }
 						Tab("Set List", systemImage: "pencil.and.list.clipboard", value: 2) {
-                            //play list view goes here
-                            Text("Hello world")
+							PlaylistViewWatch(selectedTab: $selectedTab)
                         }
                     }
                 }

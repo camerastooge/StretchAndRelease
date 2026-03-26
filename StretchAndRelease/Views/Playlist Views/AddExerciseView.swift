@@ -26,9 +26,6 @@ struct AddExerciseView: View {
     @State private var isShowingEmptyNameField = false
     @State private var isExerciseAddedToEmptyPlaylist = false
     
-    //check if playlist is active
-    @AppStorage("playlist") private var isPlaylistActive = false
-    
     @ScaledMetric var buttonWidth = 100
     
     var body: some View {
@@ -185,10 +182,6 @@ struct AddExerciseView: View {
                 Text("You must name your exercise.")
             }
         }
-    }
-    
-    func emptyPlaylistAlert() async {
-        isExerciseAddedToEmptyPlaylist = true
     }
 }
 

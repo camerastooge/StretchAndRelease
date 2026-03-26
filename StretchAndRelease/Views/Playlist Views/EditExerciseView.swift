@@ -40,12 +40,20 @@ struct EditExerciseView: View {
                             
                             Section("Stretch duration") {
                                 HStack {
-                                    Picker("Stretch", selection: $stretch) {
-                                        ForEach(1...60, id:\.self) {
-                                            Text("\($0)")
-                                                .font(.headline)
-                                        }
-                                    }
+									Picker("Stretch", selection: $stretch) {
+										ForEach(1...60, id:\.self) {
+											Text("\($0)")
+												.font(.headline)
+												.accessibilityValue(String(stretch))
+												.accessibilityAdjustableAction { direction in
+													switch direction {
+													case .increment: stretch += 1
+													case .decrement: stretch -= 1
+													@unknown default: print("not handled")
+													}
+												}
+										}
+									}
                                     .pickerStyle(.wheel)
                                     Text("sec.")
                                         .font(.headline)
@@ -56,14 +64,6 @@ struct EditExerciseView: View {
                                 .accessibilityElement(children: .ignore)
                                 .accessibilityLabel("Stretch duration \(stretch) seconds")
                                 .accessibilityHint("Adjust how long you want to hold each stretch")
-                                .accessibilityValue(String(stretch))
-                                .accessibilityAdjustableAction { direction in
-                                    switch direction {
-                                    case .increment: stretch += 1
-                                    case .decrement: stretch -= 1
-                                    @unknown default: print("not handled")
-                                    }
-                                }
                             }
                             .padding(.bottom)
                             
