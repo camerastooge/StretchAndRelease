@@ -8,9 +8,11 @@
 import SwiftUI
 
 struct TimerSettingsViewWatch: View {
-    // Environment variables
-    @Environment(\.dismiss) var dismiss
-    @Environment(Managers.self) var managers
+	//Environment properties
+	@Environment(\.colorScheme) var colorScheme
+	@Environment(\.accessibilityDifferentiateWithoutColor) var differentiateWithoutColor
+	@Environment(\.scenePhase) var scenePhase
+	@Environment(Managers.self) var managers
     
     // Binding settings passed from Timer Main view
     @Binding var totalStretch: Int
@@ -22,7 +24,8 @@ struct TimerSettingsViewWatch: View {
     @Binding var promptVolume: Double
     
     @Binding var didSettingsChange: Bool
-    
+	@Binding var selectedTab: Int
+	
     // Local variables
     @State private var stretch = 0
     @State private var rest = 0
@@ -40,40 +43,52 @@ struct TimerSettingsViewWatch: View {
                 Color.clear
                 
                 VStack {
+					Text("SETTINGS")
+						.foregroundStyle(.secondary)
+						.font(.headline)
+						.fontWeight(.bold)
+					
                     TabView {
                         WatchAppSettingsView(stretch: $stretch, rest: $rest, reps: $reps, subviewIsToggled: $subviewIsToggled)
                             .tag(0)
                         
                         WatchDeviceSettingsView(audio: $audio, haptics: $haptics, promptVolume: $promptVolume, isEditing: $isEditing)
                             .tag(1)
+						
+						Button {
+							totalStretch = Int(stretch)
+							totalRest = Int(rest)
+							totalReps = Int(reps)
+							SoundManager.instance.volume = promptVolume
+							didSettingsChange = true
+							selectedTab = 0
+						} label: {
+							if #available(watchOS 26.0, *) {
+									Text("SAVE")
+										.padding(.horizontal, 25)
+										.padding(.vertical)
+										.font(.headline)
+										.fontWeight(.bold)
+										.foregroundStyle(.white)
+										.background(.green)
+										.clipShape(.capsule)
+										.glassEffect()
+										.dynamicTypeSize(...DynamicTypeSize.accessibility2)
+							} else {
+								Text("SAVE")
+									.padding(.horizontal, 25)
+									.padding(.vertical)
+									.font(.headline)
+									.fontWeight(.bold)
+									.foregroundStyle(.white)
+									.background(.green)
+									.clipShape(.capsule)
+									.dynamicTypeSize(...DynamicTypeSize.accessibility2)
+							}
+						}
+						.buttonStyle(.plain)
                     }
                     .tabViewStyle(.verticalPage(transitionStyle: .blur))
-                }
-                .toolbar {
-                    ToolbarItem(placement: .topBarTrailing) {
-                        Button {
-                            totalStretch = Int(stretch)
-                            totalRest = Int(rest)
-                            totalReps = Int(reps)
-                            SoundManager.instance.volume = promptVolume
-                            didSettingsChange = true
-                            dismiss()
-                        } label: {
-                            if #available(watchOS 26.0, *) {
-                                ButtonView(buttonRoles: buttonRoles, deviceType: deviceType)
-                                    .accessibilityHint("Save your settings and return to the main screen")
-                                    .accessibilityLabel("Save")
-                                    .glassEffect()
-                                    .buttonStyle(.plain)
-                            } else {
-                                ButtonView(buttonRoles: buttonRoles, deviceType: deviceType)
-                                    .accessibilityHint("Save your settings and return to the main screen")
-                                    .accessibilityLabel("Save")
-                                    .buttonStyle(.plain)
-                            }
-                        }
-                        .buttonStyle(.plain)
-                    }
                 }
                 .onAppear {
                     if !subviewIsToggled {
@@ -85,8 +100,6 @@ struct TimerSettingsViewWatch: View {
                     }
                 }
             }
-            .navigationTitle("Settings")
-            .navigationBarTitleDisplayMode(.inline)
         }
     }
 }
@@ -265,7 +278,8 @@ struct WatchDeviceSettingsView: View {
     @Previewable @State var audio = true
     @Previewable @State var haptics = true
     @Previewable @State var promptVolume = 1.0
+	@Previewable @State var selectedTab = 1
     
-    TimerSettingsViewWatch(totalStretch: $totalStretch, totalRest: $totalRest, totalReps: $totalReps, audio: $audio, haptics: $haptics, promptVolume: $promptVolume, didSettingsChange: $didSettingsChange)
+	TimerSettingsViewWatch(totalStretch: $totalStretch, totalRest: $totalRest, totalReps: $totalReps, audio: $audio, haptics: $haptics, promptVolume: $promptVolume, didSettingsChange: $didSettingsChange, selectedTab: $selectedTab)
         .environment(Managers())
 }

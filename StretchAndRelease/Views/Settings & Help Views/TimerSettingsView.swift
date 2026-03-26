@@ -11,8 +11,8 @@ import SwiftData
 struct SettingsView: View {
     // Environment variables
     @Environment(\.colorScheme) var colorScheme
+	@Environment(\.dismiss) var dismiss
     @Environment(\.accessibilityDifferentiateWithoutColor) var differentiateWithoutColor
-    @Environment(\.dismiss) var dismiss
     @Environment(\.dynamicTypeSize) var dynamicTypeSize
     @Environment(Managers.self) var managers
     
@@ -142,7 +142,6 @@ struct SettingsView: View {
                 totalReps = reps
                 SoundManager.instance.volume = promptVolume
                 managers.didStatusChange = true
-                dismiss()
             } label: {
                 Text("SAVE")
                     .frame(width: buttonWidth, height: 50)

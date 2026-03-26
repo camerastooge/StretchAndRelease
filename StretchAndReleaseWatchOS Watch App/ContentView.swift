@@ -37,6 +37,7 @@ struct ContentView: View {
     @State private var isShowingSettings = false
     @State private var didSettingsChange = false
     @State private var currentIndex = 0
+	@State private var selectedTab = 0
     
     //Connectivity class for communication with phone
     @State private var connectivity = Connectivity()
@@ -54,18 +55,18 @@ struct ContentView: View {
                 
                 //Screen area for TimerActionViewWatch
                 GeometryReader { proxy in
-                    TabView {
-                        Tab {
+					TabView(selection: $selectedTab) {
+						Tab("Timer", systemImage: "timer", value: 0) {
                                 VStack {
-                                    TimerDisplayViewWatch(timeRemaining: $timeRemaining, repsCompleted: $repsCompleted, didSettingsChange: $didSettingsChange)
+									TimerDisplayViewWatch(timeRemaining: $timeRemaining, repsCompleted: $repsCompleted, didSettingsChange: $didSettingsChange)
                                     
                                     TimerButtonRowViewWatch(stretchSession: stretchSession, timeRemaining: $timeRemaining, repsCompleted: $repsCompleted, didSettingsChange: $didSettingsChange, currentIndex: $currentIndex, endAngle: $endAngle)
                                 }
                             }
-                        Tab {
-                            TimerSettingsViewWatch(totalStretch: $totalStretch, totalRest: $totalRest, totalReps: $totalReps, audio: $audio, haptics: $haptics, promptVolume: $promptVolume, didSettingsChange: $didSettingsChange)
+						Tab("Settings", systemImage: "gear", value: 1) {
+							TimerSettingsViewWatch(totalStretch: $totalStretch, totalRest: $totalRest, totalReps: $totalReps, audio: $audio, haptics: $haptics, promptVolume: $promptVolume, didSettingsChange: $didSettingsChange, selectedTab: $selectedTab)
                         }
-                        Tab {
+						Tab("Set List", systemImage: "pencil.and.list.clipboard", value: 2) {
                             //play list view goes here
                             Text("Hello world")
                         }
