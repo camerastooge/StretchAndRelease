@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct EditExerciseRowViewWatch: View {
+struct EditExerciseViewWatch: View {
 	//Environment properties
 	@Environment(\.colorScheme) var colorScheme
 	@Environment(\.accessibilityDifferentiateWithoutColor) var differentiateWithoutColor
@@ -19,6 +19,8 @@ struct EditExerciseRowViewWatch: View {
 	@State var stretch = 10
 	@State var rest = 5
 	@State var reps = 3
+	
+	@State var isExerciseUnsaved = false
 	
 	@Bindable var playlistItem: PlaylistItem
 	
@@ -105,6 +107,7 @@ struct EditExerciseRowViewWatch: View {
 						playlistItem.stretchDuration = stretch
 						playlistItem.restDuration = rest
 						playlistItem.repsToComplete = reps
+						modelContext.insert(playlistItem)
 						do {
 							try modelContext.save()
 						} catch {
@@ -137,8 +140,30 @@ struct EditExerciseRowViewWatch: View {
 					Spacer()
 				}
 			}
-			.navigationTitle(name)
+			.navigationTitle("Edit Stretch")
 			.navigationBarTitleDisplayMode(.inline)
+			.navigationBarBackButtonHidden(true)
+			.toolbar {
+				ToolbarItem(placement: .topBarLeading) {
+					Button {
+						isExerciseUnsaved = true
+					} label: {
+						if #available(watchOS 26, *) {
+							Image(systemName: "x.circle")
+								.background(.red)
+								.foregroundColor(.white)
+								.clipShape(.circle)
+								.glassEffect(.clear)
+						} else {
+							Image(systemName: "x.circle")
+								.background(.red)
+								.foregroundColor(.white)
+								.clipShape(.circle)
+						}
+					}
+				}
+				
+			}
 		}
 		.onAppear {
 			name = playlistItem.name ?? "Exercise"
@@ -146,11 +171,24 @@ struct EditExerciseRowViewWatch: View {
 			rest = playlistItem.restDuration ?? 5
 			reps = playlistItem.repsToComplete ?? 3
 		}
+		
+		.alert("Save Stretch?",isPresented: $isExerciseUnsaved) {
+			Button("OK") {
+				dismiss()
+			}
+			
+			Button("Cancel", role: .cancel) {
+				isExerciseUnsaved = false
+			}
+			
+		} message: {
+			Text("If you cancel, your changes will not be saved.")
+		}
 	}
 }
 
 #Preview {
 	@Previewable @State var item = PlaylistItem.sampleData[0]
 	
-	EditExerciseRowViewWatch(playlistItem: item)
+	EditExerciseViewWatch(playlistItem: item)
 }

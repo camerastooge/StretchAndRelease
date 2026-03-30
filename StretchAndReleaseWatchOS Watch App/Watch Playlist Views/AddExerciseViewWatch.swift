@@ -140,7 +140,7 @@ struct AddExerciseViewWatch: View {
 					Spacer()
 				}
 			}
-			.navigationTitle(name)
+			.navigationTitle("Add Stretch")
 			.navigationBarTitleDisplayMode(.inline)
 			.alert("Name Field Is Empty", isPresented: $isShowingEmptyNameField) {
 				Button("OK", role: .cancel) {

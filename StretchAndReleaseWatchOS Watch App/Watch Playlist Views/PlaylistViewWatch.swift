@@ -31,16 +31,7 @@ struct PlaylistViewWatch: View {
 	
 	//Checks for determining playlist status
 	@State private var isPlaylistInactive = false
-	@State private var playlistHasBeenEmptied = false
-	
-	//Define columns for LazyVGrid
-	private let playlistColumns: [GridItem] = [
-		GridItem(.flexible(minimum: 150), alignment: .leading),
-		GridItem(.fixed(60), alignment: .center),
-		GridItem(.fixed(60), alignment: .center),
-		GridItem(.fixed(70), alignment: .center),
-	]
-	
+	@State private var playlistHasBeenEmptied = false	
 	@State private var isShowingActive = false
 	
 	//Bindings
@@ -53,30 +44,48 @@ struct PlaylistViewWatch: View {
 		NavigationStack {
 			ZStack {
 				if !playlist.isEmpty {
-					List {
-						Section(header: playlistHeaderView()) {
-							ForEach(playlist) { exercise in
-								NavigationLink {
-									EditExerciseRowViewWatch(playlistItem: exercise)
-								} label: {
-									Text(exercise.name ?? "Exercise")
-										.fontWeight(.bold)
-										.swipeActions(edge: .trailing, allowsFullSwipe: true) {
-											Button {
-												modelContext.delete(exercise)
-											} label: {
-												Label("Delete", systemImage: "trash")
-													.tint(.red)
-													.accessibilityLabel("Delete \(exercise.name ?? "exercise")")
-													.dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+					VStack {
+						List {
+							Section {
+								ForEach(playlist) { exercise in
+									NavigationLink {
+										EditExerciseViewWatch(playlistItem: exercise)
+									} label: {
+										Text(exercise.name ?? "Exercise")
+											.fontWeight(.bold)
+											.swipeActions(edge: .trailing, allowsFullSwipe: true) {
+												Button {
+													modelContext.delete(exercise)
+												} label: {
+													Label("Delete", systemImage: "trash")
+														.tint(.red)
+														.accessibilityLabel("Delete \(exercise.name ?? "exercise")")
+														.dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+												}
 											}
-										}
+									}
+									.navigationLinkIndicatorVisibility(.hidden)
+									.accessibilityLabel("Edit \(exercise.name ?? "exercise")")
+									.listRowBackground(Color.clear)
 								}
-								.navigationLinkIndicatorVisibility(.hidden)
-								.accessibilityLabel("Edit \(exercise.name ?? "exercise")")
-								.listRowBackground(Color.clear)
+								.onMove(perform: move)
 							}
 						}
+						
+						NavigationLink {
+							   AddExerciseViewWatch()
+						   } label: {
+							   if #available(watchOS 26, *) {
+								   Image(systemName: "plus.circle.fill")
+									   .glassEffect()
+									   .font(.title)
+									   .foregroundColor(.green)
+							   } else {
+								   Image(systemName: "plus.circle.fill")
+									   .tint(.blue)
+							   }
+						   }
+						   .buttonStyle(.plain)
 					}
 				}
 				else {
@@ -87,11 +96,12 @@ struct PlaylistViewWatch: View {
 							Image(systemName: "plus.circle")
 								.font(.title)
 								.fontWeight(.bold)
+								.foregroundStyle(.blue)
 						}
 						.buttonStyle(.plain)
 						
-						Text("Playlist is Empty")
-							.font(.title)
+						Text("Set list is Empty")
+							.font(.system(size: 32))
 					} description: {
 						Text("Press ADD to add a stretch to your set list")
 							.font(.system(size: 16))
@@ -105,21 +115,18 @@ struct PlaylistViewWatch: View {
 	}
 }
 
-struct playlistHeaderView: View {
-	//Environment properties
-	@Environment(\.colorScheme) var colorScheme
-	@Environment(\.accessibilityDifferentiateWithoutColor) var differentiateWithoutColor
-	@Environment(\.dynamicTypeSize) var sizeCategory
-	
-	var body: some View {
-		Text("Name")
-			.font(.headline)
-			.fontWeight(.bold)
-			.foregroundStyle(colorScheme == .dark ? .secondary : Color.white.opacity(0.7))
-			.lineLimit(1)
-			.padding(.leading, 5)
-			.accessibilityLabel("Name")
-			.accessibilityHint("The name of the selected sretch")
+extension PlaylistViewWatch {
+	private func move(from source: IndexSet, to destination: Int) {
+		//creates mutable version of the playlist array
+		var mutableList = playlist
+		
+		//moves the item from source to destination in the list
+		mutableList.move(fromOffsets: source, toOffset: destination)
+		
+		//updates the index poperty of the item to persist position in array
+		for(index, item) in mutableList.enumerated() {
+			item.index = index
+		}
 	}
 }
 
@@ -127,6 +134,6 @@ struct playlistHeaderView: View {
 	@Previewable @State var selectedTab = 2
 	
 	PlaylistViewWatch(selectedTab: $selectedTab)
-//		.modelContainer(previewContainer)
+		.modelContainer(previewContainer)
 		.environment(Managers())
 }
