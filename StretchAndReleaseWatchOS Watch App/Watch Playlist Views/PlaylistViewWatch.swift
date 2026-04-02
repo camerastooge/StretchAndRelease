@@ -27,7 +27,7 @@ struct PlaylistViewWatch: View {
 	@State private var stretchDuration: Int = 0
 	@State private var restDuration: Int = 0
 	@State private var repsNumber: Int = 0
-	
+	@State private var isComingFromParentView = true
 	
 	//Checks for determining playlist status
 	@State private var isPlaylistInactive = false
@@ -49,7 +49,7 @@ struct PlaylistViewWatch: View {
 							Section {
 								ForEach(playlist) { exercise in
 									NavigationLink {
-										EditExerciseViewWatch(playlistItem: exercise)
+										EditExerciseViewWatch(playlistItem: exercise, isComingFromParentView: $isComingFromParentView)
 									} label: {
 										Text(exercise.name ?? "Exercise")
 											.fontWeight(.bold)

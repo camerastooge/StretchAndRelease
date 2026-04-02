@@ -30,8 +30,10 @@ struct TimerSettingsViewWatch: View {
     @State private var stretch = 0
     @State private var rest = 0
     @State private var reps = 0
+	@State private var isHapticsOn = true
     @State private var isEditing = false
     @State private var subviewIsToggled = false
+	@State private var isDismissalRequested = false
     
     // variable for button view
     var buttonRoles: ButtonRoles = .save
@@ -52,43 +54,27 @@ struct TimerSettingsViewWatch: View {
                         WatchAppSettingsView(stretch: $stretch, rest: $rest, reps: $reps, subviewIsToggled: $subviewIsToggled)
                             .tag(0)
                         
-                        WatchDeviceSettingsView(audio: $audio, haptics: $haptics, promptVolume: $promptVolume, isEditing: $isEditing)
+                        WatchDeviceSettingsView(audio: $audio, haptics: $isHapticsOn, promptVolume: $promptVolume, isEditing: $isEditing)
                             .tag(1)
-						
-						Button {
-							totalStretch = Int(stretch)
-							totalRest = Int(rest)
-							totalReps = Int(reps)
-							SoundManager.instance.volume = promptVolume
-							didSettingsChange = true
-							selectedTab = 0
-						} label: {
-							if #available(watchOS 26.0, *) {
-									Text("SAVE")
-										.padding(.horizontal, 25)
-										.padding(.vertical)
-										.font(.headline)
-										.fontWeight(.bold)
-										.foregroundStyle(.white)
-										.background(.green)
-										.clipShape(.capsule)
-										.glassEffect()
-										.dynamicTypeSize(...DynamicTypeSize.accessibility2)
-							} else {
-								Text("SAVE")
-									.padding(.horizontal, 25)
-									.padding(.vertical)
-									.font(.headline)
-									.fontWeight(.bold)
-									.foregroundStyle(.white)
-									.background(.green)
-									.clipShape(.capsule)
-									.dynamicTypeSize(...DynamicTypeSize.accessibility2)
-							}
-						}
-						.buttonStyle(.plain)
                     }
                     .tabViewStyle(.verticalPage(transitionStyle: .blur))
+					.toolbar {
+						ToolbarItem(placement: .topBarLeading){
+							Button {
+								isDismissalRequested = true
+							} label: {
+								if #available(watchOS 26.0, *) {
+									ButtonView(buttonRoles: .save, deviceType: .watch)
+										.glassEffect()
+										.dynamicTypeSize(...DynamicTypeSize.accessibility2)
+								} else {
+									ButtonView(buttonRoles: .save, deviceType: .watch)
+										.dynamicTypeSize(...DynamicTypeSize.accessibility2)
+								}
+							}
+							.buttonStyle(.plain)
+						}
+					}
                 }
                 .onAppear {
                     if !subviewIsToggled {
@@ -99,6 +85,25 @@ struct TimerSettingsViewWatch: View {
                         subviewIsToggled = false
                     }
                 }
+				
+				.alert("Save Settings?", isPresented: $isDismissalRequested) {
+					Button("Save") {
+						totalStretch = Int(stretch)
+						totalRest = Int(rest)
+						totalReps = Int(reps)
+						SoundManager.instance.volume = promptVolume
+						haptics = isHapticsOn
+						didSettingsChange = true
+						selectedTab = 0
+					}
+					
+					Button("Cancel") {
+						selectedTab = 0
+					}
+						
+				} message: {
+					
+				}
             }
         }
     }

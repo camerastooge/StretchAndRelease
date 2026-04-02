@@ -20,9 +20,8 @@ struct EditExerciseViewWatch: View {
 	@State var rest = 5
 	@State var reps = 3
 	
-	@State var isExerciseUnsaved = false
-	
 	@Bindable var playlistItem: PlaylistItem
+	@Binding var isComingFromParentView: Bool
 	
 	@ScaledMetric var buttonWidth = 65
 	
@@ -99,9 +98,12 @@ struct EditExerciseViewWatch: View {
 							.accessibilityHint("Adjust the number of repetitions")
 					}
 				}
-				HStack {
-					Spacer()
-					
+			}
+			.navigationTitle("Edit Stretch")
+			.navigationBarTitleDisplayMode(.inline)
+			.navigationBarBackButtonHidden(true)
+			.toolbar {
+				ToolbarItem(placement: .topBarLeading) {
 					Button {
 						playlistItem.name = name
 						playlistItem.stretchDuration = stretch
@@ -116,49 +118,12 @@ struct EditExerciseViewWatch: View {
 						dismiss()
 					} label: {
 						if #available(watchOS 26.0, *) {
-							Text("SAVE")
-								.frame(width: buttonWidth, height: 30)
-								.font(.headline)
-								.fontWeight(.bold)
-								.foregroundStyle(.white)
-								.background(.green)
-								.clipShape(.capsule)
+							ButtonView(buttonRoles: .save, deviceType: .watch)
 								.glassEffect()
 								.dynamicTypeSize(...DynamicTypeSize.accessibility2)
 						} else {
-							Text("SAVE")
-								.frame(width: buttonWidth, height: 30)
-								.font(.headline)
-								.fontWeight(.bold)
-								.foregroundStyle(.white)
-								.background(.green)
-								.clipShape(.capsule)
+							ButtonView(buttonRoles: .save, deviceType: .watch)
 								.dynamicTypeSize(...DynamicTypeSize.accessibility2)
-						}
-					}
-					
-					Spacer()
-				}
-			}
-			.navigationTitle("Edit Stretch")
-			.navigationBarTitleDisplayMode(.inline)
-			.navigationBarBackButtonHidden(true)
-			.toolbar {
-				ToolbarItem(placement: .topBarLeading) {
-					Button {
-						isExerciseUnsaved = true
-					} label: {
-						if #available(watchOS 26, *) {
-							Image(systemName: "x.circle")
-								.background(.red)
-								.foregroundColor(.white)
-								.clipShape(.circle)
-								.glassEffect(.clear)
-						} else {
-							Image(systemName: "x.circle")
-								.background(.red)
-								.foregroundColor(.white)
-								.clipShape(.circle)
 						}
 					}
 				}
@@ -166,29 +131,19 @@ struct EditExerciseViewWatch: View {
 			}
 		}
 		.onAppear {
+			guard isComingFromParentView else { return }
 			name = playlistItem.name ?? "Exercise"
 			stretch = playlistItem.stretchDuration ?? 10
 			rest = playlistItem.restDuration ?? 5
 			reps = playlistItem.repsToComplete ?? 3
-		}
-		
-		.alert("Save Stretch?",isPresented: $isExerciseUnsaved) {
-			Button("OK") {
-				dismiss()
-			}
-			
-			Button("Cancel", role: .cancel) {
-				isExerciseUnsaved = false
-			}
-			
-		} message: {
-			Text("If you cancel, your changes will not be saved.")
+			isComingFromParentView = false
 		}
 	}
 }
 
 #Preview {
 	@Previewable @State var item = PlaylistItem.sampleData[0]
+	@Previewable @State var isComingFromParentView = true
 	
-	EditExerciseViewWatch(playlistItem: item)
+	EditExerciseViewWatch(playlistItem: item, isComingFromParentView: $isComingFromParentView)
 }
