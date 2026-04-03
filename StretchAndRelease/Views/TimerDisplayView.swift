@@ -218,16 +218,17 @@ struct TimerDisplayView: View {
                 }
             }
             
-            .onAppear {
-                if !playlist.isEmpty {
-                    if !isPlaylistActive {
-                        isPlaylistInactive = true
-                    } else {
-                        loadPlaylistItem(currentIndex)
-                    }
-                } else {
-                    playlistItem = nil
-                }            }
+			.onAppear {
+				if !playlist.isEmpty {
+					if !isPlaylistActive {
+						isPlaylistInactive = true
+					} else {
+						loadPlaylistItem(currentIndex)
+					}
+				} else {
+					playlistItem = nil
+				}
+			}
             
             .onDisappear {
                 withAnimation(.linear(duration: 0.25)) {

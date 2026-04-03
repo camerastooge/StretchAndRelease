@@ -29,6 +29,10 @@ struct TimerDisplayViewWatch: View {
     
     //SwiftData models
     @Query(sort: \PlaylistItem.index) var playlist: [PlaylistItem]
+	
+	//playlist properties
+	@State private var playlistItem: PlaylistItem?
+	@State private var isPlaylistInactive = false
     
     //State variables used across views
     @State private var endAngle = Angle(degrees: 340)
@@ -37,16 +41,22 @@ struct TimerDisplayViewWatch: View {
     @Binding var timeRemaining: Int
     @Binding var repsCompleted: Int
     @Binding var didSettingsChange: Bool
-    
+	@Binding var currentIndex: Int
     
     // variables for button view
     var buttonRoles: ButtonRoles = .play
     var deviceType: DeviceType = .watch
-    
-    //playlist properties
-    @State private var playlistItem: PlaylistItem?
-    @State private var currentIndex = 0
-    @State private var isPlaylistInactive = false
+	
+	//display string
+	var displayString: String {
+		guard !managers.isTimerPaused else { return "PAUSED" }
+		
+		if isPlaylistActive {
+			return playlistItem?.name ?? managers.stretchPhase.phaseText
+		} else {
+			return managers.stretchPhase.phaseText
+		}
+	}
     
     var body: some View {
         VStack {
@@ -65,7 +75,7 @@ struct TimerDisplayViewWatch: View {
                         .kerning(2)
                         .contentTransition(.numericText(countsDown: true))
                         .accessibilityLabel("\(timeRemaining) seconds remaining")
-                    Text(!managers.isTimerPaused ? managers.stretchPhase.phaseText : "PAUSED")
+                    Text(displayString)
                         .scaleEffect(0.75)
                         .accessibilityLabel(!managers.isTimerPaused ? managers.stretchPhase.phaseText : "WORKOUT PAUSED")
                     Text("Reps: \(repsCompleted)/\(totalReps)")
@@ -79,7 +89,6 @@ struct TimerDisplayViewWatch: View {
                     return length * 0.95
                 }
             }
-            
             //this modifier runs when the timer publishes
             .onReceive(timer) { _ in
                 if managers.isTimerActive && !managers.isTimerPaused {
@@ -141,8 +150,25 @@ struct TimerDisplayViewWatch: View {
                     }
                 }
             }
+			.onChange(of: currentIndex) {
+				loadPlaylistItem(currentIndex)
+			}
+			.onAppear {
+				loadPlaylistItem(currentIndex)
+				timeRemaining = totalStretch
+			}
         }
     }
+	
+	//load playlistItem from currentIndex
+	func loadPlaylistItem(_ index: Int) {
+		playlistItem = playlist[index]
+		if let playlistItem {
+			totalStretch = playlistItem.stretchDuration ?? 10
+			totalRest = playlistItem.restDuration ?? 5
+			totalReps = playlistItem.repsToComplete ?? 3
+		}
+	}
 }
 
 #Preview {
@@ -150,8 +176,9 @@ struct TimerDisplayViewWatch: View {
     @Previewable @State var repsCompleted = 0
     @Previewable @State var isShowingSettings = false
     @Previewable @State var didSettingsChange = false
+	@Previewable @State var currentIndex = 0
     
-    TimerDisplayViewWatch(timeRemaining: $timeRemaining, repsCompleted: $repsCompleted, didSettingsChange: $didSettingsChange)
+	TimerDisplayViewWatch(timeRemaining: $timeRemaining, repsCompleted: $repsCompleted, didSettingsChange: $didSettingsChange, currentIndex: $currentIndex)
         .environment(Managers())
         .modelContainer(previewContainer)
 }

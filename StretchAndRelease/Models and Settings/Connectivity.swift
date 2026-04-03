@@ -25,6 +25,7 @@ class Connectivity: NSObject, WCSessionDelegate {
     
     #if os(iOS)
     func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
+
     }
     
     func sessionDidBecomeInactive(_ session: WCSession) {
@@ -37,6 +38,7 @@ class Connectivity: NSObject, WCSessionDelegate {
     
     #else
     func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
+		
     }
     
     #endif

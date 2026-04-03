@@ -13,17 +13,19 @@ struct TimerSettingsViewWatch: View {
 	@Environment(\.accessibilityDifferentiateWithoutColor) var differentiateWithoutColor
 	@Environment(\.scenePhase) var scenePhase
 	@Environment(Managers.self) var managers
+	
+	// Properties stored in UserDefaults
+	@AppStorage("stretch") private var totalStretch = 10
+	@AppStorage("rest") private var totalRest = 5
+	@AppStorage("reps") private var totalReps = 3
+	
+	@AppStorage("audio") private var audio = true
+	@AppStorage("haptics") private var haptics = true
+	@AppStorage("promptVolume") private var promptVolume = 1.0
+	@AppStorage("playlist") private var isPlaylistActive = true
     
     // Binding settings passed from Timer Main view
-    @Binding var totalStretch: Int
-    @Binding var totalRest: Int
-    @Binding var totalReps: Int
-    
-    @Binding var audio: Bool
-    @Binding var haptics: Bool
-    @Binding var promptVolume: Double
-    
-    @Binding var didSettingsChange: Bool
+	@Binding var didSettingsChange: Bool
 	@Binding var selectedTab: Int
 	
     // Local variables
@@ -54,27 +56,10 @@ struct TimerSettingsViewWatch: View {
                         WatchAppSettingsView(stretch: $stretch, rest: $rest, reps: $reps, subviewIsToggled: $subviewIsToggled)
                             .tag(0)
                         
-                        WatchDeviceSettingsView(audio: $audio, haptics: $isHapticsOn, promptVolume: $promptVolume, isEditing: $isEditing)
+						WatchDeviceSettingsView(audio: $audio, haptics: $isHapticsOn, promptVolume: $promptVolume, isPlaylistActive: $isPlaylistActive, isEditing: $isEditing)
                             .tag(1)
                     }
                     .tabViewStyle(.verticalPage(transitionStyle: .blur))
-					.toolbar {
-						ToolbarItem(placement: .topBarLeading){
-							Button {
-								isDismissalRequested = true
-							} label: {
-								if #available(watchOS 26.0, *) {
-									ButtonView(buttonRoles: .save, deviceType: .watch)
-										.glassEffect()
-										.dynamicTypeSize(...DynamicTypeSize.accessibility2)
-								} else {
-									ButtonView(buttonRoles: .save, deviceType: .watch)
-										.dynamicTypeSize(...DynamicTypeSize.accessibility2)
-								}
-							}
-							.buttonStyle(.plain)
-						}
-					}
                 }
                 .onAppear {
                     if !subviewIsToggled {
@@ -86,23 +71,13 @@ struct TimerSettingsViewWatch: View {
                     }
                 }
 				
-				.alert("Save Settings?", isPresented: $isDismissalRequested) {
-					Button("Save") {
-						totalStretch = Int(stretch)
-						totalRest = Int(rest)
-						totalReps = Int(reps)
-						SoundManager.instance.volume = promptVolume
-						haptics = isHapticsOn
-						didSettingsChange = true
-						selectedTab = 0
-					}
-					
-					Button("Cancel") {
-						selectedTab = 0
-					}
-						
-				} message: {
-					
+				.onDisappear {
+					totalStretch = Int(stretch)
+					totalRest = Int(rest)
+					totalReps = Int(reps)
+					SoundManager.instance.volume = promptVolume
+					haptics = isHapticsOn
+					didSettingsChange = true
 				}
             }
         }
@@ -233,10 +208,13 @@ struct WatchDeviceSettingsView: View {
     @Binding var audio: Bool
     @Binding var haptics: Bool
     @Binding var promptVolume: Double
+	@Binding var isPlaylistActive: Bool
+	
     @Binding var isEditing: Bool
     
     var body: some View {
         VStack {
+			Toggle("Set list: \(haptics ? "on" : "off")", isOn: $haptics)
             Toggle("Audio: \(audio ? "on" : "off")", isOn: $audio)
                 .font(.caption2)
                 .accessibilityHint("Turn audio cues on or off")
@@ -284,7 +262,9 @@ struct WatchDeviceSettingsView: View {
     @Previewable @State var haptics = true
     @Previewable @State var promptVolume = 1.0
 	@Previewable @State var selectedTab = 1
+	@Previewable @State var isPlaylistActive = false
+	
     
-	TimerSettingsViewWatch(totalStretch: $totalStretch, totalRest: $totalRest, totalReps: $totalReps, audio: $audio, haptics: $haptics, promptVolume: $promptVolume, didSettingsChange: $didSettingsChange, selectedTab: $selectedTab)
+	TimerSettingsViewWatch(didSettingsChange: $didSettingsChange, selectedTab: $selectedTab)
         .environment(Managers())
 }

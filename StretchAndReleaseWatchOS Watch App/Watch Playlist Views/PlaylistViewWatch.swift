@@ -111,6 +111,23 @@ struct PlaylistViewWatch: View {
 					.scrollDisabled(true)
 				}
 			}
+			.toolbar {
+				ToolbarItem(placement: .topBarLeading) {
+					Button {
+						withAnimation {
+							selectedTab = 0
+						}
+					} label: {
+						if #available(watchOS 26, *) {
+							Image(systemName: "house.circle.fill")
+								.glassEffect(.clear)
+						} else {
+							Image(systemName: "house.circle.fill")
+						}
+					}
+					.buttonStyle(.plain)
+				}
+			}
 		}
 	}
 }

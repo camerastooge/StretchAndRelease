@@ -138,7 +138,6 @@ struct ContentView: View {
         let settingsUpdate = ["stretch" : stretch, "rest" : rest, "reps" : reps]
         connectivity.setContext(to: settingsUpdate)
     }
-
 }
         
 

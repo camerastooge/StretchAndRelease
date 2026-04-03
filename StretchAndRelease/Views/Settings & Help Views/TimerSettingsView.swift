@@ -142,6 +142,7 @@ struct SettingsView: View {
                 totalReps = reps
                 SoundManager.instance.volume = promptVolume
                 managers.didStatusChange = true
+				dismiss()
             } label: {
                 Text("SAVE")
                     .frame(width: buttonWidth, height: 50)

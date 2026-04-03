@@ -58,13 +58,13 @@ struct ContentView: View {
 					TabView(selection: $selectedTab) {
 						Tab("Timer", systemImage: "timer", value: 0) {
                                 VStack {
-									TimerDisplayViewWatch(timeRemaining: $timeRemaining, repsCompleted: $repsCompleted, didSettingsChange: $didSettingsChange)
+									TimerDisplayViewWatch(timeRemaining: $timeRemaining, repsCompleted: $repsCompleted, didSettingsChange: $didSettingsChange, currentIndex: $currentIndex)
                                     
                                     TimerButtonRowViewWatch(stretchSession: stretchSession, timeRemaining: $timeRemaining, repsCompleted: $repsCompleted, didSettingsChange: $didSettingsChange, currentIndex: $currentIndex, endAngle: $endAngle)
                                 }
                             }
 						Tab("Settings", systemImage: "gear", value: 1) {
-							TimerSettingsViewWatch(totalStretch: $totalStretch, totalRest: $totalRest, totalReps: $totalReps, audio: $audio, haptics: $haptics, promptVolume: $promptVolume, didSettingsChange: $didSettingsChange, selectedTab: $selectedTab)
+							TimerSettingsViewWatch(didSettingsChange: $didSettingsChange, selectedTab: $selectedTab)
                         }
 						Tab("Set List", systemImage: "pencil.and.list.clipboard", value: 2) {
 							PlaylistViewWatch(selectedTab: $selectedTab)
@@ -110,19 +110,13 @@ struct ContentView: View {
                     }
                 }
                 
-                //sets timeRemaining to totalStretch on appearance
-                .onAppear {
-                    timeRemaining = totalStretch
-                }
-                
                 //prep tick audio player when app launches
                 .onAppear() {
                     SoundManager.instance.prepareTick(sound: .tick)
                     SoundManager.instance.volume = promptVolume
                 }
             }
-        }
-        ._statusBarHidden()
+		}
     }
     
     //sends updated settings to iPhone
