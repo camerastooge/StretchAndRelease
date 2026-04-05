@@ -69,34 +69,32 @@ struct ContentView: View {
                     }
                 }
 				.toolbar {
-					//settings button
-					ToolbarItem(placement: .topBarLeading) {
-						Button {
-							isShowingSettings = true
-						} label: {
-							ButtonView(buttonRoles: .settings, deviceType: deviceType)
-								.opacity(managers.stretchPhase == .stop ? 1 : 0.75)
-						}
-						.buttonStyle(.plain)
-						.accessibilityLabel("Show settings")
-					}
-					
-					//reset button
-					ToolbarItem(placement: .topBarTrailing) {
-						Button {
-							withAnimation(.easeInOut(duration: 0.25)) {
-								managers.stretchPhase = .stop
-								managers.isTimerActive = false
-								managers.isTimerPaused = false
+					if selectedTab == 0 {
+						//settings button
+						ToolbarItem(placement: .topBarLeading) {
+							Button {
+								isShowingSettings = true
+							} label: {
+								ButtonView(buttonRoles: .settings, deviceType: deviceType)
+									.opacity(managers.stretchPhase == .stop ? 1 : 0.75)
 							}
-							repsCompleted = 0
-							timeRemaining = totalStretch
-						} label: {
-							ButtonView(buttonRoles: .reset, deviceType: deviceType)
-								.opacity(managers.stretchPhase == .stop ? 1 : 0.75)
+							.buttonStyle(.plain)
+							.accessibilityLabel("Show settings")
 						}
-						.buttonStyle(.plain)
-						.accessibilityLabel("Reset timer")
+						
+						//reset button
+						ToolbarItem(placement: .topBarTrailing) {
+							Button {
+								withAnimation(.easeInOut(duration: 0.25)) {
+									managers.stretchPhase = .stop
+								}
+							} label: {
+								ButtonView(buttonRoles: .reset, deviceType: deviceType)
+									.opacity(managers.stretchPhase == .stop ? 1 : 0.75)
+							}
+							.buttonStyle(.plain)
+							.accessibilityLabel("Reset timer")
+						}
 					}
 				}
                 

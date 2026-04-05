@@ -82,6 +82,7 @@ struct TimerDisplayViewWatch: View {
                         .accessibilityLabel("Repetitions Completed \(repsCompleted) of \(totalReps)")
                 }
             }
+			
             .containerRelativeFrame([.horizontal, .vertical]) { length, axis in
                 if axis == .vertical {
                     return length * 0.8
@@ -144,11 +145,28 @@ struct TimerDisplayViewWatch: View {
                     }()
                         
                     case .stop: return {
-                        managers.isTimerActive = false
+						withAnimation(.easeOut(duration: 0.5)) {
+							managers.isTimerActive = false
+							managers.isTimerPaused = false
+							repsCompleted = 0
+							timeRemaining = totalStretch
+							endAngle = Angle(degrees: 340)
+						}
                         stretchSession.stop()
                     }()
                     }
-                }
+				} else {
+					if managers.isTimerPaused && managers.stretchPhase == .stop {
+						withAnimation(.easeOut(duration: 0.5)) {
+							managers.isTimerActive = false
+							managers.isTimerPaused = false
+							repsCompleted = 0
+							timeRemaining = totalStretch
+							endAngle = Angle(degrees: 340)
+						}
+						stretchSession.stop()
+					}
+				}
             }
 			.onChange(of: currentIndex) {
 				loadPlaylistItem(currentIndex)
