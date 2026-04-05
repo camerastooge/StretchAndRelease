@@ -25,7 +25,7 @@ struct TimerDisplayViewWatch: View {
     @AppStorage("audio") private var audio = true
     @AppStorage("haptics") private var haptics = true
     @AppStorage("promptVolume") private var promptVolume = 1.0
-    @AppStorage("playlist") private var isPlaylistActive = true
+    @AppStorage("playlist") private var isPlaylistActive = false
     
     //SwiftData models
     @Query(sort: \PlaylistItem.index) var playlist: [PlaylistItem]
@@ -154,7 +154,9 @@ struct TimerDisplayViewWatch: View {
 				loadPlaylistItem(currentIndex)
 			}
 			.onAppear {
-				loadPlaylistItem(currentIndex)
+				if !playlist.isEmpty {
+					loadPlaylistItem(currentIndex)
+				}
 				timeRemaining = totalStretch
 			}
         }

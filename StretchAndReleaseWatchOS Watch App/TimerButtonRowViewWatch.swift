@@ -65,26 +65,6 @@ struct TimerButtonRowViewWatch: View {
                         .padding(.trailing)
                         .accessibilityInputLabels(["Previous Stretch"])
                         .accessibilityLabel("Go to the previous stretch on the set list")
-                    } else {
-                        Button {
-                            withAnimation(.linear(duration: 0.25)) {
-                                managers.isTimerActive = false
-                                managers.isTimerPaused = false
-                                repsCompleted = 0
-                                managers.stretchPhase = .stop
-                                timeRemaining = totalStretch
-                                stretchSession.stop()
-                            }
-                            withAnimation(.easeInOut(duration: 0.5)) {
-                                endAngle = managers.updateEndAngle(timeRemaining: timeRemaining, totalTime: totalStretch)
-                            }
-                        } label: {
-                            ButtonView(buttonRoles: .reset, deviceType: deviceType)
-                        }
-                        .buttonStyle(.plain)
-                        .padding(.trailing)
-                        .accessibilityInputLabels(["Reset", "Reset Timer"])
-                        .accessibilityLabel("Reset Timer")
                     }
                     
                     Spacer()
@@ -134,17 +114,6 @@ struct TimerButtonRowViewWatch: View {
                     .padding(.trailing)
                     .accessibilityInputLabels(["Start", "Pause", "Start Timer", "Pause Timer"])
                     .accessibilityLabel(managers.stretchPhase != .stretch ? "Start the Timer" : "Pause the Timer")
-                    .accessibilityHint("Press to start or pause the timer.  Long press to reset the timer to its starting point.")
-                    .onLongPressGesture(minimumDuration: 0.5) {
-                        if managers.isTimerPaused {
-                            withAnimation(.linear(duration: 0.25)) {
-                                managers.isTimerPaused = true
-                                managers.isTimerActive = false
-                            }
-                        }
-                        isResetToggled.toggle()
-                    }
-                    
                     Spacer()
                     
                     //Next exercise button
@@ -170,39 +139,6 @@ struct TimerButtonRowViewWatch: View {
         }
         .scrollDisabled(true)
         .containerRelativeFrame(.horizontal)
-        .alert("Reset Timer?", isPresented: $isResetToggled) {
-            if #available(watchOS 26.0, *) {
-                Button("OK", role: .confirm) {
-                    resetTimer()
-                }
-            } else {
-                Button("OK") {
-                    resetTimer()
-                }
-            }
-            
-            Button("Cancel", role: .cancel) {
-                if managers.isTimerPaused {
-                    unPauseTimer()
-                }
-            }
-        } message: {
-            Text("Stop the timer and reset your stretch?")
-        }
-    }
-    
-    func resetTimer() {
-        withAnimation(.linear(duration: 0.25)) {
-            managers.isTimerActive = false
-            managers.isTimerPaused = false
-            repsCompleted = 0
-            managers.stretchPhase = .stop
-            timeRemaining = totalStretch
-            stretchSession.stop()
-        }
-        withAnimation(.easeInOut(duration: 0.5)) {
-            endAngle = managers.updateEndAngle(timeRemaining: timeRemaining, totalTime: totalStretch)
-        }
     }
     
     func unPauseTimer() {

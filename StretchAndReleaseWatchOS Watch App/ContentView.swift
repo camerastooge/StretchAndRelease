@@ -25,7 +25,7 @@ struct ContentView: View {
     @AppStorage("audio") private var audio = true
     @AppStorage("haptics") private var haptics = true
     @AppStorage("promptVolume") private var promptVolume = 1.0
-    @AppStorage("playlist") private var isPlaylistActive = true
+    @AppStorage("playlist") private var isPlaylistActive = false
     
     //SwiftData models
     @Query(sort: \PlaylistItem.index) var playlist: [PlaylistItem]
@@ -63,14 +63,42 @@ struct ContentView: View {
                                     TimerButtonRowViewWatch(stretchSession: stretchSession, timeRemaining: $timeRemaining, repsCompleted: $repsCompleted, didSettingsChange: $didSettingsChange, currentIndex: $currentIndex, endAngle: $endAngle)
                                 }
                             }
-						Tab("Settings", systemImage: "gear", value: 1) {
-							TimerSettingsViewWatch(didSettingsChange: $didSettingsChange, selectedTab: $selectedTab)
-                        }
-						Tab("Set List", systemImage: "pencil.and.list.clipboard", value: 2) {
+						Tab("Set List", systemImage: "pencil.and.list.clipboard", value: 1) {
 							PlaylistViewWatch(selectedTab: $selectedTab)
                         }
                     }
                 }
+				.toolbar {
+					//settings button
+					ToolbarItem(placement: .topBarLeading) {
+						Button {
+							isShowingSettings = true
+						} label: {
+							ButtonView(buttonRoles: .settings, deviceType: deviceType)
+								.opacity(managers.stretchPhase == .stop ? 1 : 0.75)
+						}
+						.buttonStyle(.plain)
+						.accessibilityLabel("Show settings")
+					}
+					
+					//reset button
+					ToolbarItem(placement: .topBarTrailing) {
+						Button {
+							withAnimation(.easeInOut(duration: 0.25)) {
+								managers.stretchPhase = .stop
+								managers.isTimerActive = false
+								managers.isTimerPaused = false
+							}
+							repsCompleted = 0
+							timeRemaining = totalStretch
+						} label: {
+							ButtonView(buttonRoles: .reset, deviceType: deviceType)
+								.opacity(managers.stretchPhase == .stop ? 1 : 0.75)
+						}
+						.buttonStyle(.plain)
+						.accessibilityLabel("Reset timer")
+					}
+				}
                 
                 //stops and resets tiner when settings view is toggled
                 .onChange(of: isShowingSettings) {
@@ -115,6 +143,10 @@ struct ContentView: View {
                     SoundManager.instance.prepareTick(sound: .tick)
                     SoundManager.instance.volume = promptVolume
                 }
+				
+				.sheet(isPresented: $isShowingSettings) {
+					TimerSettingsViewWatch(didSettingsChange: $didSettingsChange)
+				}
             }
 		}
     }
@@ -123,8 +155,7 @@ struct ContentView: View {
     func sendContext(stretch: Int, rest: Int, reps: Int) {
         let settingsUpdate = ["stretch" : stretch, "rest" : rest, "reps" : reps]
         connectivity.setContext(to: settingsUpdate)
-    }
-}
+    }}
 
 #Preview {
     ContentView()

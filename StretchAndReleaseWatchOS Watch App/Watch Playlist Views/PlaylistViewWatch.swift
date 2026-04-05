@@ -103,7 +103,7 @@ struct PlaylistViewWatch: View {
 						Text("Set list is Empty")
 							.font(.system(size: 32))
 					} description: {
-						Text("Press ADD to add a stretch to your set list")
+						Text("Press \(Image(systemName: "plus.circle")) to add a stretch to your set list")
 							.font(.system(size: 16))
 							.foregroundStyle(colorScheme == .dark ? .white : .black)
 					}
@@ -151,6 +151,6 @@ extension PlaylistViewWatch {
 	@Previewable @State var selectedTab = 2
 	
 	PlaylistViewWatch(selectedTab: $selectedTab)
-		.modelContainer(previewContainer)
+//		.modelContainer(previewContainer)
 		.environment(Managers())
 }
