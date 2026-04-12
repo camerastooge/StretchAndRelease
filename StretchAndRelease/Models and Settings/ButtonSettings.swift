@@ -22,11 +22,10 @@ enum ButtonRoles {
     
     var buttonColor: Color {
         switch self {
-        case .play: Color.green
+		case .play, .save: Color.green
         case .pause: Color.yellow
         case .reset: Color.red
         case .settings: Color.blue
-        case .save: Color.green
         }
     }
 }
