@@ -26,7 +26,6 @@ struct TimerSettingsViewWatch: View {
     
     // Binding settings passed from Timer Main view
 	@Binding var didSettingsChange: Bool
-	@Binding var selectedTab: Int
 	
     // Local variables
     @State private var stretch = 0
@@ -34,7 +33,6 @@ struct TimerSettingsViewWatch: View {
     @State private var reps = 0
 	@State private var isHapticsOn = true
     @State private var isEditing = false
-    @State private var subviewIsToggled = false
 	@State private var isDismissalRequested = false
     
     // variable for button view
@@ -47,28 +45,22 @@ struct TimerSettingsViewWatch: View {
                 Color.clear
                 
                 VStack {
-					Text("SETTINGS")
-						.foregroundStyle(.secondary)
-						.font(.headline)
-						.fontWeight(.bold)
-					
-                    TabView {
-                        WatchAppSettingsView(stretch: $stretch, rest: $rest, reps: $reps, subviewIsToggled: $subviewIsToggled)
+					TabView {
+                        WatchAppSettingsView(stretch: $stretch, rest: $rest, reps: $reps)
                             .tag(0)
                         
 						WatchDeviceSettingsView(audio: $audio, haptics: $isHapticsOn, promptVolume: $promptVolume, isPlaylistActive: $isPlaylistActive, isEditing: $isEditing)
                             .tag(1)
                     }
-                    .tabViewStyle(.verticalPage(transitionStyle: .blur))
+					.tabViewStyle(.page)
                 }
+				.navigationTitle("SETTINGS")
+				.navigationBarTitleDisplayMode(.inline)
+				
                 .onAppear {
-                    if !subviewIsToggled {
-                        stretch = totalStretch
-                        rest = totalRest
-                        reps = totalReps
-                    } else {
-                        subviewIsToggled = false
-                    }
+					stretch = totalStretch
+					rest = totalRest
+					reps = totalReps
                 }
 				
 				.onDisappear {
@@ -89,7 +81,6 @@ struct WatchAppSettingsView: View {
     @Binding var stretch: Int
     @Binding var rest: Int
     @Binding var reps: Int
-    @Binding var subviewIsToggled: Bool
     
     var body: some View {
         List {
@@ -198,9 +189,6 @@ struct WatchAppSettingsView: View {
                 .accessibilityHint("Change the number of repetitions to perform")
             }
         }
-        .onDisappear {
-            subviewIsToggled = true
-        }
     }
 }
 
@@ -214,15 +202,12 @@ struct WatchDeviceSettingsView: View {
     
     var body: some View {
         VStack {
-			Toggle("Set list: \(haptics ? "on" : "off")", isOn: $haptics)
+			Toggle("Set list: \(haptics ? "on" : "off")", isOn: $isPlaylistActive)
+				.padding(.top, 10)
             Toggle("Audio: \(audio ? "on" : "off")", isOn: $audio)
-                .font(.caption2)
                 .accessibilityHint("Turn audio cues on or off")
-                .padding(.bottom, 10)
             Toggle("Haptics: \(haptics ? "on" : "off")", isOn: $haptics)
-                .font(.caption2)
                 .accessibilityHint("Turn haptic feedback on or off")
-                .padding(.bottom, 10)
             HStack {
                 Slider(
                     value: $promptVolume,
@@ -265,6 +250,6 @@ struct WatchDeviceSettingsView: View {
 	@Previewable @State var isPlaylistActive = false
 	
     
-	TimerSettingsViewWatch(didSettingsChange: $didSettingsChange, selectedTab: $selectedTab)
+	TimerSettingsViewWatch(didSettingsChange: $didSettingsChange)
         .environment(Managers())
 }

@@ -8,7 +8,7 @@
 import SwiftUI
 
 enum ButtonRoles {
-    case play, pause, reset, settings, save, nextItem, previousItem
+    case play, pause, reset, settings, save, nextItem, previousItem, add
     
     var buttonImage: String {
         switch self {
@@ -19,6 +19,7 @@ enum ButtonRoles {
             case .save: "square.and.arrow.up.circle"
             case .nextItem: "chevron.right.dotted.chevron.right"
             case .previousItem: "chevron.backward.chevron.backward.dotted"
+			case .add: "plus.circle.fill"
         }
     }
     
@@ -27,7 +28,7 @@ enum ButtonRoles {
         case .play: Color.green
         case .pause: Color.yellow
         case .reset: Color.red
-        case .settings: Color.blue
+		case .settings, .add: Color.blue
         case .save: Color.green
         case .nextItem, .previousItem: Color.purple
         }

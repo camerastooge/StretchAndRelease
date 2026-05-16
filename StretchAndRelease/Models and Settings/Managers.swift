@@ -25,9 +25,7 @@ class Managers {
     //function to set end angle of arc
     func updateEndAngle(timeRemaining: Int, totalTime: Int) -> Angle {
         switch stretchPhase {
-        case .stretch:
-            return Angle(degrees: Double(timeRemaining) / Double(totalTime) * 320 + 20)
-        case .rest:
+		case .stretch, .rest:
             return Angle(degrees: Double(timeRemaining) / Double(totalTime) * 320 + 20)
         case .stop:
             return Angle(degrees: 340)

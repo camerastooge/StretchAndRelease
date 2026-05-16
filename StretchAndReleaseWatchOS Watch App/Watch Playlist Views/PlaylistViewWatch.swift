@@ -33,6 +33,7 @@ struct PlaylistViewWatch: View {
 	@State private var isPlaylistInactive = false
 	@State private var playlistHasBeenEmptied = false	
 	@State private var isShowingActive = false
+	@State private var isShowingAddExerciseView = false
 	
 	//Bindings
 	@Binding var selectedTab: Int
@@ -71,39 +72,14 @@ struct PlaylistViewWatch: View {
 								.onMove(perform: move)
 							}
 						}
-						
-						NavigationLink {
-							   AddExerciseViewWatch()
-						   } label: {
-							   if #available(watchOS 26, *) {
-								   Image(systemName: "plus.circle.fill")
-									   .glassEffect()
-									   .font(.title)
-									   .foregroundColor(.green)
-							   } else {
-								   Image(systemName: "plus.circle.fill")
-									   .tint(.blue)
-							   }
-						   }
-						   .buttonStyle(.plain)
 					}
 				}
 				else {
 					ContentUnavailableView {
-						NavigationLink {
-							AddExerciseViewWatch()
-						} label: {
-							Image(systemName: "plus.circle")
-								.font(.title)
-								.fontWeight(.bold)
-								.foregroundStyle(.blue)
-						}
-						.buttonStyle(.plain)
-						
 						Text("Set list is Empty")
 							.font(.system(size: 32))
 					} description: {
-						Text("Press ADD to add a stretch to your set list")
+						Text("Press \(Image(systemName: "plus.circle")) to add a stretch to your set list")
 							.font(.system(size: 16))
 							.foregroundStyle(colorScheme == .dark ? .white : .black)
 					}
@@ -114,20 +90,20 @@ struct PlaylistViewWatch: View {
 			.toolbar {
 				ToolbarItem(placement: .topBarLeading) {
 					Button {
-						withAnimation {
-							selectedTab = 0
-						}
+						isShowingAddExerciseView = true
 					} label: {
 						if #available(watchOS 26, *) {
-							Image(systemName: "house.circle.fill")
+							ButtonView(buttonRoles: .add, deviceType: .watch)
 								.glassEffect(.clear)
-						} else {
-							Image(systemName: "house.circle.fill")
 						}
 					}
 					.buttonStyle(.plain)
+					.accessibilityLabel("Add an item to the set list")
 				}
 			}
+		}
+		.sheet(isPresented: $isShowingAddExerciseView) {
+			AddExerciseViewWatch()
 		}
 	}
 }
