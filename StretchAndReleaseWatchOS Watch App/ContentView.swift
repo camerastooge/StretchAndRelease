@@ -44,7 +44,10 @@ struct ContentView: View {
     // local properties
     @State var playlistItem: PlaylistItem?
     @State private var currentIndex = 0
-    @State private var isPlaylistInactive = false
+	
+	var timerTextLabel: String {
+		playlistItem?.name ?? managers.stretchPhase.phaseText
+	}
     
     //Connectivity class for communication with phone
     @State private var connectivity = Connectivity()
@@ -60,9 +63,7 @@ struct ContentView: View {
                 //Screen area for TimerActionViewWatch
                 VStack {
                     ZStack {
-                        Color.gray.opacity(0)
-                        
-                        VStack {
+                      VStack {
                             Color.gray.opacity(0)
                             
                             ZStack {
@@ -79,7 +80,7 @@ struct ContentView: View {
                                             .kerning(2)
                                             .contentTransition(.numericText(countsDown: true))
                                             .accessibilityLabel("\(timeRemaining) seconds remaining")
-                                        Text(!isTimerPaused ? stretchPhase.phaseText : "PAUSED")
+                                        Text(!isTimerPaused ? timerTextLabel : "PAUSED")
                                             .scaleEffect(0.75)
                                             .accessibilityLabel(!isTimerPaused ? stretchPhase.phaseText : "WORKOUT PAUSED")
                                         Text("Reps: \(repsCompleted)/\(totalReps)")
@@ -378,5 +379,7 @@ struct ContentView: View {
 
 #Preview {
     ContentView()
+		.modelContainer(previewContainer)
+		.environment(Managers())
 }
 

@@ -22,18 +22,18 @@ struct TimerSettingsViewWatch: View {
 	@AppStorage("audio") private var audio = true
 	@AppStorage("haptics") private var haptics = true
 	@AppStorage("promptVolume") private var promptVolume = 1.0
-	@AppStorage("playlist") private var isPlaylistActive = true
+	@AppStorage("playlist") private var isPlaylistActive = false
     
     // Binding settings passed from Timer Main view
 	@Binding var didSettingsChange: Bool
 	
     // Local variables
-    @State private var stretch = 0
-    @State private var rest = 0
-    @State private var reps = 0
-	@State private var isHapticsOn = true
-    @State private var isEditing = false
-	@State private var isDismissalRequested = false
+//    @State private var stretch = 0
+//    @State private var rest = 0
+//    @State private var reps = 0
+//	@State private var isHapticsOn = true
+//    @State private var isEditing = false
+//	@State private var isDismissalRequested = false
     
     // variable for button view
     var buttonRoles: ButtonRoles = .save
@@ -46,10 +46,10 @@ struct TimerSettingsViewWatch: View {
                 
                 VStack {
 					TabView {
-                        WatchAppSettingsView(stretch: $stretch, rest: $rest, reps: $reps)
+                        WatchAppSettingsView()
                             .tag(0)
                         
-						WatchDeviceSettingsView(audio: $audio, haptics: $isHapticsOn, promptVolume: $promptVolume, isPlaylistActive: $isPlaylistActive, isEditing: $isEditing)
+						WatchDeviceSettingsView()
                             .tag(1)
                     }
 					.tabViewStyle(.page)
@@ -57,20 +57,20 @@ struct TimerSettingsViewWatch: View {
 				.navigationTitle("SETTINGS")
 				.navigationBarTitleDisplayMode(.inline)
 				
-                .onAppear {
-					stretch = totalStretch
-					rest = totalRest
-					reps = totalReps
-                }
+//                .onAppear {
+//					stretch = totalStretch
+//					rest = totalRest
+//					reps = totalReps
+//                }
 				
-				.onDisappear {
-					totalStretch = Int(stretch)
-					totalRest = Int(rest)
-					totalReps = Int(reps)
-					SoundManager.instance.volume = promptVolume
-					haptics = isHapticsOn
-					didSettingsChange = true
-				}
+//				.onDisappear {
+//					totalStretch = Int(stretch)
+//					totalRest = Int(rest)
+//					totalReps = Int(reps)
+//					SoundManager.instance.volume = promptVolume
+//					haptics = isHapticsOn
+//					didSettingsChange = true
+//				}
             }
         }
     }
@@ -78,9 +78,10 @@ struct TimerSettingsViewWatch: View {
 
 struct WatchAppSettingsView: View {
     
-    @Binding var stretch: Int
-    @Binding var rest: Int
-    @Binding var reps: Int
+	// Properties stored in UserDefaults
+	@AppStorage("stretch") private var totalStretch = 10
+	@AppStorage("rest") private var totalRest = 5
+	@AppStorage("reps") private var totalReps = 3
     
     var body: some View {
         List {
@@ -88,7 +89,7 @@ struct WatchAppSettingsView: View {
                 Text("Stretch Duration")
                     .font(.headline)
                     .accessibilityLabel("Stretch")
-                Picker("Stretch Duration", selection: $stretch) {
+                Picker("Stretch Duration", selection: $totalStretch) {
                     ForEach(1...60, id:\.self) {
                         Text("\($0) sec")
                     }
@@ -96,13 +97,13 @@ struct WatchAppSettingsView: View {
                 .pickerStyle(.wheel)
                 .labelsHidden()
                 .accessibilityElement(children: .ignore)
-                .accessibilityLabel("Stretch duration \(stretch) seconds")
+                .accessibilityLabel("Stretch duration \(totalStretch) seconds")
                 .accessibilityHint("Adjust how long you want to hold each strecth")
-                .accessibilityValue(String(stretch))
+                .accessibilityValue(String(totalStretch))
                 .accessibilityAdjustableAction { direction in
                     switch direction {
-                    case .increment: stretch += 1
-                    case .decrement: stretch -= 1
+                    case .increment: totalStretch += 1
+                    case .decrement: totalStretch -= 1
                     @unknown default: print("not handled")
                     }
                 }
@@ -112,7 +113,7 @@ struct WatchAppSettingsView: View {
                     Text("Stretch")
                         .font(.caption2)
                     Spacer()
-                    Text("\(stretch) sec")
+                    Text("\(totalStretch) sec")
                         .foregroundColor(.white)
                 }
                 .accessibilityElement(children: .combine)
@@ -123,7 +124,7 @@ struct WatchAppSettingsView: View {
                 Text("Rest Duration")
                     .font(.headline)
                     .accessibilityLabel("Rest")
-                Picker("Rest Duration", selection: $rest) {
+                Picker("Rest Duration", selection: $totalRest) {
                     ForEach(1...30, id:\.self) {
                         Text("\($0) sec")
                     }
@@ -131,13 +132,13 @@ struct WatchAppSettingsView: View {
                 .pickerStyle(.wheel)
                 .labelsHidden()
                 .accessibilityElement(children: .ignore)
-                .accessibilityLabel("Rest period \(rest) seconds")
+                .accessibilityLabel("Rest period \(totalRest) seconds")
                 .accessibilityHint("Adjust rest period between stretches")
-                .accessibilityValue(String(rest))
+                .accessibilityValue(String(totalRest))
                 .accessibilityAdjustableAction { direction in
                     switch direction {
-                    case .increment: rest += 1
-                    case .decrement: rest -= 1
+                    case .increment: totalRest += 1
+                    case .decrement: totalRest -= 1
                     @unknown default: print("not handled")
                     }
                 }
@@ -147,7 +148,7 @@ struct WatchAppSettingsView: View {
                     Text("Rest")
                         .font(.caption2)
                     Spacer()
-                    Text("\(rest) sec")
+                    Text("\(totalRest) sec")
                         .foregroundColor(.white)
                 }
                 .accessibilityElement(children: .combine)
@@ -158,7 +159,7 @@ struct WatchAppSettingsView: View {
                 Text("Repetitions")
                     .font(.headline)
                     .accessibilityLabel("Repetitions")
-                Picker("Number of Repetitions to Complete", selection: $reps) {
+                Picker("Number of Repetitions to Complete", selection: $totalReps) {
                     ForEach(1...20, id:\.self) {
                         Text("\($0) repetitions")
                     }
@@ -166,13 +167,13 @@ struct WatchAppSettingsView: View {
                 .pickerStyle(.wheel)
                 .labelsHidden()
                 .accessibilityElement(children: .ignore)
-                .accessibilityLabel("Repetition count \(reps)")
+                .accessibilityLabel("Repetition count \(totalReps)")
                 .accessibilityHint("Adjust how many times to perform the stretch")
-                .accessibilityValue(String(reps))
+                .accessibilityValue(String(totalReps))
                 .accessibilityAdjustableAction { direction in
                     switch direction {
-                    case .increment: reps += 1
-                    case .decrement: reps -= 1
+                    case .increment: totalReps += 1
+                    case .decrement: totalReps -= 1
                     @unknown default: print("not handled")
                     }
                 }
@@ -182,7 +183,7 @@ struct WatchAppSettingsView: View {
                     Text("Repetitions")
                         .font(.caption2)
                     Spacer()
-                    Text("\(reps) reps")
+                    Text("\(totalReps) reps")
                         .foregroundColor(.white)
                 }
                 .accessibilityElement(children: .combine)
@@ -193,12 +194,13 @@ struct WatchAppSettingsView: View {
 }
 
 struct WatchDeviceSettingsView: View {
-    @Binding var audio: Bool
-    @Binding var haptics: Bool
-    @Binding var promptVolume: Double
-	@Binding var isPlaylistActive: Bool
+	// Properties stored in UserDefaults
+	@AppStorage("audio") private var audio = true
+	@AppStorage("haptics") private var haptics = true
+	@AppStorage("promptVolume") private var promptVolume = 1.0
+	@AppStorage("playlist") private var isPlaylistActive = false
 	
-    @Binding var isEditing: Bool
+	@State private var isEditing = false
     
     var body: some View {
         VStack {
