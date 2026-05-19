@@ -13,27 +13,9 @@ struct TimerSettingsViewWatch: View {
 	@Environment(\.accessibilityDifferentiateWithoutColor) var differentiateWithoutColor
 	@Environment(\.scenePhase) var scenePhase
 	@Environment(Managers.self) var managers
-	
-	// Properties stored in UserDefaults
-	@AppStorage("stretch") private var totalStretch = 10
-	@AppStorage("rest") private var totalRest = 5
-	@AppStorage("reps") private var totalReps = 3
-	
-	@AppStorage("audio") private var audio = true
-	@AppStorage("haptics") private var haptics = true
-	@AppStorage("promptVolume") private var promptVolume = 1.0
-	@AppStorage("playlist") private var isPlaylistActive = false
     
     // Binding settings passed from Timer Main view
 	@Binding var didSettingsChange: Bool
-	
-    // Local variables
-//    @State private var stretch = 0
-//    @State private var rest = 0
-//    @State private var reps = 0
-//	@State private var isHapticsOn = true
-//    @State private var isEditing = false
-//	@State private var isDismissalRequested = false
     
     // variable for button view
     var buttonRoles: ButtonRoles = .save
@@ -56,21 +38,6 @@ struct TimerSettingsViewWatch: View {
                 }
 				.navigationTitle("SETTINGS")
 				.navigationBarTitleDisplayMode(.inline)
-				
-//                .onAppear {
-//					stretch = totalStretch
-//					rest = totalRest
-//					reps = totalReps
-//                }
-				
-//				.onDisappear {
-//					totalStretch = Int(stretch)
-//					totalRest = Int(rest)
-//					totalReps = Int(reps)
-//					SoundManager.instance.volume = promptVolume
-//					haptics = isHapticsOn
-//					didSettingsChange = true
-//				}
             }
         }
     }

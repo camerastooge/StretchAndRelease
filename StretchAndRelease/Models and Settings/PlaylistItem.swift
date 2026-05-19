@@ -32,7 +32,7 @@ class PlaylistItem {
 extension PlaylistItem {
     static var sampleData: [PlaylistItem] {
         [
-            PlaylistItem(index: 0, name: "Upward reach", stretchDuration: 3, restDuration: 2, repsToComplete: 2),
+            PlaylistItem(index: 0, name: "Upward reach", stretchDuration: 4, restDuration: 2, repsToComplete: 2),
             PlaylistItem(index: 1, name: "Left reach", stretchDuration: 2, restDuration: 2, repsToComplete: 2),
             PlaylistItem(index: 2, name: "Right reach", stretchDuration: 3, restDuration: 2, repsToComplete: 2),
             PlaylistItem(index: 3, name: "Downward reach", stretchDuration: 2, restDuration: 2, repsToComplete: 2)

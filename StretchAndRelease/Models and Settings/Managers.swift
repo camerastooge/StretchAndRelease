@@ -22,13 +22,19 @@ class Managers {
         isTimerPaused = false
     }
     
-    //function to set end angle of arc
-    func updateEndAngle(timeRemaining: Int, totalTime: Int) -> Angle {
-        switch stretchPhase {
-		case .stretch, .rest:
-            return Angle(degrees: Double(timeRemaining) / Double(totalTime) * 320 + 20)
-        case .stop:
-            return Angle(degrees: 340)
-        }
+    func pauseTimer() {
+        isTimerActive = false
+        isTimerPaused = true
+    }
+    
+    func unpauseTimer() {
+        isTimerActive = true
+        isTimerPaused = false
+    }
+    
+    func stopTimer() {
+        isTimerActive = false
+        isTimerPaused = false
+        stretchPhase = .stop
     }
 }
