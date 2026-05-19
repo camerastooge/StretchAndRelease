@@ -84,15 +84,17 @@ struct ContentView: View {
                                         .stroke(displayColor, style: StrokeStyle(lineWidth: 10, lineCap: .round))
                                         .rotationEffect(Angle(degrees: 90))
                                     
-                                    VStack {
+									VStack(alignment: .center) {
                                         Text("\(String(format: "%02d", Int(timeRemaining)))")
                                             .font(.largeTitle)
                                             .kerning(2)
                                             .contentTransition(.numericText(countsDown: true))
                                             .accessibilityLabel("\(timeRemaining) seconds remaining")
+											.padding(.bottom)
                                         Text(timerTextLabel)
                                             .scaleEffect(0.75)
                                             .accessibilityLabel(timerTextLabel)
+											.padding(.bottom)
                                         Text("Reps: \(repsCompleted)/\(totalReps)")
                                             .accessibilityLabel("Repetitions Completed \(repsCompleted) of \(totalReps)")
                                     }
@@ -218,35 +220,37 @@ struct ContentView: View {
                     //prep audio tick sound
                     SoundManager.instance.prepareTick(sound: .tick)
                     SoundManager.instance.volume = promptVolume
-                    
-                    //load first playlist item
-                    if !playlist.isEmpty {
-                        if !isPlaylistActive {
-                            isPlaylistInactive = true
-                        } else {
-                            loadPlaylistItem(currentIndex)
-                        }
-                    } else {
-                        playlistItem = nil
-                    }
-                    
+					
+					//load first playlist item, if playlist is active
+					if isPlaylistActive {
+						if !playlist.isEmpty {
+							currentIndex = 0
+							loadPlaylistItem(currentIndex)
+						} else {
+							playlistItem = nil
+							isPlaylistActive = false
+						}
+					} else {
+						timeRemaining = totalStretch
+						repsCompleted = 0
+						managers.stretchPhase = .stop
+					}
                     //sets timeRemaining to totalStretch
                     timeRemaining = totalStretch
                 }
                 
                 .onChange(of: isPlaylistActive) {
-                    if isPlaylistActive {
-                        if !playlist.isEmpty {
-                            currentIndex = 0
-                            loadPlaylistItem(currentIndex)
-                        } else {
-                            isPlaylistActive = false
-                        }
-                    } else {
-                        managers.stretchPhase = .stop
-                        repsCompleted = 0
-                        timeRemaining = totalStretch
-                    }
+					if isPlaylistActive {
+						if !playlist.isEmpty {
+							currentIndex = 0
+							loadPlaylistItem(currentIndex)
+						} else {
+							playlistItem = nil
+							isPlaylistActive = false
+						}
+					} else {
+						playlistItem = nil
+					}
                 }
                 
                 //this modifier runs when the timer publishes
