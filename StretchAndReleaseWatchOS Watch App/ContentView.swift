@@ -22,7 +22,7 @@ struct ContentView: View {
     @AppStorage("audio") private var audio = true
     @AppStorage("haptics") private var haptics = true
     @AppStorage("promptVolume") private var promptVolume = 1.0
-    @AppStorage("playlist") private var isPlaylistActive = false
+    @AppStorage("playlist") private var isPlaylistActive = true
     
     // state variables used across views
     @State private var timeRemaining: Int = 0
@@ -91,10 +91,50 @@ struct ContentView: View {
                                             .contentTransition(.numericText(countsDown: true))
                                             .accessibilityLabel("\(timeRemaining) seconds remaining")
 											.padding(.bottom)
-                                        Text(timerTextLabel)
-                                            .scaleEffect(0.75)
-                                            .accessibilityLabel(timerTextLabel)
-											.padding(.bottom)
+										
+										//convert this to a grid to make the name section fixed width?
+										
+										HStack(alignment: .center) {
+											if isPlaylistActive {
+												Button {
+													currentIndex -= 1
+													if currentIndex < 0 {
+														currentIndex = playlist.count - 1
+													}
+													loadPlaylistItem(currentIndex)
+												} label: {
+													Image(systemName: "arrowtriangle.left.fill")
+														.foregroundStyle(.white)
+												}
+												.buttonStyle(.plain)
+												
+											}
+											
+											Spacer()
+												
+                                        	Text(timerTextLabel)
+												.accessibilityLabel(timerTextLabel)
+											
+											Spacer()
+											
+											if isPlaylistActive {
+												Button {
+													currentIndex += 1
+													if currentIndex == playlist.count {
+														currentIndex = 0
+													}
+													loadPlaylistItem(currentIndex)
+												} label: {
+													Image(systemName: "arrowtriangle.right.fill")
+														.foregroundStyle(.white)
+												}
+												.buttonStyle(.plain)
+												
+											}
+                                        }
+										.padding(.horizontal)
+										.padding(.bottom)
+										
                                         Text("Reps: \(repsCompleted)/\(totalReps)")
                                             .accessibilityLabel("Repetitions Completed \(repsCompleted) of \(totalReps)")
                                     }
@@ -397,6 +437,8 @@ struct ContentView: View {
             totalReps = playlistItem.repsToComplete ?? 3
         }
     }
+	
+	
     
     //sends updated settings to iPhone
     func sendContext(stretch: Int, rest: Int, reps: Int) {
