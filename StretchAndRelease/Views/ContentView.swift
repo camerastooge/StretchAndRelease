@@ -101,6 +101,8 @@ struct ContentView: View {
         }
         .sheet(isPresented: $isShowingSettings) {
             SettingsView()
+				.presentationDetents([.large])
+				.presentationDragIndicator(.visible)
         }
         
         .sheet(isPresented: $isShowingHelpView) {

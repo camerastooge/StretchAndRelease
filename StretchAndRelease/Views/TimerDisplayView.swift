@@ -77,6 +77,7 @@ struct TimerDisplayView: View {
                                     .opacity(0.75)
                             }
                             .accessibilityLabel("Go to previous item in set list")
+							.accessibilityInputLabels(["Previous", "Previous Stretch"])
                             
                             Spacer()
                             
@@ -92,6 +93,7 @@ struct TimerDisplayView: View {
                                     .opacity(0.75)
                             }
                             .accessibilityLabel("Go to next item in set list")
+							.accessibilityInputLabels(["Next", "Next Stretch"])
 
                             Spacer()
                         }
@@ -146,6 +148,8 @@ struct TimerDisplayView: View {
                             ButtonView(buttonRoles: !managers.isTimerActive ? .play : .pause, deviceType: deviceType)
                         }
                         .accessibilityLabel(!managers.isTimerActive ? "Start Timer" : "Pause Timer")
+						.accessibilityHint("This button starts or pauses the timer.")
+						.accessibilityInputLabels(["Start", "Start Timer", "Pause", "Pause Timer"])
                         
                         Spacer()
                         
@@ -163,6 +167,8 @@ struct TimerDisplayView: View {
                             ButtonView(buttonRoles: .reset, deviceType: .phone)
                         }
                         .accessibilityLabel("Reset Timer")
+						.accessibilityHint("This button reset the timer.")
+						.accessibilityInputLabels(["Reset", "Reset Timer"])
                         
                         Spacer()
                     }

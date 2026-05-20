@@ -105,26 +105,6 @@ struct SettingsView: View {
                 .padding(.bottom)
                 .navigationTitle("Settings")
                 .navigationBarTitleDisplayMode(.inline)
-                .toolbar {
-                    ToolbarItem {
-                        Button(role: .cancel) {
-                            dismiss()
-                        } label: {
-                            if #available(iOS 26.0, *) {
-                                Image(systemName: "x.circle.fill")
-                                    .glassEffect()
-                                    .tint(.red)
-                                    .accessibilityLabel("Return to main screen")
-                                    .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
-                            } else {
-                                Image(systemName: "x.circle.fill")
-                                    .tint(.red)
-                                    .accessibilityLabel("Return to main screen")
-                                    .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
-                            }
-                        }
-                    }
-                }
                 .alert("Empty Setlists", isPresented: $isPlaylistEmpty) {
                     //add code to bring up add exercise view?
                 } message: {
