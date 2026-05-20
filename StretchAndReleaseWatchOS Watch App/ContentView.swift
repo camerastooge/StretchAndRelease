@@ -58,6 +58,14 @@ struct ContentView: View {
             Color.gray
         }
     }
+	
+	var dragAccessibilityHint: String {
+		if isPlaylistActive {
+			"Drag to the left to go to the next stretch.  Drag to the right to go to the previous exercise."
+		} else {
+			"This is the current stretch phase."
+		}
+	}
     
     //Connectivity class for communication with phone
     @State private var connectivity = Connectivity()
@@ -84,7 +92,7 @@ struct ContentView: View {
                                         .stroke(displayColor, style: StrokeStyle(lineWidth: 10, lineCap: .round))
                                         .rotationEffect(Angle(degrees: 90))
                                     
-									VStack(alignment: .center) {
+									VStack {
                                         Text("\(String(format: "%02d", Int(timeRemaining)))")
                                             .font(.largeTitle)
                                             .kerning(2)
@@ -93,47 +101,79 @@ struct ContentView: View {
 											.padding(.bottom)
 										
 										//convert this to a grid to make the name section fixed width?
-										
-										HStack(alignment: .center) {
-											if isPlaylistActive {
-												Button {
-													currentIndex -= 1
-													if currentIndex < 0 {
-														currentIndex = playlist.count - 1
+										Grid {
+											GridRow {
+												HStack {
+													if isPlaylistActive {
+														Button {
+															currentIndex -= 1
+															if currentIndex < 0 {
+																currentIndex = playlist.count - 1
+															}
+															loadPlaylistItem(currentIndex)
+														} label: {
+															Image(systemName: "arrowtriangle.left.fill")
+																.foregroundStyle(.white)
+														}
+														.buttonStyle(.plain)
+														.accessibilityLabel("Go to the previous stretch")
+														.accessibilityInputLabels(["previous", "previous stretch"])
+													} else {
+														Color.clear
 													}
-													loadPlaylistItem(currentIndex)
-												} label: {
-													Image(systemName: "arrowtriangle.left.fill")
-														.foregroundStyle(.white)
 												}
-												.buttonStyle(.plain)
+												.frame(width: 15)
 												
-											}
-											
-											Spacer()
+												Text(timerTextLabel)
+													.frame(width: 120)
+													.lineLimit(1)
+													.minimumScaleFactor(0.5)
+													.gesture(
+															DragGesture()
+																.onEnded { gesture in
+																	if isPlaylistActive {
+																		if gesture.translation.width < 0 {
+																			currentIndex -= 1
+																			if currentIndex < 0 {
+																				currentIndex = playlist.count - 1
+																			}
+																		} else if gesture.translation.width > 0 {
+																			currentIndex += 1
+																			if currentIndex == playlist.count {
+																				currentIndex = 0
+																			}
+																		}
+																		loadPlaylistItem(currentIndex)
+																	}
+																}
+															)
+													.accessibilityLabel(timerTextLabel)
+													.accessibilityHint(dragAccessibilityHint)
 												
-                                        	Text(timerTextLabel)
-												.accessibilityLabel(timerTextLabel)
-											
-											Spacer()
-											
-											if isPlaylistActive {
-												Button {
-													currentIndex += 1
-													if currentIndex == playlist.count {
-														currentIndex = 0
+												HStack {
+													if isPlaylistActive {
+														Button {
+															currentIndex += 1
+															if currentIndex == playlist.count {
+																currentIndex = 0
+															}
+															loadPlaylistItem(currentIndex)
+														} label: {
+															Image(systemName: "arrowtriangle.right.fill")
+																.foregroundStyle(.white)
+														}
+														.buttonStyle(.plain)
+														.accessibilityLabel("Go to the next stretch")
+														.accessibilityInputLabels(["next", "next stretch"])
+													} else {
+														Color.clear
 													}
-													loadPlaylistItem(currentIndex)
-												} label: {
-													Image(systemName: "arrowtriangle.right.fill")
-														.foregroundStyle(.white)
 												}
-												.buttonStyle(.plain)
-												
+												.frame(width: 15)
+
 											}
-                                        }
-										.padding(.horizontal)
-										.padding(.bottom)
+											.frame(height: 25)
+										}
 										
                                         Text("Reps: \(repsCompleted)/\(totalReps)")
                                             .accessibilityLabel("Repetitions Completed \(repsCompleted) of \(totalReps)")
