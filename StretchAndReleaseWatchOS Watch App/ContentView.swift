@@ -33,6 +33,7 @@ struct ContentView: View {
     // state variables only used on main view
     @State private var isShowingSettings = false
     @State private var didSettingsChange = false
+	@State private var offset: CGFloat = 0
     
     //SwiftData query
     @Query(sort: \PlaylistItem.index) var playlist: [PlaylistItem]
@@ -128,6 +129,8 @@ struct ContentView: View {
 													.frame(width: 120)
 													.lineLimit(1)
 													.minimumScaleFactor(0.5)
+													.offset(x: offset)
+													.transition(.slide)
 													.gesture(
 															DragGesture()
 																.onEnded { gesture in
@@ -143,7 +146,9 @@ struct ContentView: View {
 																				currentIndex = 0
 																			}
 																		}
-																		loadPlaylistItem(currentIndex)
+																		withAnimation(.linear(duration: 0.25)) {
+																			loadPlaylistItem(currentIndex)
+																		}
 																	}
 																}
 															)
