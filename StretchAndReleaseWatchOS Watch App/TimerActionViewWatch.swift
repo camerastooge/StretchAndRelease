@@ -257,6 +257,7 @@ struct TimerActionViewWatch: View {
 		.containerRelativeFrame(.vertical) { length, _ in
 			length * 0.35
 		}
+		
 		.onChange(of: isPlaylistActive) {
 			if isPlaylistActive {
 				if !playlist.isEmpty {
@@ -416,6 +417,7 @@ struct TimerActionViewWatch: View {
 			totalRest = playlistItem.restDuration ?? 5
 			totalReps = playlistItem.repsToComplete ?? 3
 		}
+		timeRemaining = totalStretch
 	}
 }
 

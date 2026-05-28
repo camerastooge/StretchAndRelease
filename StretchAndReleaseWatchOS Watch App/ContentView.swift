@@ -129,6 +129,7 @@ struct ContentView: View {
 						totalRest = playlistItem.restDuration ?? 5
 						totalReps = playlistItem.repsToComplete ?? 3
 					}
+					timeRemaining = totalStretch
 				} else {
 					playlistItem = nil
 					isPlaylistActive = false
