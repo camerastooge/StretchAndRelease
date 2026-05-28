@@ -69,203 +69,134 @@ struct ContentView: View {
 	}
     
     //Connectivity class for communication with phone
-    @State private var connectivity = Connectivity()
-    
-    // variables for button view
-    var buttonRoles: ButtonRoles = .play
-    var deviceType: DeviceType = .watch
-    
+    @State private var connectivity = Connectivity()    
     
     var body: some View {
         NavigationStack {
             ZStack {
-                //Screen area for TimerActionViewWatch
-                VStack {
-                    ZStack {
-                      VStack {
-                            Color.gray.opacity(0)
-                            
-                            ZStack {
-                                Color.gray.opacity(0)
-                                
-                                ZStack {
-                                    Arc(endAngle: endAngle)
-                                        .stroke(displayColor, style: StrokeStyle(lineWidth: 10, lineCap: .round))
-                                        .rotationEffect(Angle(degrees: 90))
-                                    
-									VStack {
-                                        Text("\(String(format: "%02d", Int(timeRemaining)))")
-                                            .font(.largeTitle)
-                                            .kerning(2)
-                                            .contentTransition(.numericText(countsDown: true))
-                                            .accessibilityLabel("\(timeRemaining) seconds remaining")
-											.padding(.bottom)
-										
-										//convert this to a grid to make the name section fixed width?
-										Grid {
-											GridRow {
-												HStack {
-													if isPlaylistActive {
-														Button {
-															currentIndex -= 1
-															if currentIndex < 0 {
-																currentIndex = playlist.count - 1
-															}
-															loadPlaylistItem(currentIndex)
-														} label: {
-															Image(systemName: "arrowtriangle.left.fill")
-																.foregroundStyle(.white)
-														}
-														.buttonStyle(.plain)
-														.accessibilityLabel("Go to the previous stretch")
-														.accessibilityInputLabels(["previous", "previous stretch"])
-													} else {
-														Color.clear
-													}
-												}
-												.frame(width: 15)
-												
-												Text(timerTextLabel)
-													.frame(width: 120)
-													.lineLimit(1)
-													.minimumScaleFactor(0.5)
-													.offset(x: offset)
-													.transition(.slide)
-													.gesture(
-															DragGesture()
-																.onEnded { gesture in
-																	if isPlaylistActive {
-																		if gesture.translation.width < 0 {
-																			currentIndex -= 1
-																			if currentIndex < 0 {
-																				currentIndex = playlist.count - 1
-																			}
-																		} else if gesture.translation.width > 0 {
-																			currentIndex += 1
-																			if currentIndex == playlist.count {
-																				currentIndex = 0
-																			}
-																		}
-																		withAnimation(.linear(duration: 0.25)) {
-																			loadPlaylistItem(currentIndex)
-																		}
-																	}
-																}
-															)
-													.accessibilityLabel(timerTextLabel)
-													.accessibilityHint(dragAccessibilityHint)
-												
-												HStack {
-													if isPlaylistActive {
-														Button {
-															currentIndex += 1
-															if currentIndex == playlist.count {
-																currentIndex = 0
-															}
-															loadPlaylistItem(currentIndex)
-														} label: {
-															Image(systemName: "arrowtriangle.right.fill")
-																.foregroundStyle(.white)
-														}
-														.buttonStyle(.plain)
-														.accessibilityLabel("Go to the next stretch")
-														.accessibilityInputLabels(["next", "next stretch"])
-													} else {
-														Color.clear
-													}
-												}
-												.frame(width: 15)
-
-											}
-											.frame(height: 25)
-										}
-										
-                                        Text("Reps: \(repsCompleted)/\(totalReps)")
-                                            .accessibilityLabel("Repetitions Completed \(repsCompleted) of \(totalReps)")
-                                    }
-                                    .font(.caption)
-                                    .fontWeight(.bold)
-                                    .foregroundStyle(displayColor)
-                                }
-                                .sensoryFeedback(.impact(intensity: haptics ? managers.stretchPhase.phaseIntensity : 0.0), trigger: endAngle)
-                            }
-                            .containerRelativeFrame(.horizontal, alignment: .center) { length, _ in
-                                length * 0.9
-                            }
-                            .containerRelativeFrame(.vertical, alignment: .center) { length, _ in
-                                length * 0.96
-                            }
-                            
-                            //Button Row
-                            HStack {
-                                //play-pause button
-                                Button {
-                                    withAnimation {
-                                        // timer starting from full stop
-                                        if managers.stretchPhase == .stop {
-                                            if audio {
-                                                SoundManager.instance.playPrompt(sound: .countdownExpanded)
-                                            }
-                                            DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-                                                withAnimation(.linear(duration: 0.25)) {
-                                                    repsCompleted = 0
-                                                    managers.startTimer()
-                                                }
-                                            }
-                                        } else if !managers.isTimerPaused {
-                                            // pause the timer
-                                            managers.pauseTimer()
-                                        } else {
-                                            //unpause the timer
-                                            if audio {
-                                                SoundManager.instance.playPrompt(sound: .countdownExpanded)
-                                            }
-                                            DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-                                                withAnimation(.linear(duration: 0.25)) {
-                                                    managers.unpauseTimer()
-                                                }
-                                            }
-                                        }
-                                    }
-                                } label: {
-                                    ButtonView(buttonRoles: !managers.isTimerActive ? .play : .pause, deviceType: deviceType)
-                                    
-                                }
-                                .buttonStyle(.plain)
-                                .padding(.trailing)
-                                .accessibilityInputLabels(["Start", "Pause", "Start Timer", "Pause Timer"])
-                                .accessibilityLabel("Start or Pause Timer")
-                                
-                                //resets timer
-                                Button {
-                                    managers.stopTimer()
-                                    repsCompleted = 0
-                                    timeRemaining = totalStretch
-                                    withAnimation(.linear(duration: 0.5)) {
-                                        updateEndAngle()
-                                    }
-                                } label: {
-                                    ButtonView(buttonRoles: .reset, deviceType: deviceType)
-                                }
-                                .buttonStyle(.plain)
-                                .padding(.trailing)
-                                .accessibilityInputLabels(["Reset", "Reset Timer"])
-                                .accessibilityLabel("Reset Timer")
-                                
-                                //Settings
-                                Button {
-                                    isShowingSettings.toggle()
-                                } label: {
-                                    ButtonView(buttonRoles: .settings, deviceType: deviceType)
-                                }
-                                .buttonStyle(.plain)
-                                .accessibilityInputLabels(["Settings"])
-                                .accessibilityLabel("Show Settings")
-                            }
-                            .dynamicTypeSize(DynamicTypeSize.xxxLarge)
-                            .containerRelativeFrame(.vertical) { length, _ in
-                                length * 0.35
-                            }                    }
+				TabView {
+					Tab {
+						TimerActionViewWatch()
+					}
+					Tab {
+						PlaylistViewWatch()
+					}
+				}
+//						VStack {
+//							Color.gray.opacity(0)
+//							
+//							ZStack {
+//								Color.gray.opacity(0)
+//								
+//								ZStack {
+//									Arc(endAngle: endAngle)
+//										.stroke(displayColor, style: StrokeStyle(lineWidth: 10, lineCap: .round))
+//										.rotationEffect(Angle(degrees: 90))
+//									
+//									VStack {
+//										Text("\(String(format: "%02d", Int(timeRemaining)))")
+//											.font(.largeTitle)
+//											.kerning(2)
+//											.contentTransition(.numericText(countsDown: true))
+//											.accessibilityLabel("\(timeRemaining) seconds remaining")
+//											.padding(.bottom)
+//										
+//										//convert this to a grid to make the name section fixed width?
+//										Grid {
+//											GridRow {
+//												HStack {
+//													if isPlaylistActive {
+//														Button {
+//															currentIndex -= 1
+//															if currentIndex < 0 {
+//																currentIndex = playlist.count - 1
+//															}
+//															loadPlaylistItem(currentIndex)
+//														} label: {
+//															Image(systemName: "arrowtriangle.left.fill")
+//																.foregroundStyle(.white)
+//														}
+//														.buttonStyle(.plain)
+//														.accessibilityLabel("Go to the previous stretch")
+//														.accessibilityInputLabels(["previous", "previous stretch"])
+//													} else {
+//														Color.clear
+//													}
+//												}
+//												.frame(width: 15)
+//												
+//												Text(timerTextLabel)
+//													.frame(width: 120)
+//													.lineLimit(1)
+//													.minimumScaleFactor(0.5)
+//													.offset(x: offset)
+//													.transition(.slide)
+//													.gesture(
+//														DragGesture()
+//															.onEnded { gesture in
+//																if isPlaylistActive {
+//																	if gesture.translation.width < 0 {
+//																		currentIndex -= 1
+//																		if currentIndex < 0 {
+//																			currentIndex = playlist.count - 1
+//																		}
+//																	} else if gesture.translation.width > 0 {
+//																		currentIndex += 1
+//																		if currentIndex == playlist.count {
+//																			currentIndex = 0
+//																		}
+//																	}
+//																	withAnimation(.linear(duration: 0.25)) {
+//																		loadPlaylistItem(currentIndex)
+//																	}
+//																}
+//															}
+//													)
+//													.accessibilityLabel(timerTextLabel)
+//													.accessibilityHint(dragAccessibilityHint)
+//												
+//												HStack {
+//													if isPlaylistActive {
+//														Button {
+//															currentIndex += 1
+//															if currentIndex == playlist.count {
+//																currentIndex = 0
+//															}
+//															loadPlaylistItem(currentIndex)
+//														} label: {
+//															Image(systemName: "arrowtriangle.right.fill")
+//																.foregroundStyle(.white)
+//														}
+//														.buttonStyle(.plain)
+//														.accessibilityLabel("Go to the next stretch")
+//														.accessibilityInputLabels(["next", "next stretch"])
+//													} else {
+//														Color.clear
+//													}
+//												}
+//												.frame(width: 15)
+//												
+//											}
+//											.frame(height: 25)
+//										}
+//										
+//										Text("Reps: \(repsCompleted)/\(totalReps)")
+//											.accessibilityLabel("Repetitions Completed \(repsCompleted) of \(totalReps)")
+//									}
+//									.font(.caption)
+//									.fontWeight(.bold)
+//									.foregroundStyle(displayColor)
+//								}
+//								.sensoryFeedback(.impact(intensity: haptics ? managers.stretchPhase.phaseIntensity : 0.0), trigger: endAngle)
+//							}
+//							.containerRelativeFrame(.horizontal, alignment: .center) { length, _ in
+//								length * 0.9
+//							}
+//							.containerRelativeFrame(.vertical, alignment: .center) { length, _ in
+//								length * 0.96
+//							}
+//							
+//						}
                     }
                 }
                 .sheet(isPresented: $isShowingSettings) {
@@ -310,7 +241,12 @@ struct ContentView: View {
 					if isPlaylistActive {
 						if !playlist.isEmpty {
 							currentIndex = 0
-							loadPlaylistItem(currentIndex)
+							playlistItem = playlist[currentIndex]
+							if let playlistItem {
+								totalStretch = playlistItem.stretchDuration ?? 10
+								totalRest = playlistItem.restDuration ?? 5
+								totalReps = playlistItem.repsToComplete ?? 3
+							}
 						} else {
 							playlistItem = nil
 							isPlaylistActive = false
@@ -323,168 +259,9 @@ struct ContentView: View {
                     //sets timeRemaining to totalStretch
                     timeRemaining = totalStretch
                 }
-                
-                .onChange(of: isPlaylistActive) {
-					if isPlaylistActive {
-						if !playlist.isEmpty {
-							currentIndex = 0
-							loadPlaylistItem(currentIndex)
-						} else {
-							playlistItem = nil
-							isPlaylistActive = false
-						}
-					} else {
-						playlistItem = nil
-					}
-                }
-                
-                //this modifier runs when the timer publishes
-                .onReceive(timer) { _ in
-                        if managers.isTimerActive && !managers.isTimerPaused {
-                            switch managers.stretchPhase {
-                            case .stretch: return manageStretch()
-                            case .rest: return manageRest()
-                            case .stop: return manageStop()
-                            }
-                        }
-                }
-            }
-        }
         ._statusBarHidden()
     }
-    
-    //function to stop timer
-    func timerFullStop() {
-        if audio {
-            SoundManager.instance.playPrompt(sound: .relax)
-        }
-        withAnimation(.easeOut(duration: 0.5)) {
-            managers.stopTimer()
-            updateEndAngle()
-        }
-        timeRemaining = totalStretch
-    }
-    
-    //function to manage stretch portion of stretch
-    func manageStretch() {
-        if timeRemaining > 0 {
-            timeRemaining -= 1
-            withAnimation(.easeOut(duration: 1)) {
-                updateEndAngle()
-            }
-            if audio {
-                SoundManager.instance.playTick(sound: .tick)
-            }
-        } else {
-            repsCompleted += 1
-            if repsCompleted < totalReps {
-                if audio {
-                    SoundManager.instance.playPrompt(sound: .rest)
-                }
-                withAnimation {
-                    managers.stretchPhase = .rest
-                }
-            } else {
-                if !isPlaylistActive {
-                    timerFullStop()
-                } else {
-                    if currentIndex != playlist.count - 1 {
-                        if audio {
-                            SoundManager.instance.playPrompt(sound: .rest)
-                        }
-                        withAnimation {
-                            managers.stretchPhase = .rest
-                        }
-                    } else {
-                        timerFullStop()
-                        currentIndex = 0
-                        loadPlaylistItem(currentIndex)
-                    }
-                }
-            }
-        }
-    }
-    
-    //function to manage rest portion of stretch
-    func manageRest() {
-        if timeRemaining != totalRest {
-            timeRemaining += 1
-            withAnimation(.easeOut(duration: 1)) {
-                updateEndAngle()
-            }
-        } else {
-            //not using playlist feature -> throws back to stretch phase
-            if !isPlaylistActive {
-                timeRemaining = totalStretch
-                withAnimation {
-                    managers.stretchPhase = .stretch
-                }
-                if audio {
-                    SoundManager.instance.playPrompt(sound: .stretch)
-                }
-            } else {
-                //using playlist feature -> reps completed, go to next exercise
-                if repsCompleted == totalReps {
-                    managers.isTimerActive = false
-                    withAnimation(.linear(duration: 0.5)) {
-                        managers.stretchPhase = .stretch
-                        repsCompleted = 0
-                    }
-                    currentIndex += 1
-                    loadPlaylistItem(currentIndex)
-                    timeRemaining = totalStretch
-                    if audio {
-                        SoundManager.instance.playPrompt(sound: .countdownExpanded)
-                    }
-                    DispatchQueue.main.asyncAfter(deadline: audio ? .now() + 3 : .now() + 0.25) {
-                        managers.isTimerActive = true
-                    }
-                } else {
-                   // using playlist feature -> reps not completed, go to stretch phase
-                    timeRemaining = totalStretch
-                    withAnimation {
-                        managers.stretchPhase = .stretch
-                    }
-                    if audio {
-                        SoundManager.instance.playPrompt(sound: .stretch)
-                    }
-                }
-            }
-        }
-    }
-    
-    //function to manage timer stop
-    func manageStop() {
-        withAnimation(.easeOut(duration: 1)) {
-            timerFullStop()
-            updateEndAngle()
-        }
-    }
-    
-    //function to set end angle of arc
-    func updateEndAngle() {
-        switch managers.stretchPhase {
-        case .stretch:
-            endAngle = Angle(degrees: Double(timeRemaining) / Double(totalStretch) * 320 + 20)
-        case .rest:
-            endAngle = Angle(degrees: Double(timeRemaining) / Double(totalRest) * 320 + 20)
-        case .stop:
-            endAngle = Angle(degrees: 340)
-        }
-    }
-    
-    //load playlistItem values into timer properties
-    func loadPlaylistItem(_ index: Int) {
-        playlistItem = playlist[index]
-        if let playlistItem {
-            totalStretch = playlistItem.stretchDuration ?? 10
-            totalRest = playlistItem.restDuration ?? 5
-            totalReps = playlistItem.repsToComplete ?? 3
-        }
-    }
 	
-	
-    
     //sends updated settings to iPhone
     func sendContext(stretch: Int, rest: Int, reps: Int) {
         let settingsUpdate = ["stretch" : stretch, "rest" : rest, "reps" : reps]

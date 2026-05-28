@@ -35,9 +35,6 @@ struct PlaylistViewWatch: View {
 	@State private var isShowingActive = false
 	@State private var isShowingAddExerciseView = false
 	
-	//Bindings
-	@Binding var selectedTab: Int
-	
 	//SwiftData models
 	@Query(sort: \PlaylistItem.index) var playlist: [PlaylistItem]
 	
@@ -126,7 +123,7 @@ extension PlaylistViewWatch {
 #Preview {
 	@Previewable @State var selectedTab = 2
 	
-	PlaylistViewWatch(selectedTab: $selectedTab)
+	PlaylistViewWatch()
 		.modelContainer(previewContainer)
 		.environment(Managers())
 }
