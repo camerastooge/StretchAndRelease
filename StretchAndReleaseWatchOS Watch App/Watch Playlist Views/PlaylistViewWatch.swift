@@ -76,26 +76,26 @@ struct PlaylistViewWatch: View {
 						Text("Set list is Empty")
 							.font(.system(size: 32))
 					} description: {
-						Text("Press \(Image(systemName: "plus.circle")) to add a stretch to your set list")
-							.font(.system(size: 16))
-							.foregroundStyle(colorScheme == .dark ? .white : .black)
+						VStack {
+							Button {
+								isShowingAddExerciseView = true
+							} label: {
+								if #available(watchOS 26, *) {
+									ButtonView(buttonRoles: .add, deviceType: .watch)
+										.glassEffect(.clear)
+								} else {
+									ButtonView(buttonRoles: .add, deviceType: .watch)
+								}
+							}
+							.buttonStyle(.plain)
+							.accessibilityLabel("Add an item to the set list")
+							Text("Press \(Image(systemName: "plus.circle")) to add a stretch to your set list")
+								.font(.system(size: 16))
+								.foregroundStyle(colorScheme == .dark ? .white : .black)
+						}
 					}
 					.containerRelativeFrame([.vertical, .horizontal])
 					.scrollDisabled(true)
-				}
-			}
-			.toolbar {
-				ToolbarItem(placement: .topBarLeading) {
-					Button {
-						isShowingAddExerciseView = true
-					} label: {
-						if #available(watchOS 26, *) {
-							ButtonView(buttonRoles: .add, deviceType: .watch)
-								.glassEffect(.clear)
-						}
-					}
-					.buttonStyle(.plain)
-					.accessibilityLabel("Add an item to the set list")
 				}
 			}
 		}
@@ -124,6 +124,6 @@ extension PlaylistViewWatch {
 	@Previewable @State var selectedTab = 2
 	
 	PlaylistViewWatch()
-		.modelContainer(previewContainer)
+//		.modelContainer(previewContainer)
 		.environment(Managers())
 }

@@ -88,7 +88,7 @@ struct TimerActionViewWatch: View {
 						.kerning(2)
 						.contentTransition(.numericText(countsDown: true))
 						.accessibilityLabel("\(timeRemaining) seconds remaining")
-						.padding(.bottom)
+						.padding(.bottom, 5)
 					
 					//convert this to a grid to make the name section fixed width?
 					Grid {
@@ -115,7 +115,7 @@ struct TimerActionViewWatch: View {
 							.frame(width: 15)
 							
 							Text(timerTextLabel)
-								.frame(width: 120)
+								.frame(width: 90)
 								.lineLimit(1)
 								.minimumScaleFactor(0.5)
 								.offset(x: offset)
@@ -166,7 +166,7 @@ struct TimerActionViewWatch: View {
 							.frame(width: 15)
 
 						}
-						.frame(height: 25)
+						.frame(height: 20)
 					}
 					
 					Text("Reps: \(repsCompleted)/\(totalReps)")
@@ -179,11 +179,12 @@ struct TimerActionViewWatch: View {
 			.sensoryFeedback(.impact(intensity: haptics ? managers.stretchPhase.phaseIntensity : 0.0), trigger: endAngle)
 			}
 		.containerRelativeFrame(.horizontal, alignment: .center) { length, _ in
-			length * 0.9
+			length * 0.8
 		}
 		.containerRelativeFrame(.vertical, alignment: .center) { length, _ in
-			length * 0.96
+			length * 0.86
 		}
+		.padding(.bottom, 12)
 		
 		
 		//Button Row
@@ -279,6 +280,11 @@ struct TimerActionViewWatch: View {
 					case .stop: return manageStop()
 					}
 				}
+		}
+		
+		//shows settings screen
+		.sheet(isPresented: $isShowingSettings) {
+			TimerSettingsViewWatch(didSettingsChange: $didSettingsChange)
 		}
     }
 	
