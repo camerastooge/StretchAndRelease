@@ -13,7 +13,7 @@ class Managers {
     var isTimerActive = false
     var isTimerPaused = false
     var isResetToggled = false
-    var didStatusChange = false
+//    var didStatusChange = false
     var stretchPhase: StretchPhase = .stop
     
     func startTimer() {

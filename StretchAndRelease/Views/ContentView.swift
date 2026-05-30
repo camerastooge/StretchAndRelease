@@ -47,7 +47,7 @@ struct ContentView: View {
 
     var body: some View {
         NavigationStack {
-            TabView {
+            TabView() {
                 Tab("Timer", systemImage: "timer") {
                     TimerDisplayView()
                 }
@@ -62,7 +62,6 @@ struct ContentView: View {
                 ToolbarItem {
                     Button {
                         isShowingHelpView.toggle()
-                        managers.didStatusChange.toggle()
                     } label: {
                         if #available(iOS 26.0, *) {
                             Image(systemName: "questionmark.circle")
@@ -82,9 +81,8 @@ struct ContentView: View {
                 }
                 
                 ToolbarItem {
-                    Button {
-                        isShowingSettings.toggle()
-                        managers.didStatusChange.toggle()
+                    NavigationLink {
+                        SettingsView()
                     } label: {
                         if #available(iOS 26.0, *) {
                             Image(systemName: "gear")
@@ -98,11 +96,6 @@ struct ContentView: View {
                 }
             }
 
-        }
-        .sheet(isPresented: $isShowingSettings) {
-            SettingsView()
-				.presentationDetents([.large])
-				.presentationDragIndicator(.visible)
         }
         
         .sheet(isPresented: $isShowingHelpView) {
@@ -125,14 +118,24 @@ struct ContentView: View {
             connectivity.didStatusChange = false
         }
         
-        //when settings change, updates main display and sends updated settings to Apple Watch app
-        .onChange(of: managers.didStatusChange) {
+        //when view changes, update timer settings and send them to Apple Watch app
+        .onDisappear {
             managers.stretchPhase = .stop
             managers.isTimerActive = false
             managers.isTimerPaused = false
-            sendContext(stretch: totalStretch, rest: totalRest, reps: totalReps)
-            managers.didStatusChange = false
+            Task {
+                sendContext(stretch: totalStretch, rest: totalRest, reps: totalReps)
+            }
         }
+        
+        //when settings change, updates main display and sends updated settings to Apple Watch app
+//        .onChange(of: managers.didStatusChange) {
+//            managers.stretchPhase = .stop
+//            managers.isTimerActive = false
+//            managers.isTimerPaused = false
+//            sendContext(stretch: totalStretch, rest: totalRest, reps: totalReps)
+//            managers.didStatusChange = false
+//        }
     }
     
     //function sends updated settings to Apple Watch
@@ -146,6 +149,6 @@ struct ContentView: View {
 
 #Preview {
     ContentView()
-        .modelContainer(previewContainer)
+//        .modelContainer(previewContainer)
         .environment(Managers())
 }

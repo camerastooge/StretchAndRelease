@@ -126,9 +126,19 @@ struct AddExerciseView: View {
                         }
                     }
                     .scrollContentBackground(.hidden)
-                    
-                    Spacer()
-                    
+                }
+            }
+            .navigationTitle("Add Exercise")
+            .navigationBarTitleDisplayMode(.inline)
+            .alert("Name Field Is Empty", isPresented: $isShowingEmptyNameField) {
+                Button("OK", role: .cancel) {
+                    isShowingEmptyNameField = false
+                }
+            } message: {
+                Text("You must name your exercise.")
+            }
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
                     Button {
                         if !name.isEmpty {
                             let playlistItem = PlaylistItem(index: playlist.isEmpty ? 0 : playlist.count + 1, name: name, stretchDuration: stretch, restDuration: rest, repsToComplete: reps)
@@ -142,44 +152,35 @@ struct AddExerciseView: View {
                         } else {
                             isShowingEmptyNameField = true
                         }
-                        
                     } label: {
                         if #available(iOS 26.0, *) {
-                            Text("SAVE")
-                                .frame(width: buttonWidth, height: 50)
-                                .font(.headline)
-                                .fontWeight(.bold)
-                                .foregroundStyle(.white)
-                                .background(.green)
-                                .clipShape(.capsule)
-                                .glassEffect()
-                                .padding(.top, 25)
-                                .padding(.bottom, 25)
-                                .dynamicTypeSize(...DynamicTypeSize.accessibility2)
+                            Image(systemName: "chevron.left")
+                                .glassEffect(.clear)
                         } else {
-                            Text("SAVE")
-                                .frame(width: buttonWidth, height: 50)
-                                .font(.headline)
-                                .fontWeight(.bold)
-                                .foregroundStyle(.white)
-                                .background(.green)
-                                .clipShape(.capsule)
-                                .padding(.top, 25)
-                                .padding(.bottom, 25)
-                                .dynamicTypeSize(...DynamicTypeSize.accessibility2)
+                            Image(systemName: "chevron.left")
+                                .accessibilityLabel("Save changes and return to set list view")
                         }
                     }
-                    
+                    .buttonStyle(.plain)
                 }
-            }
-            .navigationTitle("Add Exercise")
-            .navigationBarTitleDisplayMode(.inline)
-            .alert("Name Field Is Empty", isPresented: $isShowingEmptyNameField) {
-                Button("OK", role: .cancel) {
-                    isShowingEmptyNameField = false
+                
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(role: .cancel) {
+                        dismiss()
+                    } label: {
+                        if #available(iOS 26.0, *) {
+                            Image(systemName: "x.circle")
+                                .glassEffect(.clear)
+                                .foregroundStyle(.red)
+                                .accessibilityLabel("Cancel and return to set list view")
+                        } else {
+                            Image(systemName: "x.circle.fill")
+                                .foregroundStyle(Color.red)
+                                .accessibilityLabel("Cancel and return to set list view")
+                        }
+                    }
+                    .buttonStyle(.plain)
                 }
-            } message: {
-                Text("You must name your exercise.")
             }
         }
     }

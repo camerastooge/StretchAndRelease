@@ -203,17 +203,17 @@ struct TimerDisplayView: View {
                 timeRemaining = totalStretch
             }
             
-            //stops and resets timer when either settings or help views are toggled
-            .onChange(of: managers.didStatusChange) {
-                withAnimation(.smooth(duration: 0.25)) {
-                    managers.stretchPhase = .stop
-                    managers.isTimerActive = false
-                    managers.isTimerPaused = false
-                    timeRemaining = totalStretch
-                    repsCompleted = 0
-                    endAngle = Angle(degrees: 340)
-                }
-            }
+//            //stops and resets timer when either settings or help views are toggled
+//            .onChange(of: managers.didStatusChange) {
+//                withAnimation(.smooth(duration: 0.25)) {
+//                    managers.stretchPhase = .stop
+//                    managers.isTimerActive = false
+//                    managers.isTimerPaused = false
+//                    timeRemaining = totalStretch
+//                    repsCompleted = 0
+//                    endAngle = Angle(degrees: 340)
+//                }
+//            }
             
             .onChange(of: isPlaylistActive) {
                 if isPlaylistActive {
@@ -245,35 +245,12 @@ struct TimerDisplayView: View {
                 managers.isTimerPaused = false
                 timeRemaining = totalStretch
             }
-            
-            .alert("Set List is Not Active", isPresented: $isPlaylistInactive) {
-                if #available(iOS 26.0, *) {
-                    Button("OK", role: .confirm) {
-                        isPlaylistActive = true
-                        loadPlaylistItem(currentIndex)
-                    }
-                    
-                    Button("Cancel", role: .cancel) { }
-                    .backgroundStyle(Color.red)
-                } else {
-                    Button("OK") {
-                        isPlaylistActive = true
-                        loadPlaylistItem(currentIndex)
-                    }
-                    
-                    Button(role: .cancel) { } label: {
-                        Text("Cancel")
-                            .backgroundStyle(Color.red)
-                    }
-                }
-            } message: {
-                Text("Do you want to turn the set list on?")
-            }
         }
     }
     
     //load playlistItem values into timer properties
     func loadPlaylistItem(_ index: Int) {
+        guard !playlist.isEmpty else { return }
         playlistItem = playlist[index]
         if let playlistItem {
             totalStretch = playlistItem.stretchDuration ?? 10

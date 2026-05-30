@@ -33,7 +33,6 @@ struct PlaylistView: View {
     
     //Checks for determining playlist status
     @State private var isPlaylistInactive = false
-    @State private var playlistHasBeenEmptied = false
     
     //Define columns for LazyVGrid
     private let playlistColumns: [GridItem] = [
@@ -56,6 +55,7 @@ struct PlaylistView: View {
                             ForEach(playlist) { exercise in
                                 NavigationLink {
                                     EditExerciseView(playlistItem: exercise)
+                                        .navigationBarBackButtonHidden()
                                 } label: {
                                     PlaylistRowView(item: exercise, columns: playlistColumns)
                                         .swipeActions(edge: .trailing, allowsFullSwipe: true) {
@@ -81,6 +81,7 @@ struct PlaylistView: View {
                     .safeAreaInset(edge: .bottom) {
                         NavigationLink {
                             AddExerciseView()
+                                .navigationBarBackButtonHidden()
                         } label: {
                             Text("ADD")
                                 .frame(width: 200, height: 65)
@@ -130,47 +131,12 @@ struct PlaylistView: View {
             .navigationBarTitleDisplayMode(.inline)
             .onChange(of: playlist) {
                 if playlist.isEmpty {
-                    playlistHasBeenEmptied = true
                     isPlaylistActive = false
                 } else {
                     if !isPlaylistActive {
                         isPlaylistInactive = true
                     }
                 }
-            }
-            .alert("Set List is Not Active", isPresented: $isPlaylistInactive) {
-                if #available(iOS 26.0, *) {
-                    Button("OK", role: .confirm) {
-                        isPlaylistActive = true
-                    }
-                    
-                    Button("Cancel", role: .cancel) { }
-                    .backgroundStyle(Color.red)
-                } else {
-                    Button("OK") {
-                        isPlaylistActive = true
-                    }
-                    
-                    Button(role: .cancel) { } label: {
-                        Text("Cancel")
-                            .backgroundStyle(Color.red)
-                    }
-                }
-            } message: {
-                Text("Do you want to turn the set list on?")
-            }
-            .alert("Set list has been turned off", isPresented: $playlistHasBeenEmptied) {
-                if #available(iOS 26.0, *) {
-                    Button("OK", role: .confirm) {
-                        isPlaylistActive = false
-                    }
-                } else {
-                    Button("OK") {
-                        isPlaylistActive = false
-                    }
-                }
-            } message: {
-                Text("The set list has been turned off since it is empty.")
             }
         }
     }

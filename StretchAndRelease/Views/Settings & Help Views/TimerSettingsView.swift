@@ -35,13 +35,40 @@ struct SettingsView: View {
     @State private var reps = 0
     @State private var isEditing = false
     @State private var isPlaylistEmpty = false
+    @State private var isShowingEmptyPlaylistAlert = false
+    @State private var showAddExerciseView = false
     
     @ScaledMetric var buttonWidth = 100
+    
+    private var volumeSlider: some View {
+        Slider(
+            value: $promptVolume,
+            in: 0.0...1.0
+        ) {
+            Text("Prompt Volume")
+        } minimumValueLabel: {
+            Image(systemName: "speaker.slash.fill")
+        } maximumValueLabel: {
+            Image(systemName: "speaker.wave.3")
+        } onEditingChanged: { editing in
+            isEditing = editing
+        }
+        .accessibilityLabel("Volume")
+        .accessibilityHint("Adjust volume of voice prompts")
+        .accessibilityValue(String(promptVolume.formatted(.percent)))
+        .accessibilityAdjustableAction { direction in
+            switch direction {
+            case .increment: promptVolume += 0.1
+            case .decrement: promptVolume -= 0.1
+            @unknown default: print("not handled")
+            }
+        }
+    }
     
     var body: some View {
         NavigationStack {
             ScrollView {
-                Section {
+                VStack(spacing: 0) {
                     if !dynamicTypeSize.isAccessibilitySize {
                         PhoneTimerSettingsTypicalView(stretch: $stretch, rest: $rest, reps: $reps, isEditing: $isEditing)
                             .scrollDisabled(true)
@@ -56,72 +83,51 @@ struct SettingsView: View {
                             }
                     }
                 }
-                
                             
-                Section {
-                    Section {
-                        VStack(spacing: 25) {
-                            HStack {
-                                Toggle("Use playlist", isOn: $isPlaylistActive)
-                                    .accessibilityHint("Turn playlist on or off")
-                            }
-                            HStack {
-                                Toggle("Haptic feedback", isOn: $haptics)
-                                    .accessibilityHint("Turn haptic feedback on or off")
-                            }
-                            HStack {
-                                Toggle("Audio cues", isOn: $audio)
-                                    .accessibilityHint("Turn audio cues on or off")
-                            }
-                            HStack {
-                                Slider(
-                                    value: $promptVolume,
-                                    in: 0.0...1.0
-                                ) {
-                                    Text("Prompt Volume")
-                                } minimumValueLabel: {
-                                    Image(systemName: "speaker.slash.fill")
-                                } maximumValueLabel: {
-                                    Image(systemName: "speaker.wave.3")
-                                } onEditingChanged: { editing in
-                                    isEditing = editing
-                                }
-                                .accessibilityLabel("Volume")
-                                .accessibilityHint("Adjust volume of voice prompts")
-                                .accessibilityValue(String(promptVolume.formatted(.percent)))
-                                .accessibilityAdjustableAction { direction in
-                                    switch direction {
-                                    case .increment: promptVolume += 0.1
-                                    case .decrement: promptVolume -= 0.1
-                                    @unknown default: print("not handled")
-                                    }
-                                }
-                            }
-                        }
+                VStack(spacing: 25) {
+                    HStack {
+                        Toggle("Use playlist", isOn: $isPlaylistActive)
+                            .accessibilityHint("Turn playlist on or off")
                     }
-                    .padding(.horizontal)
-                    .dynamicTypeSize(...DynamicTypeSize.xxLarge)
+                    HStack {
+                        Toggle("Haptic feedback", isOn: $haptics)
+                            .accessibilityHint("Turn haptic feedback on or off")
+                    }
+                    HStack {
+                        Toggle("Audio cues", isOn: $audio)
+                            .accessibilityHint("Turn audio cues on or off")
+                    }
+                    HStack {
+                        volumeSlider
+                    }
                 }
+                .padding(.horizontal)
                 .padding(.bottom)
-                .navigationTitle("Settings")
-                .navigationBarTitleDisplayMode(.inline)
-                .alert("Empty Setlists", isPresented: $isPlaylistEmpty) {
-                    //add code to bring up add exercise view?
-                } message: {
-                    Text("There is nothing in the set list. \n Please add some exercises.")
-                }
-
-                
+                .dynamicTypeSize(...DynamicTypeSize.xxLarge)
             }
             .scrollDisabled(true)
+            .navigationTitle("Settings")
+            .navigationBarTitleDisplayMode(.inline)
+            .navigationDestination(isPresented: $showAddExerciseView) {
+                AddExerciseView()
+                    .navigationBarBackButtonHidden()
+            }
+            .alert("Empty Setlists", isPresented: $isShowingEmptyPlaylistAlert) {
+                Button("Add Exercise") {
+                    showAddExerciseView = true
+                }
+                Button("Cancel", role: .cancel) {}
+            } message: {
+                Text("There is nothing in the set list. \n Please add some exercises.")
+            }
         }
+        
         .safeAreaInset(edge: .bottom) {
             Button {
                 totalStretch = stretch
                 totalRest = rest
                 totalReps = reps
                 SoundManager.instance.volume = promptVolume
-                managers.didStatusChange = true
 				dismiss()
             } label: {
                 Text("SAVE")
@@ -132,20 +138,24 @@ struct SettingsView: View {
                     .background(.green)
                     .clipShape(.capsule)
                     .dynamicTypeSize(...DynamicTypeSize.accessibility2)
+                    .opacity(showAddExerciseView ? 0 : 1)
             }
             .accessibilityLabel("Save")
             .accessibilityHint("Save your settings and return to the main screen")
         }
+        
         .onAppear {
             stretch = totalStretch
             rest = totalRest
             reps = totalReps
         }
+        
         .onChange(of: isPlaylistActive) {
             if isPlaylistActive {
-                if playlist.isEmpty {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                     isPlaylistEmpty = true
                     isPlaylistActive = false
+                    isShowingEmptyPlaylistAlert = true
                 }
             }
         }

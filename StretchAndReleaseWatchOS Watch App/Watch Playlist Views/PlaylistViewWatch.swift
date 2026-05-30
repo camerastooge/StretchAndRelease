@@ -69,6 +69,21 @@ struct PlaylistViewWatch: View {
 								.onMove(perform: move)
 							}
 						}
+                        .toolbar {
+                            ToolbarItem(placement: .topBarTrailing) {
+                                Button {
+                                    isShowingAddExerciseView = true
+                                } label: {
+                                    if #available(watchOS 26, *) {
+                                        ButtonView(buttonRoles: .add, deviceType: .watch)
+                                            .glassEffect(.clear)
+                                    } else {
+                                        ButtonView(buttonRoles: .add, deviceType: .watch)
+                                    }
+                                }
+                                .buttonStyle(.plain)
+                            }
+                        }
 					}
 				}
 				else {
@@ -124,6 +139,6 @@ extension PlaylistViewWatch {
 	@Previewable @State var selectedTab = 2
 	
 	PlaylistViewWatch()
-//		.modelContainer(previewContainer)
+		.modelContainer(previewContainer)
 		.environment(Managers())
 }

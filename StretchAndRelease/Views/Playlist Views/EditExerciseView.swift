@@ -125,46 +125,6 @@ struct EditExerciseView: View {
                             }
                         }
                         .scrollContentBackground(.hidden)
-                        
-                        Spacer()
-                        
-                        Button {
-                            playlistItem.name = name
-                            playlistItem.stretchDuration = stretch
-                            playlistItem.restDuration = rest
-                            playlistItem.repsToComplete = reps
-                            do {
-                                try modelContext.save()
-                            } catch {
-                                print("Error: \(error.localizedDescription)")
-                            }
-                            dismiss()
-                        } label: {
-                            if #available(iOS 26.0, *) {
-                                Text("SAVE")
-                                    .frame(width: buttonWidth, height: 50)
-                                    .font(.headline)
-                                    .fontWeight(.bold)
-                                    .foregroundStyle(.white)
-                                    .background(.green)
-                                    .clipShape(.capsule)
-                                    .glassEffect()
-                                    .padding(.top, 25)
-                                    .padding(.bottom, 25)
-                                    .dynamicTypeSize(...DynamicTypeSize.accessibility2)
-                            } else {
-                                Text("SAVE")
-                                    .frame(width: buttonWidth, height: 50)
-                                    .font(.headline)
-                                    .fontWeight(.bold)
-                                    .foregroundStyle(.white)
-                                    .background(.green)
-                                    .clipShape(.capsule)
-                                    .padding(.top, 25)
-                                    .padding(.bottom, 25)
-                                    .dynamicTypeSize(...DynamicTypeSize.accessibility2)
-                            }
-                        }
                     }
                 }
                 .navigationTitle("Edit Exercise")
@@ -176,6 +136,26 @@ struct EditExerciseView: View {
             stretch = playlistItem.stretchDuration ?? 10
             rest = playlistItem.restDuration ?? 5
             reps = playlistItem.repsToComplete ?? 3
+        }
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button {
+                    playlistItem.name = name
+                    playlistItem.stretchDuration = stretch
+                    playlistItem.restDuration = rest
+                    playlistItem.repsToComplete = reps
+                    try? modelContext.save()
+                    dismiss()
+                } label: {
+                    if #available(iOS 26.0, *) {
+                        Image(systemName: "chevron.left")
+                            .glassEffect(.clear)
+                    } else {
+                        Image(systemName: "chevron.left")
+                            .accessibilityLabel("Save changes and return to set list view")
+                    }
+                }
+            }
         }
     }
 }
