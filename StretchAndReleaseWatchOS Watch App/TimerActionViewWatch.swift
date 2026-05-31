@@ -245,7 +245,7 @@ struct TimerActionViewWatch: View {
 			
 			//Settings
 			Button {
-				isShowingSettings.toggle()
+				isShowingSettings = true
 			} label: {
 				ButtonView(buttonRoles: .settings, deviceType: deviceType)
 			}
@@ -284,8 +284,9 @@ struct TimerActionViewWatch: View {
 		}
 		
 		//shows settings screen
-		.sheet(isPresented: $isShowingSettings) {
-			TimerSettingsViewWatch(didSettingsChange: $didSettingsChange)
+		.navigationDestination(isPresented: $isShowingSettings) {
+			TimerSettingsViewWatch()
+				.navigationBarBackButtonHidden()
 		}
     }
 	

@@ -11,11 +11,9 @@ struct TimerSettingsViewWatch: View {
 	//Environment properties
 	@Environment(\.colorScheme) var colorScheme
 	@Environment(\.accessibilityDifferentiateWithoutColor) var differentiateWithoutColor
+	@Environment(\.dismiss) var dismiss
 	@Environment(\.scenePhase) var scenePhase
 	@Environment(Managers.self) var managers
-    
-    // Binding settings passed from Timer Main view
-	@Binding var didSettingsChange: Bool
     
     // variable for button view
     var buttonRoles: ButtonRoles = .save
@@ -40,6 +38,41 @@ struct TimerSettingsViewWatch: View {
 				.navigationBarTitleDisplayMode(.inline)
             }
         }
+		.toolbar {
+			ToolbarItem(placement: .topBarLeading) {
+				Button {
+					managers.didSettingsChange = true
+					dismiss()
+				} label: {
+					if #available(watchOS 26.0, *) {
+						Image(systemName: "chevron.left")
+							.glassEffect(.clear)
+					} else {
+						Image(systemName: "chevron.left")
+							.accessibilityLabel("Save changes and return to set list view")
+					}
+				}
+				.buttonStyle(.plain)
+			}
+			
+			ToolbarItem(placement: .topBarTrailing) {
+				Button {
+					dismiss()
+				} label: {
+					if #available(watchOS 26.0, *) {
+						Image(systemName: "x.circle")
+							.glassEffect(.clear)
+							.foregroundStyle(.red)
+							.accessibilityLabel("Cancel and return to set list view")
+					} else {
+						Image(systemName: "x.circle.fill")
+							.foregroundStyle(Color.red)
+							.accessibilityLabel("Cancel and return to set list view")
+					}
+				}
+				.buttonStyle(.plain)
+			}
+		}
     }
 }
 
@@ -208,7 +241,6 @@ struct WatchDeviceSettingsView: View {
 
 
 #Preview {
-    @Previewable @State var didSettingsChange: Bool = false
     @Previewable @State var totalStretch = 10
     @Previewable @State var totalRest = 5
     @Previewable @State var totalReps = 3
@@ -219,6 +251,6 @@ struct WatchDeviceSettingsView: View {
 	@Previewable @State var isPlaylistActive = false
 	
     
-	TimerSettingsViewWatch(didSettingsChange: $didSettingsChange)
+	TimerSettingsViewWatch()
         .environment(Managers())
 }

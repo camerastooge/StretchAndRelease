@@ -32,7 +32,6 @@ struct ContentView: View {
 	
 	// state variables only used on main view
 	@State private var isShowingSettings = false
-	@State private var didSettingsChange = false
 	@State private var offset: CGFloat = 0
 	
 	//SwiftData query
@@ -104,9 +103,9 @@ struct ContentView: View {
 		}
 		
 		//sends updated settings to iOS app
-		.onChange(of: didSettingsChange) {
+		.onChange(of: managers.didSettingsChange) {
 			sendContext(stretch: totalStretch, rest: totalRest, reps: totalReps)
-			didSettingsChange = false
+			managers.didSettingsChange = false
 		}
 		
 		//when user changes totalStretch in SettingsView, force timeRemaining to reset to TotalStretch
@@ -139,6 +138,7 @@ struct ContentView: View {
 				repsCompleted = 0
 				managers.stretchPhase = .stop
 			}
+			
 			//sets timeRemaining to totalStretch
 			timeRemaining = totalStretch
 		}

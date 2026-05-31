@@ -83,6 +83,7 @@ struct ContentView: View {
                 ToolbarItem {
                     NavigationLink {
                         SettingsView()
+							.navigationBarBackButtonHidden()
                     } label: {
                         if #available(iOS 26.0, *) {
                             Image(systemName: "gear")
@@ -108,6 +109,7 @@ struct ContentView: View {
         .onAppear() {
             SoundManager.instance.prepareTick(sound: .tick)
             SoundManager.instance.volume = promptVolume
+			sendContext(stretch: totalStretch, rest: totalRest, reps: totalRest)
         }
         
         .onChange(of: connectivity.didStatusChange) {
@@ -122,26 +124,20 @@ struct ContentView: View {
         .onDisappear {
             managers.stretchPhase = .stop
             managers.isTimerActive = false
-            managers.isTimerPaused = false
-            Task {
-                sendContext(stretch: totalStretch, rest: totalRest, reps: totalReps)
-            }
-        }
+            managers.isTimerPaused = false        }
         
         //when settings change, updates main display and sends updated settings to Apple Watch app
-//        .onChange(of: managers.didStatusChange) {
-//            managers.stretchPhase = .stop
-//            managers.isTimerActive = false
-//            managers.isTimerPaused = false
-//            sendContext(stretch: totalStretch, rest: totalRest, reps: totalReps)
-//            managers.didStatusChange = false
-//        }
+        .onChange(of: managers.didSettingsChange) {
+            sendContext(stretch: totalStretch, rest: totalRest, reps: totalReps)
+			managers.didSettingsChange = false
+        }
     }
     
     //function sends updated settings to Apple Watch
     func sendContext(stretch: Int, rest: Int, reps: Int) {
         let settingsUpdate = ["stretch" : stretch, "rest" : rest, "reps" : reps]
         connectivity.setContext(to: settingsUpdate)
+		print("context sent")
     }
 }
         
@@ -149,6 +145,6 @@ struct ContentView: View {
 
 #Preview {
     ContentView()
-//        .modelContainer(previewContainer)
+        .modelContainer(previewContainer)
         .environment(Managers())
 }

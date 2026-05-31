@@ -121,28 +121,45 @@ struct SettingsView: View {
                 Text("There is nothing in the set list. \n Please add some exercises.")
             }
         }
-        
-        .safeAreaInset(edge: .bottom) {
-            Button {
-                totalStretch = stretch
-                totalRest = rest
-                totalReps = reps
-                SoundManager.instance.volume = promptVolume
-				dismiss()
-            } label: {
-                Text("SAVE")
-                    .frame(width: buttonWidth, height: 50)
-                    .font(.headline)
-                    .fontWeight(.bold)
-                    .foregroundStyle(.white)
-                    .background(.green)
-                    .clipShape(.capsule)
-                    .dynamicTypeSize(...DynamicTypeSize.accessibility2)
-                    .opacity(showAddExerciseView ? 0 : 1)
-            }
-            .accessibilityLabel("Save")
-            .accessibilityHint("Save your settings and return to the main screen")
-        }
+		.toolbar {
+			ToolbarItem(placement: .topBarLeading) {
+				Button {
+					totalStretch = stretch
+					totalRest = rest
+					totalReps = reps
+					SoundManager.instance.volume = promptVolume
+					managers.didSettingsChange = true
+					dismiss()
+				} label: {
+					if #available(iOS 26.0, *) {
+						Image(systemName: "chevron.left")
+							.glassEffect(.clear)
+					} else {
+						Image(systemName: "chevron.left")
+							.accessibilityLabel("Save changes and return to set list view")
+					}
+				}
+				.buttonStyle(.plain)
+			}
+			
+			ToolbarItem(placement: .topBarTrailing) {
+				Button {
+					dismiss()
+				} label: {
+					if #available(iOS 26.0, *) {
+						Image(systemName: "x.circle")
+							.glassEffect(.clear)
+							.foregroundStyle(.red)
+							.accessibilityLabel("Cancel and return to set list view")
+					} else {
+						Image(systemName: "x.circle.fill")
+							.foregroundStyle(Color.red)
+							.accessibilityLabel("Cancel and return to set list view")
+					}
+				}
+				.buttonStyle(.plain)
+			}
+		}
         
         .onAppear {
             stretch = totalStretch

@@ -155,7 +155,26 @@ struct EditExerciseView: View {
                             .accessibilityLabel("Save changes and return to set list view")
                     }
                 }
+				.buttonStyle(.plain)
             }
+			
+			ToolbarItem(placement: .navigationBarTrailing) {
+				Button(role: .cancel) {
+					dismiss()
+				} label: {
+					if #available(iOS 26.0, *) {
+						Image(systemName: "x.circle")
+							.glassEffect(.clear)
+							.foregroundStyle(.red)
+							.accessibilityLabel("Cancel and return to set list view")
+					} else {
+						Image(systemName: "x.circle.fill")
+							.foregroundStyle(Color.red)
+							.accessibilityLabel("Cancel and return to set list view")
+					}
+				}
+				.buttonStyle(.plain)
+			}
         }
     }
 }
