@@ -31,7 +31,8 @@ struct TimerActionViewWatch: View {
 	let timer = Timer.publish(every: 1.0, on: .main, in: .common).autoconnect()
 	
 	// state variables only used on main view
-	@State private var isShowingSettings = false
+	@Binding var isShowingSettings: Bool
+	
 	@State private var didSettingsChange = false
 	@State private var offset: CGFloat = 0
 	
@@ -244,14 +245,15 @@ struct TimerActionViewWatch: View {
 			.accessibilityLabel("Reset Timer")
 			
 			//Settings
-			Button {
-				isShowingSettings = true
+			NavigationLink {
+				TimerSettingsViewWatch()
+					.navigationBarBackButtonHidden()
 			} label: {
 				ButtonView(buttonRoles: .settings, deviceType: deviceType)
 			}
 			.buttonStyle(.plain)
-			.accessibilityInputLabels(["Settings"])
-			.accessibilityLabel("Show Settings")
+			.accessibilityLabel("show settings")
+			.accessibilityInputLabels(["settings"])
 		}
 		.dynamicTypeSize(DynamicTypeSize.xxxLarge)
 		.containerRelativeFrame(.vertical) { length, _ in
@@ -281,12 +283,6 @@ struct TimerActionViewWatch: View {
 					case .stop: return manageStop()
 					}
 				}
-		}
-		
-		//shows settings screen
-		.navigationDestination(isPresented: $isShowingSettings) {
-			TimerSettingsViewWatch()
-				.navigationBarBackButtonHidden()
 		}
     }
 	
@@ -423,7 +419,9 @@ struct TimerActionViewWatch: View {
 }
 
 #Preview {
-    TimerActionViewWatch()
+	@Previewable @State var isShowingSettings = false
+	
+	TimerActionViewWatch(isShowingSettings: $isShowingSettings)
 		.modelContainer(previewContainer)
 		.environment(Managers())
 }

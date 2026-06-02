@@ -75,7 +75,7 @@ struct ContentView: View {
 			ZStack {
 				TabView {
 					Tab {
-						TimerActionViewWatch()
+						TimerActionViewWatch(isShowingSettings: $isShowingSettings)
 					}
 					Tab {
 						PlaylistViewWatch()
@@ -99,12 +99,13 @@ struct ContentView: View {
 			totalStretch = connectivity.statusContext["stretch"] as? Int ?? 10
 			totalRest = connectivity.statusContext["rest"] as? Int ?? 5
 			totalReps = connectivity.statusContext["reps"] as? Int ?? 5
+			isPlaylistActive = connectivity.statusContext["playlist"] as? Bool ?? false
 			connectivity.didStatusChange = false
 		}
 		
 		//sends updated settings to iOS app
 		.onChange(of: managers.didSettingsChange) {
-			sendContext(stretch: totalStretch, rest: totalRest, reps: totalReps)
+			sendContext(stretch: totalStretch, rest: totalRest, reps: totalReps, playlist: isPlaylistActive)
 			managers.didSettingsChange = false
 		}
 		
@@ -146,8 +147,8 @@ struct ContentView: View {
 	}
 	
 	//sends updated settings to iPhone
-	func sendContext(stretch: Int, rest: Int, reps: Int) {
-		let settingsUpdate = ["stretch" : stretch, "rest" : rest, "reps" : reps]
+	func sendContext(stretch: Int, rest: Int, reps: Int, playlist: Bool) {
+		let settingsUpdate: [String: Any] = ["stretch" : stretch, "rest" : rest, "reps" : reps, "playlist" : playlist]
 		connectivity.setContext(to: settingsUpdate)
 	}
 }

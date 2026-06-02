@@ -12,7 +12,7 @@ import WatchConnectivity
 class Connectivity: NSObject, WCSessionDelegate {
     var statusText = ""
     var didStatusChange = false
-    var statusContext: [String: Any] = ["stretch" : 0, "rest" : 0, "reps" : 0]
+	var statusContext: [String: Any] = ["stretch" : 0, "rest" : 0, "reps" : 0, "playlist" : false]
     
     override init() {
         super.init()
