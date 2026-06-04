@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct TimerSettingsViewWatch: View {
 	//Environment properties
@@ -15,6 +16,9 @@ struct TimerSettingsViewWatch: View {
 	@Environment(\.scenePhase) var scenePhase
 	@Environment(Managers.self) var managers
     
+	//State properties
+	@State private var showAddExerciseview = false
+	
     // variable for button view
     var buttonRoles: ButtonRoles = .save
     var deviceType: DeviceType = .watch
@@ -27,15 +31,17 @@ struct TimerSettingsViewWatch: View {
                 VStack {
 					TabView {
                         WatchAppSettingsView()
-                            .tag(0)
                         
-						WatchDeviceSettingsView()
-                            .tag(1)
+						WatchDeviceSettingsView(showAddExerciseView: $showAddExerciseview)
                     }
 					.tabViewStyle(.page)
                 }
 				.navigationTitle("SETTINGS")
 				.navigationBarTitleDisplayMode(.inline)
+				.navigationDestination(isPresented: $showAddExerciseview) {
+					AddExerciseViewWatch()
+						.navigationBarBackButtonHidden()
+				}
             }
         }
 		.toolbar {
@@ -85,75 +91,29 @@ struct WatchAppSettingsView: View {
     
     var body: some View {
         List {
-            NavigationLink(destination: VStack {
-                Text("Stretch Duration")
-                    .font(.headline)
-                    .accessibilityLabel("Stretch")
-                Picker("Stretch Duration", selection: $totalStretch) {
-                    ForEach(1...60, id:\.self) {
-                        Text("\($0) sec")
-                    }
-                }
-                .pickerStyle(.wheel)
-                .labelsHidden()
-                .accessibilityElement(children: .ignore)
-                .accessibilityLabel("Stretch duration \(totalStretch) seconds")
-                .accessibilityHint("Adjust how long you want to hold each strecth")
-                .accessibilityValue(String(totalStretch))
-                .accessibilityAdjustableAction { direction in
-                    switch direction {
-                    case .increment: totalStretch += 1
-                    case .decrement: totalStretch -= 1
-                    @unknown default: print("not handled")
-                    }
-                }
-            }
-            ) {
-                HStack {
-                    Text("Stretch")
-                        .font(.caption2)
-                    Spacer()
-                    Text("\(totalStretch) sec")
-                        .foregroundColor(.white)
-                }
-                .accessibilityElement(children: .combine)
-                .accessibilityHint("Change the length of the time you hold each stretch")
-            }
-            
-            NavigationLink(destination: VStack {
-                Text("Rest Duration")
-                    .font(.headline)
-                    .accessibilityLabel("Rest")
-                Picker("Rest Duration", selection: $totalRest) {
-                    ForEach(1...30, id:\.self) {
-                        Text("\($0) sec")
-                    }
-                }
-                .pickerStyle(.wheel)
-                .labelsHidden()
-                .accessibilityElement(children: .ignore)
-                .accessibilityLabel("Rest period \(totalRest) seconds")
-                .accessibilityHint("Adjust rest period between stretches")
-                .accessibilityValue(String(totalRest))
-                .accessibilityAdjustableAction { direction in
-                    switch direction {
-                    case .increment: totalRest += 1
-                    case .decrement: totalRest -= 1
-                    @unknown default: print("not handled")
-                    }
-                }
-            }
-            ) {
-                HStack {
-                    Text("Rest")
-                        .font(.caption2)
-                    Spacer()
-                    Text("\(totalRest) sec")
-                        .foregroundColor(.white)
-                }
-                .accessibilityElement(children: .combine)
-                .accessibilityHint("Change the length of the rest period between stretches")
-            }
+			NavigationLink(destination: StretchPickerView()) {
+				HStack {
+					Text("Stretch")
+						.font(.caption2)
+					Spacer()
+					Text("\(totalStretch) sec")
+						.foregroundColor(.white)
+				}
+				.accessibilityElement(children: .combine)
+				.accessibilityHint("Change the length of the time you hold each stretch")
+			}
+			
+			NavigationLink(destination: RestPickerView()) {
+				HStack {
+					Text("Rest")
+						.font(.caption2)
+					Spacer()
+					Text("\(totalRest) sec")
+						.foregroundColor(.white)
+				}
+				.accessibilityElement(children: .combine)
+				.accessibilityHint("Change the length of the rest period between stretches")
+			}
             
             NavigationLink(destination: VStack {
                 Text("Repetitions")
@@ -200,7 +160,14 @@ struct WatchDeviceSettingsView: View {
 	@AppStorage("promptVolume") private var promptVolume = 1.0
 	@AppStorage("playlist") private var isPlaylistActive = false
 	
+	//SwiftData query
+	@Query(sort: \PlaylistItem.index) var playlist: [PlaylistItem]
+	
+	//State properties
 	@State private var isEditing = false
+	@State private var isShowingEmptyPlaylistAlert = false
+	
+	@Binding var showAddExerciseView: Bool
     
     var body: some View {
         VStack {
@@ -236,21 +203,97 @@ struct WatchDeviceSettingsView: View {
             }
         }
         .padding([.horizontal, .vertical])
+		.onChange(of: isPlaylistActive) {
+			if isPlaylistActive && playlist.isEmpty {
+				DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+					isShowingEmptyPlaylistAlert = true
+				}
+				
+					isPlaylistActive = false
+			}
+		}
+		.alert("Empty Setlists", isPresented: $isShowingEmptyPlaylistAlert) {
+			Button("Add Exercise") {
+				showAddExerciseView = true
+			}
+			Button("Cancel", role: .cancel) {}
+		} message: {
+			Text("There is nothing in the set list. \n Please add some exercises.")
+		}
     }
+}
+
+// Subview for Stretch Picker
+struct StretchPickerView: View {
+	@AppStorage("stretch") var totalStretch = 10
+	
+	var body: some View {
+		VStack {
+			Text("Stretch Duration").font(.headline)
+			Picker("Stretch Duration", selection: $totalStretch) {
+				ForEach(1...60, id: \.self) { Text("\($0) sec") }
+			}
+			.pickerStyle(.wheel)
+			.labelsHidden()
+			.accessibilityElement(children: .ignore)
+			.accessibilityLabel("Stretch period \(totalStretch) seconds")
+			.accessibilityHint("Adjust how long to hold each stretch")
+			.accessibilityValue(String(totalStretch))
+			.accessibilityAdjustableAction { direction in
+				switch direction {
+				case .increment: totalStretch += 1
+				case .decrement: totalStretch -= 1
+				@unknown default: print("not handled")
+				}
+			}
+		}
+	}
+}
+
+// Subview for Rest Picker
+struct RestPickerView: View {
+	@AppStorage("rest") private var totalRest = 5
+	
+	var body: some View {
+		VStack {
+			Text("Rest Duration").font(.headline)
+			Picker("Rest Duration", selection: $totalRest) {
+				ForEach(1...60, id: \.self) { Text("\($0) sec") }
+			}
+			.pickerStyle(.wheel)
+			.labelsHidden()
+			.accessibilityElement(children: .ignore)
+			.accessibilityLabel("Rest period \(totalRest) seconds")
+			.accessibilityHint("Adjust rest period between stretches")
+			.accessibilityValue(String(totalRest))
+			.accessibilityAdjustableAction { direction in
+				switch direction {
+				case .increment: totalRest += 1
+				case .decrement: totalRest -= 1
+				@unknown default: print("not handled")
+				}
+			}
+		}
+	}
+}
+
+//Subview for Reps picker
+struct RepsPickerView: View {
+	@AppStorage("reps") private var totalReps = 0
+	
+	var body: some View {
+		VStack {
+			Text("Reps").font(.headline)
+		}
+	}
 }
 
 
 #Preview {
-    @Previewable @State var totalStretch = 10
-    @Previewable @State var totalRest = 5
-    @Previewable @State var totalReps = 3
-    @Previewable @State var audio = true
-    @Previewable @State var haptics = true
-    @Previewable @State var promptVolume = 1.0
-	@Previewable @State var selectedTab = 1
-	@Previewable @State var isPlaylistActive = false
+	@Previewable @State var showExerciseView = false
 	
     
 	TimerSettingsViewWatch()
         .environment(Managers())
+		.modelContainer(previewContainer)
 }

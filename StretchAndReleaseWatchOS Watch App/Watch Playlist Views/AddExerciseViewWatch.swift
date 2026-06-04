@@ -98,9 +98,18 @@ struct AddExerciseViewWatch: View {
 							.accessibilityHint("Set the number of repetitions")
 					}
 				}
-				HStack {
-					Spacer()
-					
+			}
+			.navigationTitle("Add Stretch")
+			.navigationBarTitleDisplayMode(.inline)
+			.alert("Name Field Is Empty", isPresented: $isShowingEmptyNameField) {
+				Button("OK", role: .cancel) {
+					isShowingEmptyNameField = false
+				}
+			} message: {
+				Text("You must name your exercise.")
+			}
+			.toolbar {
+				ToolbarItem(placement: .topBarLeading) {
 					Button {
 						if !name.isEmpty {
 							let item = PlaylistItem(index: playlist.isEmpty ? 0 : playlist.count + 1, name: name, stretchDuration: stretch, restDuration: rest, repsToComplete: reps)
@@ -116,38 +125,30 @@ struct AddExerciseViewWatch: View {
 						}
 					} label: {
 						if #available(watchOS 26.0, *) {
-							Text("SAVE")
-								.frame(width: 75, height: 30)
-								.font(.headline)
-								.fontWeight(.bold)
-								.foregroundStyle(.white)
-								.background(.green)
-								.clipShape(.capsule)
-								.glassEffect()
-								.dynamicTypeSize(...DynamicTypeSize.accessibility2)
+							Image(systemName: "chevron.left")
+								.glassEffect(.clear)
 						} else {
-							Text("SAVE")
-								.frame(width: 75, height: 30)
-								.font(.headline)
-								.fontWeight(.bold)
-								.foregroundStyle(.white)
-								.background(.green)
-								.clipShape(.capsule)
-								.dynamicTypeSize(...DynamicTypeSize.accessibility2)
+							Image(systemName: "chevron.left")
 						}
 					}
-					
-					Spacer()
+					.buttonStyle(.plain)
+					.accessibilityLabel("Save changes and return to set list view")
 				}
-			}
-			.navigationTitle("Add Stretch")
-			.navigationBarTitleDisplayMode(.inline)
-			.alert("Name Field Is Empty", isPresented: $isShowingEmptyNameField) {
-				Button("OK", role: .cancel) {
-					isShowingEmptyNameField = false
+				ToolbarItem(placement: .topBarTrailing) {
+					Button {
+						dismiss()
+					} label: {
+						if #available(watchOS 26.0, *) {
+							Image(systemName: "x.circle")
+								.foregroundColor(.red)
+								.glassEffect(.clear)
+						} else {
+							Image(systemName: "chevron.left")
+								.backgroundStyle(.red)
+						}
+					}
+					.buttonStyle(.plain)
 				}
-			} message: {
-				Text("You must name your exercise.")
 			}
 		}
 	}

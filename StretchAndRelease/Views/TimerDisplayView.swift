@@ -203,18 +203,6 @@ struct TimerDisplayView: View {
                 timeRemaining = totalStretch
             }
             
-//            //stops and resets timer when either settings or help views are toggled
-//            .onChange(of: managers.didStatusChange) {
-//                withAnimation(.smooth(duration: 0.25)) {
-//                    managers.stretchPhase = .stop
-//                    managers.isTimerActive = false
-//                    managers.isTimerPaused = false
-//                    timeRemaining = totalStretch
-//                    repsCompleted = 0
-//                    endAngle = Angle(degrees: 340)
-//                }
-//            }
-            
             .onChange(of: isPlaylistActive) {
                 if isPlaylistActive {
                     currentIndex = 0

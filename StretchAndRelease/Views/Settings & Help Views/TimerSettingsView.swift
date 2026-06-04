@@ -34,8 +34,7 @@ struct SettingsView: View {
     @State private var rest = 0
     @State private var reps = 0
     @State private var isEditing = false
-    @State private var isPlaylistEmpty = false
-    @State private var isShowingEmptyPlaylistAlert = false
+	@State private var isShowingEmptyPlaylistAlert = false
     @State private var showAddExerciseView = false
     
     @ScaledMetric var buttonWidth = 100
@@ -168,12 +167,13 @@ struct SettingsView: View {
         }
         
         .onChange(of: isPlaylistActive) {
-            if isPlaylistActive {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                    isPlaylistEmpty = true
-                    isPlaylistActive = false
-                    isShowingEmptyPlaylistAlert = true
-                }
+			print("is playlist active PRE: \(isPlaylistActive)")
+			print("is playlist empty PRE: \(playlist.isEmpty)")
+			if isPlaylistActive && playlist.isEmpty {
+				DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+					isShowingEmptyPlaylistAlert = true
+				}
+				isPlaylistActive = false
             }
         }
     }

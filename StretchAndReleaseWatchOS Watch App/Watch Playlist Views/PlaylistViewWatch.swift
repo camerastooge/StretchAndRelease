@@ -71,17 +71,18 @@ struct PlaylistViewWatch: View {
 						}
                         .toolbar {
                             ToolbarItem(placement: .topBarTrailing) {
-                                Button {
-                                    isShowingAddExerciseView = true
-                                } label: {
-                                    if #available(watchOS 26, *) {
-                                        ButtonView(buttonRoles: .add, deviceType: .watch)
-                                            .glassEffect(.clear)
-                                    } else {
-                                        ButtonView(buttonRoles: .add, deviceType: .watch)
-                                    }
-                                }
-                                .buttonStyle(.plain)
+								NavigationLink {
+									AddExerciseViewWatch()
+										.navigationBarBackButtonHidden()
+								} label: {
+									if #available(watchOS 26.0, *) {
+										ButtonView(buttonRoles: .add, deviceType: .watch)
+											.glassEffect()
+									} else {
+										ButtonView(buttonRoles: .add, deviceType: .watch)
+									}
+								}
+								.accessibilityLabel("Add an item to the set list")
                             }
                         }
 					}
@@ -92,10 +93,11 @@ struct PlaylistViewWatch: View {
 							.font(.system(size: 32))
 					} description: {
 						VStack {
-							Button {
-								isShowingAddExerciseView = true
+							NavigationLink {
+								AddExerciseViewWatch()
+									.navigationBarBackButtonHidden()
 							} label: {
-								if #available(watchOS 26, *) {
+								if #available(watchOS 26.0, *) {
 									ButtonView(buttonRoles: .add, deviceType: .watch)
 										.glassEffect(.clear)
 								} else {
@@ -139,6 +141,6 @@ extension PlaylistViewWatch {
 	@Previewable @State var selectedTab = 2
 	
 	PlaylistViewWatch()
-		.modelContainer(previewContainer)
 		.environment(Managers())
+		.modelContainer(previewContainer)
 }

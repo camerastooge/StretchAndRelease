@@ -75,7 +75,7 @@ struct ContentView: View {
 			ZStack {
 				TabView {
 					Tab {
-						TimerActionViewWatch(isShowingSettings: $isShowingSettings)
+						TimerActionViewWatch(timeRemaining: $timeRemaining, isShowingSettings: $isShowingSettings)
 					}
 					Tab {
 						PlaylistViewWatch()
@@ -99,6 +99,7 @@ struct ContentView: View {
 			totalStretch = connectivity.statusContext["stretch"] as? Int ?? 10
 			totalRest = connectivity.statusContext["rest"] as? Int ?? 5
 			totalReps = connectivity.statusContext["reps"] as? Int ?? 5
+			timeRemaining = totalStretch
 			isPlaylistActive = connectivity.statusContext["playlist"] as? Bool ?? false
 			connectivity.didStatusChange = false
 		}
@@ -110,7 +111,7 @@ struct ContentView: View {
 		}
 		
 		//when user changes totalStretch in SettingsView, force timeRemaining to reset to TotalStretch
-		.onChange(of: totalStretch) {
+		.onChange(of: totalStretch, initial: true) {
 			timeRemaining = totalStretch
 		}
 		
@@ -155,7 +156,7 @@ struct ContentView: View {
 
 #Preview {
 	ContentView()
-		.modelContainer(previewContainer)
 		.environment(Managers())
+		.modelContainer(previewContainer)
 }
 

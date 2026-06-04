@@ -25,12 +25,12 @@ struct TimerActionViewWatch: View {
 	@AppStorage("playlist") private var isPlaylistActive = true
 	
 	// state variables used across views
-	@State private var timeRemaining: Int = 0
 	@State private var repsCompleted: Int = 0
 	@State private var endAngle = Angle(degrees: 340)
 	let timer = Timer.publish(every: 1.0, on: .main, in: .common).autoconnect()
 	
 	// state variables only used on main view
+	@Binding var timeRemaining: Int
 	@Binding var isShowingSettings: Bool
 	
 	@State private var didSettingsChange = false
@@ -249,7 +249,13 @@ struct TimerActionViewWatch: View {
 				TimerSettingsViewWatch()
 					.navigationBarBackButtonHidden()
 			} label: {
-				ButtonView(buttonRoles: .settings, deviceType: deviceType)
+				if #available(watchOS 26.0, *) {
+					ButtonView(buttonRoles: .settings, deviceType: deviceType)
+						.glassEffect(.clear)
+				} else {
+					ButtonView(buttonRoles: .settings, deviceType: deviceType)
+				}
+				
 			}
 			.buttonStyle(.plain)
 			.accessibilityLabel("show settings")
@@ -272,6 +278,11 @@ struct TimerActionViewWatch: View {
 			} else {
 				playlistItem = nil
 			}
+		}
+		
+		//when user changes totalStretch in SettingsView, force timeRemaining to reset to TotalStretch
+		.onChange(of: totalStretch, initial: true) {
+			timeRemaining = totalStretch
 		}
 		
 		//this modifier runs when the timer publishes
@@ -420,8 +431,9 @@ struct TimerActionViewWatch: View {
 
 #Preview {
 	@Previewable @State var isShowingSettings = false
+	@Previewable @State var timeRemaining = 5
 	
-	TimerActionViewWatch(isShowingSettings: $isShowingSettings)
+	TimerActionViewWatch(timeRemaining: $timeRemaining, isShowingSettings: $isShowingSettings)
 		.modelContainer(previewContainer)
 		.environment(Managers())
 }
