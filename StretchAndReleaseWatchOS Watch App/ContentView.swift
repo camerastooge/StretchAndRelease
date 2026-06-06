@@ -40,32 +40,6 @@ struct ContentView: View {
 	// playlist properties
 	@State var playlistItem: PlaylistItem?
 	@State private var currentIndex = 0
-	@State private var isPlaylistInactive = true
-	
-	//local properties for display
-	var timerTextLabel: String {
-		if !managers.isTimerPaused {
-			playlistItem?.name ?? managers.stretchPhase.phaseText
-		} else {
-			"PAUSED"
-		}
-	}
-	
-	var displayColor: Color {
-		if !managers.isTimerPaused {
-			managers.stretchPhase.phaseColor
-		} else {
-			Color.gray
-		}
-	}
-	
-	var dragAccessibilityHint: String {
-		if isPlaylistActive {
-			"Drag to the left to go to the next stretch.  Drag to the right to go to the previous exercise."
-		} else {
-			"This is the current stretch phase."
-		}
-	}
 	
 	//Connectivity class for communication with phone
 	@State private var connectivity = Connectivity()

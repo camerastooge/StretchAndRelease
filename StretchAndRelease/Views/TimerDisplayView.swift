@@ -36,8 +36,9 @@ struct TimerDisplayView: View {
     
     // local properties
     @State var playlistItem: PlaylistItem?
-    @State private var currentIndex = 0
     @State private var isPlaylistInactive = false
+    
+    @Binding var playlistIndex: Int?
     
     // variables for button view
     var buttonRoles: ButtonRoles = .play
@@ -67,11 +68,12 @@ struct TimerDisplayView: View {
                             
                             //PREVIOUS EXERCISE BUTTON
                             Button {
-                                currentIndex -= 1
-                                if currentIndex < 0 {
-                                    currentIndex = playlist.count - 1
+                                guard var playlistIndex else { return }
+                                playlistIndex -= 1
+                                if playlistIndex < 0 {
+                                    playlistIndex = playlist.count - 1
                                 }
-                                loadPlaylistItem(currentIndex)
+                                loadPlaylistItem(playlistIndex)
                             } label: {
                                 ButtonView(buttonRoles: .previousItem, deviceType: deviceType)
                                     .opacity(0.75)
@@ -83,11 +85,12 @@ struct TimerDisplayView: View {
                             
                             //NEXT EXERCISE BUTTON
                             Button {
-                                currentIndex += 1
-                                if currentIndex == playlist.count {
-                                    currentIndex = 0
+                                guard var playlistIndex else { return }
+                                playlistIndex += 1
+                                if playlistIndex == playlist.count {
+                                    playlistIndex = 0
                                 }
-                                loadPlaylistItem(currentIndex)
+                                loadPlaylistItem(playlistIndex)
                             } label: {
                                 ButtonView(buttonRoles: .nextItem, deviceType: deviceType)
                                     .opacity(0.75)
@@ -204,9 +207,10 @@ struct TimerDisplayView: View {
             }
             
             .onChange(of: isPlaylistActive) {
+                guard var playlistIndex else { return }
                 if isPlaylistActive {
-                    currentIndex = 0
-                    loadPlaylistItem(currentIndex)
+                    playlistIndex = 0
+                    loadPlaylistItem(playlistIndex)
                 } else {
                     playlistItem = nil
                 }
@@ -217,7 +221,8 @@ struct TimerDisplayView: View {
 					if !isPlaylistActive {
 						isPlaylistInactive = true
 					} else {
-						loadPlaylistItem(currentIndex)
+                        guard let playlistIndex else { return }
+						loadPlaylistItem(playlistIndex)
 					}
 				} else {
 					playlistItem = nil
@@ -294,7 +299,7 @@ struct TimerDisplayView: View {
                 if !isPlaylistActive {
                     timerFullStop()
                 } else {
-                    if currentIndex != playlist.count - 1 {
+                    if playlistIndex != playlist.count - 1 {
                         if audio {
                             SoundManager.instance.playPrompt(sound: .rest)
                         }
@@ -303,8 +308,8 @@ struct TimerDisplayView: View {
                         }
                     } else {
                         timerFullStop()
-                        currentIndex = 0
-                        loadPlaylistItem(currentIndex)
+                        playlistIndex = 0
+                        loadPlaylistItem(playlistIndex ?? 0)
                     }
                 }
             }
@@ -330,14 +335,15 @@ struct TimerDisplayView: View {
                 }
             } else {
                 //using playlist feature -> reps completed, go to next exercise
+                guard var playlistIndex else { return }
                 if repsCompleted == totalReps {
                     managers.isTimerActive = false
                     withAnimation(.linear(duration: 0.5)) {
                         managers.stretchPhase = .stretch
                         repsCompleted = 0
                     }
-                    currentIndex += 1
-                    loadPlaylistItem(currentIndex)
+                    playlistIndex += 1
+                    loadPlaylistItem(playlistIndex)
                     timeRemaining = totalStretch
                     if audio {
                         SoundManager.instance.playPrompt(sound: .countdownExpanded)
@@ -371,7 +377,9 @@ struct TimerDisplayView: View {
 }
 
 #Preview {
-    TimerDisplayView()
+    @Previewable @State var playlistIndex: Int? = 0
+    
+    TimerDisplayView(playlistIndex: $playlistIndex)
         .environment(Managers())
         .modelContainer(previewContainer)
 }

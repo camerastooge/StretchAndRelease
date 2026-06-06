@@ -39,86 +39,91 @@ struct PlaylistViewWatch: View {
 	@Query(sort: \PlaylistItem.index) var playlist: [PlaylistItem]
 	
 	var body: some View {
-		NavigationStack {
-			ZStack {
-				if !playlist.isEmpty {
-					VStack {
-						List {
-							Section {
-								ForEach(playlist) { exercise in
-									NavigationLink {
-										EditExerciseViewWatch(playlistItem: exercise, isComingFromParentView: $isComingFromParentView)
-									} label: {
-										Text(exercise.name ?? "Exercise")
-											.fontWeight(.bold)
-											.swipeActions(edge: .trailing, allowsFullSwipe: true) {
-												Button {
-													modelContext.delete(exercise)
-												} label: {
-													Label("Delete", systemImage: "trash")
-														.tint(.red)
-														.accessibilityLabel("Delete \(exercise.name ?? "exercise")")
-														.dynamicTypeSize(...DynamicTypeSize.xxxLarge)
-												}
-											}
-									}
-									.navigationLinkIndicatorVisibility(.hidden)
-									.accessibilityLabel("Edit \(exercise.name ?? "exercise")")
-									.listRowBackground(Color.clear)
-								}
-								.onMove(perform: move)
-							}
-						}
-                        .toolbar {
-                            ToolbarItem(placement: .topBarTrailing) {
-								NavigationLink {
-									AddExerciseViewWatch()
-										.navigationBarBackButtonHidden()
-								} label: {
-									if #available(watchOS 26.0, *) {
-										ButtonView(buttonRoles: .add, deviceType: .watch)
-											.glassEffect()
-									} else {
-										ButtonView(buttonRoles: .add, deviceType: .watch)
-									}
-								}
-								.accessibilityLabel("Add an item to the set list")
+		ZStack {
+            NavigationStack {
+                ZStack {
+                    if !playlist.isEmpty {
+                        ZStack {
+                            VStack {
+                                List {
+                                    Section {
+                                        ForEach(playlist) { exercise in
+                                            NavigationLink {
+                                                EditExerciseViewWatch(playlistItem: exercise, isComingFromParentView: $isComingFromParentView)
+                                            } label: {
+                                                Text(exercise.name ?? "Exercise")
+                                                    .fontWeight(.bold)
+                                                    .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                                                        Button {
+                                                            modelContext.delete(exercise)
+                                                        } label: {
+                                                            Label("Delete", systemImage: "trash")
+                                                                .tint(.red)
+                                                                .accessibilityLabel("Delete \(exercise.name ?? "exercise")")
+                                                                .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                                                        }
+                                                    }
+                                            }
+                                            .navigationLinkIndicatorVisibility(.hidden)
+                                            .accessibilityLabel("Edit \(exercise.name ?? "exercise")")
+                                            .listRowBackground(Color.clear)
+                                        }
+                                        .onMove(perform: move)
+                                    }
+                                }
+                            }
+                            
+                            VStack {
+                                Spacer()
+                                NavigationLink {
+                                    AddExerciseViewWatch()
+                                        .navigationBarBackButtonHidden()
+                                } label: {
+                                    if #available(watchOS 26.0, *) {
+                                        ButtonView(buttonRoles: .add, deviceType: .watch)
+                                            .glassEffect(.clear)
+                                    } else {
+                                        ButtonView(buttonRoles: .add, deviceType: .watch)
+                                    }
+                                }
+                                .buttonStyle(.plain)
+                                .accessibilityLabel("Add an item to the set list")
                             }
                         }
-					}
-				}
-				else {
-					ContentUnavailableView {
-						Text("Set list is Empty")
-							.font(.system(size: 32))
-					} description: {
-						VStack {
-							NavigationLink {
-								AddExerciseViewWatch()
-									.navigationBarBackButtonHidden()
-							} label: {
-								if #available(watchOS 26.0, *) {
-									ButtonView(buttonRoles: .add, deviceType: .watch)
-										.glassEffect(.clear)
-								} else {
-									ButtonView(buttonRoles: .add, deviceType: .watch)
-								}
-							}
-							.buttonStyle(.plain)
-							.accessibilityLabel("Add an item to the set list")
-							Text("Press \(Image(systemName: "plus.circle")) to add a stretch to your set list")
-								.font(.system(size: 16))
-								.foregroundStyle(colorScheme == .dark ? .white : .black)
-						}
-					}
-					.containerRelativeFrame([.vertical, .horizontal])
-					.scrollDisabled(true)
-				}
-			}
-		}
-		.sheet(isPresented: $isShowingAddExerciseView) {
-			AddExerciseViewWatch()
-		}
+                    }
+                    else {
+                        ContentUnavailableView {
+                            Text("Set list is Empty")
+                                .font(.system(size: 32))
+                        } description: {
+                        VStack {
+                            NavigationLink {
+                                AddExerciseViewWatch()
+                                    .navigationBarBackButtonHidden()
+                            } label: {
+                                if #available(watchOS 26.0, *) {
+                                    ButtonView(buttonRoles: .add, deviceType: .watch)
+                                        .glassEffect(.clear)
+                                } else {
+                                    ButtonView(buttonRoles: .add, deviceType: .watch)
+                                }
+                            }
+                            .buttonStyle(.plain)
+                            .accessibilityLabel("Add an item to the set list")
+                            Text("Press \(Image(systemName: "plus.circle")) to add a stretch to your set list")
+                                .font(.system(size: 16))
+                                .foregroundStyle(colorScheme == .dark ? .white : .black)
+                        }
+                        }
+                        .containerRelativeFrame([.vertical, .horizontal])
+                        .scrollDisabled(true)
+                    }
+                }
+            }
+            .sheet(isPresented: $isShowingAddExerciseView) {
+                AddExerciseViewWatch()
+            }
+        }
 	}
 }
 

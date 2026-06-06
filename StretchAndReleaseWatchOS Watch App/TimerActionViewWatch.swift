@@ -22,7 +22,7 @@ struct TimerActionViewWatch: View {
 	@AppStorage("audio") private var audio = true
 	@AppStorage("haptics") private var haptics = true
 	@AppStorage("promptVolume") private var promptVolume = 1.0
-	@AppStorage("playlist") private var isPlaylistActive = true
+	@AppStorage("playlist") private var isPlaylistActive = false
 	
 	// state variables used across views
 	@State private var repsCompleted: Int = 0
@@ -220,8 +220,12 @@ struct TimerActionViewWatch: View {
 					}
 				}
 			} label: {
-				ButtonView(buttonRoles: !managers.isTimerActive ? .play : .pause, deviceType: deviceType)
-				
+                if #available(watchOS 26.0, *) {
+                    ButtonView(buttonRoles: !managers.isTimerActive ? .play : .pause, deviceType: deviceType)
+                        .glassEffect()
+                } else {
+                    ButtonView(buttonRoles: !managers.isTimerActive ? .play : .pause, deviceType: deviceType)
+                }
 			}
 			.buttonStyle(.plain)
 			.padding(.trailing)
@@ -237,7 +241,12 @@ struct TimerActionViewWatch: View {
 					updateEndAngle()
 				}
 			} label: {
-				ButtonView(buttonRoles: .reset, deviceType: deviceType)
+                if #available(watchOS 26.0, *) {
+                    ButtonView(buttonRoles: .reset, deviceType: deviceType)
+                        .glassEffect()
+                } else {
+                    ButtonView(buttonRoles: .reset, deviceType: deviceType)
+                }
 			}
 			.buttonStyle(.plain)
 			.padding(.trailing)
@@ -251,7 +260,7 @@ struct TimerActionViewWatch: View {
 			} label: {
 				if #available(watchOS 26.0, *) {
 					ButtonView(buttonRoles: .settings, deviceType: deviceType)
-						.glassEffect(.clear)
+						.glassEffect()
 				} else {
 					ButtonView(buttonRoles: .settings, deviceType: deviceType)
 				}
@@ -434,6 +443,6 @@ struct TimerActionViewWatch: View {
 	@Previewable @State var timeRemaining = 5
 	
 	TimerActionViewWatch(timeRemaining: $timeRemaining, isShowingSettings: $isShowingSettings)
+        .environment(Managers())
 		.modelContainer(previewContainer)
-		.environment(Managers())
 }

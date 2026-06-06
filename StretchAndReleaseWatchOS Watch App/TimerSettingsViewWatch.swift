@@ -115,39 +115,16 @@ struct WatchAppSettingsView: View {
 				.accessibilityHint("Change the length of the rest period between stretches")
 			}
             
-            NavigationLink(destination: VStack {
-                Text("Repetitions")
-                    .font(.headline)
-                    .accessibilityLabel("Repetitions")
-                Picker("Number of Repetitions to Complete", selection: $totalReps) {
-                    ForEach(1...20, id:\.self) {
-                        Text("\($0) repetitions")
-                    }
-                }
-                .pickerStyle(.wheel)
-                .labelsHidden()
-                .accessibilityElement(children: .ignore)
-                .accessibilityLabel("Repetition count \(totalReps)")
-                .accessibilityHint("Adjust how many times to perform the stretch")
-                .accessibilityValue(String(totalReps))
-                .accessibilityAdjustableAction { direction in
-                    switch direction {
-                    case .increment: totalReps += 1
-                    case .decrement: totalReps -= 1
-                    @unknown default: print("not handled")
-                    }
-                }
-            }
-            ) {
+            NavigationLink(destination: RepsPickerView()) {
                 HStack {
-                    Text("Repetitions")
+                    Text("Reps")
                         .font(.caption2)
                     Spacer()
                     Text("\(totalReps) reps")
-                        .foregroundColor(.white)
+                    .foregroundColor(.white)
                 }
                 .accessibilityElement(children: .combine)
-                .accessibilityHint("Change the number of repetitions to perform")
+                .accessibilityHint("Change the number of repetitions for each set")
             }
         }
     }
@@ -284,6 +261,24 @@ struct RepsPickerView: View {
 	var body: some View {
 		VStack {
 			Text("Reps").font(.headline)
+            Picker("Number of Reps", selection: $totalReps) {
+                ForEach(1...60, id:\.self) {
+                    Text("\($0) reps")
+                }
+            }
+            .pickerStyle(.wheel)
+            .labelsHidden()
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel("Reps \(totalReps)")
+            .accessibilityHint("Adjust number of reps for each exercise")
+            .accessibilityValue(String(totalReps))
+            .accessibilityAdjustableAction { direction in
+                switch direction {
+                case .increment: totalReps += 1
+                case .decrement: totalReps -= 1
+                @unknown default: print("not handled")
+                }
+            }
 		}
 	}
 }

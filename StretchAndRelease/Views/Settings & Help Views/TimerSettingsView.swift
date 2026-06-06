@@ -34,6 +34,11 @@ struct SettingsView: View {
     @State private var rest = 0
     @State private var reps = 0
     @State private var isEditing = false
+    @State private var playlistToggle = false
+    @State private var hapticToggle = false
+    @State private var audioToggle = false
+    @State private var volumeValue = 0.0
+    
 	@State private var isShowingEmptyPlaylistAlert = false
     @State private var showAddExerciseView = false
     
@@ -41,7 +46,7 @@ struct SettingsView: View {
     
     private var volumeSlider: some View {
         Slider(
-            value: $promptVolume,
+            value: $volumeValue,
             in: 0.0...1.0
         ) {
             Text("Prompt Volume")
@@ -54,11 +59,11 @@ struct SettingsView: View {
         }
         .accessibilityLabel("Volume")
         .accessibilityHint("Adjust volume of voice prompts")
-        .accessibilityValue(String(promptVolume.formatted(.percent)))
+        .accessibilityValue(String(volumeValue.formatted(.percent)))
         .accessibilityAdjustableAction { direction in
             switch direction {
-            case .increment: promptVolume += 0.1
-            case .decrement: promptVolume -= 0.1
+            case .increment: volumeValue += 0.1
+            case .decrement: volumeValue -= 0.1
             @unknown default: print("not handled")
             }
         }
@@ -85,15 +90,15 @@ struct SettingsView: View {
                             
                 VStack(spacing: 25) {
                     HStack {
-                        Toggle("Use playlist", isOn: $isPlaylistActive)
+                        Toggle("Use playlist", isOn: $playlistToggle)
                             .accessibilityHint("Turn playlist on or off")
                     }
                     HStack {
-                        Toggle("Haptic feedback", isOn: $haptics)
+                        Toggle("Haptic feedback", isOn: $hapticToggle)
                             .accessibilityHint("Turn haptic feedback on or off")
                     }
                     HStack {
-                        Toggle("Audio cues", isOn: $audio)
+                        Toggle("Audio cues", isOn: $audioToggle)
                             .accessibilityHint("Turn audio cues on or off")
                     }
                     HStack {
@@ -127,6 +132,10 @@ struct SettingsView: View {
 					totalRest = rest
 					totalReps = reps
 					SoundManager.instance.volume = promptVolume
+                    audio = audioToggle
+                    haptics = hapticToggle
+                    isPlaylistActive = playlistToggle
+                    promptVolume = volumeValue
 					managers.didSettingsChange = true
 					dismiss()
 				} label: {
@@ -164,16 +173,18 @@ struct SettingsView: View {
             stretch = totalStretch
             rest = totalRest
             reps = totalReps
+            playlistToggle = isPlaylistActive
+            hapticToggle = haptics
+            audioToggle = audio
+            volumeValue = promptVolume
         }
         
-        .onChange(of: isPlaylistActive) {
-			print("is playlist active PRE: \(isPlaylistActive)")
-			print("is playlist empty PRE: \(playlist.isEmpty)")
-			if isPlaylistActive && playlist.isEmpty {
-				DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+        .onChange(of: playlistToggle, initial: false) {
+			if playlistToggle && playlist.isEmpty {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
 					isShowingEmptyPlaylistAlert = true
+                    playlistToggle = false
 				}
-				isPlaylistActive = false
             }
         }
     }

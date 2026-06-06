@@ -110,6 +110,7 @@ struct PlaylistView: View {
                     .safeAreaInset(edge: .bottom) {
                         NavigationLink {
                             AddExerciseView()
+                                .navigationBarBackButtonHidden()
                         } label: {
                             Text("ADD")
                                 .frame(width: 200, height: 65)

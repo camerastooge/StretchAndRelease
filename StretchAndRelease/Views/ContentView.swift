@@ -15,6 +15,9 @@ struct ContentView: View {
     @Environment(\.dynamicTypeSize) var sizeCategory
     @Environment(Managers.self) var managers
     
+    //SwiftData query
+    @Query(sort: \PlaylistItem.index) var playlist: [PlaylistItem]
+    
     // Properties stored in UserDefaults
     @AppStorage("stretch") private var totalStretch = 10
     @AppStorage("rest") private var totalRest = 5
@@ -28,6 +31,7 @@ struct ContentView: View {
     //State properties
     @State private var isShowingHelpView: Bool = false
     @State private var isShowingSettings: Bool = false
+    @State private var playlistIndex: Int? = nil
     
     // Connectivity class for communication with Apple Watch
     @State private var connectivity = Connectivity()
@@ -49,11 +53,12 @@ struct ContentView: View {
         NavigationStack {
             TabView() {
                 Tab("Timer", systemImage: "timer") {
-                    TimerDisplayView()
+                    TimerDisplayView(playlistIndex: $playlistIndex)
                 }
                 
                 Tab("Set list", systemImage: "list.bullet") {
                     PlaylistView()
+                        .navigationBarBackButtonHidden()
                 }
             }
             .navigationTitle(navigationBarTitleString)
@@ -105,11 +110,18 @@ struct ContentView: View {
                 .presentationDragIndicator(.visible)
         }
         
-        //prep tick audio player when app launches
         .onAppear() {
+            //prep tick audio player when app launches
             SoundManager.instance.prepareTick(sound: .tick)
             SoundManager.instance.volume = promptVolume
-			sendContext(stretch: totalStretch, rest: totalRest, reps: totalRest, playlist: isPlaylistActive)
+            
+            //sends context to Apple Watch if connected
+            sendContext(stretch: totalStretch, rest: totalRest, reps: totalRest, playlistIndex: playlistIndex ?? 0, playlist: isPlaylistActive)
+            
+            //check playlist status and set isPlaylistAvailable to false if empty
+            if playlist.isEmpty {
+                isPlaylistActive = false
+            }
         }
         
         .onChange(of: connectivity.didStatusChange) {
@@ -117,6 +129,7 @@ struct ContentView: View {
             totalStretch = connectivity.statusContext["stretch"] as? Int ?? 10
             totalRest = connectivity.statusContext["rest"] as? Int ?? 5
             totalReps = connectivity.statusContext["reps"] as? Int ?? 5
+            playlistIndex = connectivity.statusContext["playlistIndex"] as? Int ?? 0
 			isPlaylistActive = connectivity.statusContext["playlist"] as? Bool ?? false
             connectivity.didStatusChange = false
         }
@@ -129,14 +142,14 @@ struct ContentView: View {
         
         //when settings change, updates main display and sends updated settings to Apple Watch app
         .onChange(of: managers.didSettingsChange) {
-			sendContext(stretch: totalStretch, rest: totalRest, reps: totalReps, playlist: isPlaylistActive)
+            sendContext(stretch: totalStretch, rest: totalRest, reps: totalReps, playlistIndex: playlistIndex ?? 0, playlist: isPlaylistActive)
 			managers.didSettingsChange = false
         }
     }
     
     //function sends updated settings to Apple Watch
-	func sendContext(stretch: Int, rest: Int, reps: Int, playlist: Bool) {
-		let settingsUpdate: [String : Any] = ["stretch" : stretch, "rest" : rest, "reps" : reps, "playlist" : playlist]
+    func sendContext(stretch: Int, rest: Int, reps: Int, playlistIndex: Int, playlist: Bool) {
+        let settingsUpdate: [String : Any] = ["stretch" : stretch, "rest" : rest, "reps" : reps, "playlistIndex" : playlistIndex, "playlist" : playlist]
         connectivity.setContext(to: settingsUpdate)
 		print("context sent")
     }
