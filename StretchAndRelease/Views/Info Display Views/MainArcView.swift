@@ -48,7 +48,7 @@ struct MainArcView: View {
                     .kerning(2)
                     .contentTransition(.numericText(countsDown: true))
                     .accessibilityLabel("\(timeRemaining) seconds remaining")
-                Text(!managers.isTimerPaused ? timerTextLabel : "PAUSED")
+                Text(timerTextLabel)
                     .scaleEffect(0.75)
                     .accessibilityLabel(!managers.isTimerPaused ? timerTextLabel : "WORKOUT PAUSED")
                 Text("Reps: \(repsCompleted)/\(totalReps)")

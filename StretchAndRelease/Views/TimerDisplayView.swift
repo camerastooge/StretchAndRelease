@@ -41,6 +41,19 @@ struct TimerDisplayView: View {
     // variables for button view
     var buttonRoles: ButtonRoles = .play
     var deviceType: DeviceType = .phone
+	var timerTextLabel: String {
+		if isPlaylistActive {
+			guard let playlistItem else { return managers.stretchPhase.phaseText }
+			return playlistItem.name ?? managers.stretchPhase.phaseText
+		} else {
+			if managers.isTimerPaused {
+				return "PAUSED"
+			} else {
+				return managers.stretchPhase.phaseText
+			}
+		}
+		
+	}
     
     var body: some View {
         GeometryReader { proxy in
@@ -48,7 +61,7 @@ struct TimerDisplayView: View {
             
             VStack(spacing: 0) {
                 ZStack {
-                    MainArcView(endAngle: $endAngle, timeRemaining: $timeRemaining, totalReps: $totalReps, repsCompleted: $repsCompleted, timerTextLabel: playlistItem?.name ?? managers.stretchPhase.phaseText)
+                    MainArcView(endAngle: $endAngle, timeRemaining: $timeRemaining, totalReps: $totalReps, repsCompleted: $repsCompleted, timerTextLabel: timerTextLabel)
                         
                 }
                 .containerRelativeFrame(.horizontal, alignment: .center) { length, _ in
@@ -333,12 +346,14 @@ struct TimerDisplayView: View {
 						withAnimation(.easeOut(duration: 1)) {
 							updateEndAngle()
 						}
+						managers.isTimerActive = true
 					} else {
 						managers.stretchPhase = .stretch
 						repsCompleted = 0
 						playlistIndex += 1
 						loadPlaylistItem(playlistIndex)
 						timeRemaining = totalStretch
+						managers.isTimerActive = true
 					}
 				}
 			}
@@ -360,12 +375,19 @@ struct TimerDisplayView: View {
 				} else {
 					guard var playlistIndex else { return }
 					if repsCompleted == totalReps {
-						managers.isTimerActive = false
 						managers.stretchPhase = .stretch
 						repsCompleted = 0
 						playlistIndex += 1
 						loadPlaylistItem(playlistIndex)
 						timeRemaining = totalStretch
+					} else {
+						timeRemaining = totalStretch
+						withAnimation {
+							managers.stretchPhase = .stretch
+						}
+						if audio {
+							SoundManager.instance.playPrompt(sound: .stretch)
+						}
 					}
 				}
 			}
