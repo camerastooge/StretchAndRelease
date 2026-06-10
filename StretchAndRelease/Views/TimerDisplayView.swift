@@ -35,10 +35,8 @@ struct TimerDisplayView: View {
     @Query(sort: \PlaylistItem.index) var playlist: [PlaylistItem]
     
     // local properties
-    @State var playlistItem: PlaylistItem?
-    @State private var isPlaylistInactive = false
-    
-    @Binding var playlistIndex: Int?
+	@Binding var playlistIndex: Int?
+    @Binding var playlistItem: PlaylistItem?
     
     // variables for button view
     var buttonRoles: ButtonRoles = .play
@@ -206,17 +204,18 @@ struct TimerDisplayView: View {
             
 			.onAppear {
 				if !playlist.isEmpty {
-					if !isPlaylistActive {
-						isPlaylistInactive = true
-					} else {
-                        guard let playlistIndex else { return }
+					if isPlaylistActive {
+						guard let playlistIndex else { return }
 						loadPlaylistItem(playlistIndex)
+					} else {
+						playlistItem = nil
 					}
 				} else {
 					playlistItem = nil
+					isPlaylistActive = false
 				}
 			}
-            
+			
             .onDisappear {
                 withAnimation(.linear(duration: 0.25)) {
                     managers.stretchPhase = .stop
@@ -225,6 +224,7 @@ struct TimerDisplayView: View {
                 managers.isTimerActive = false
                 managers.isTimerPaused = false
                 timeRemaining = totalStretch
+				repsCompleted = 0
             }
         }
     }
@@ -385,8 +385,8 @@ struct TimerDisplayView: View {
 
 #Preview {
     @Previewable @State var playlistIndex: Int? = 0
-    
-    TimerDisplayView(playlistIndex: $playlistIndex)
+	@Previewable @State var playlistItem: PlaylistItem? = .sampleData[0]
+	TimerDisplayView(playlistIndex: $playlistIndex, playlistItem: $playlistItem)
         .environment(Managers())
         .modelContainer(previewContainer)
 }
