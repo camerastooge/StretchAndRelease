@@ -130,8 +130,7 @@ struct TimerDisplayView: View {
                             
                             //pause the timer
                             else if !managers.isTimerPaused {
-                                managers.isTimerActive = false
-                                managers.isTimerPaused = true
+								managers.isTimerPaused = true
                             }
                             
                             //un-pause the timer
@@ -139,14 +138,13 @@ struct TimerDisplayView: View {
                                 if audio {
                                     SoundManager.instance.playPrompt(sound: .countdown)
                                 }
-                                DispatchQueue.main.asyncAfter(deadline: audio ? .now() + 3 : .now() + 0.5) {
+								DispatchQueue.main.asyncAfter(deadline: audio ? .now() + 2.0 : .now() + 0.5) {
                                     withAnimation(.linear(duration: 0.25)) {
                                         managers.isTimerActive = true
                                         managers.isTimerPaused = false
                                     }
                                 }
-                                
-                            }
+							}
                         } label: {
                             ButtonView(buttonRoles: !managers.isTimerActive ? .play : .pause, deviceType: deviceType)
                         }
@@ -160,9 +158,9 @@ struct TimerDisplayView: View {
                         
                         Button {
                             withAnimation(.easeInOut(duration: 0.25)) {
-                                managers.stretchPhase = .stop
                                 managers.isTimerActive = false
                                 managers.isTimerPaused = false
+								managers.stretchPhase = .stop
                             }
                             repsCompleted = 0
                             timeRemaining = totalStretch
@@ -184,22 +182,12 @@ struct TimerDisplayView: View {
             
             //this modifier runs when the timer publishes
             .onReceive(timer) { _ in
-                    if managers.isTimerActive && !managers.isTimerPaused {
-                        switch managers.stretchPhase {
-                        case .stretch: return manageStretch()
-                        case .rest: return manageRest()
-                        case .stop: return manageStop()
-                        }
-                    } else if managers.stretchPhase == .stop {
-                        managers.stretchPhase = .stop
-                        managers.isTimerActive = false
-                        managers.isTimerPaused = false
-                        timeRemaining = totalStretch
-                        withAnimation(.easeOut(duration: 0.5)) {
-                            updateEndAngle()
-                        }
-                    }
-            }
+				switch managers.stretchPhase {
+				case .stretch: return manageStretch()
+				case .rest: return manageRest()
+				case .stop: return manageStop()
+				}
+			}
             
             //when user changes totalStretch in SettingsView, or app launches and loads totalStretch from AppStorage, force timeRemaining to reset to TotalStretch
             .onChange(of: totalStretch, initial: true) {
@@ -277,97 +265,116 @@ struct TimerDisplayView: View {
     }
     
     //function to manage stretch portion of stretch
-    func manageStretch() {
-        if timeRemaining > 0 {
-            timeRemaining -= 1
-            withAnimation(.easeOut(duration: 1)) {
-                updateEndAngle()
-            }
-            if audio {
-                SoundManager.instance.playTick(sound: .tick)
-            }
-        } else {
-            repsCompleted += 1
-            if repsCompleted < totalReps {
-                if audio {
-                    SoundManager.instance.playPrompt(sound: .rest)
-                }
-                withAnimation {
-                    managers.stretchPhase = .rest
-                }
-            } else {
-                if !isPlaylistActive {
-                    timerFullStop()
-                } else {
-                    if playlistIndex != playlist.count - 1 {
-                        if audio {
-                            SoundManager.instance.playPrompt(sound: .rest)
-                        }
-                        withAnimation {
-                            managers.stretchPhase = .rest
-                        }
-                    } else {
-                        timerFullStop()
-                        playlistIndex = 0
-                        loadPlaylistItem(playlistIndex ?? 0)
-                    }
-                }
-            }
-        }
-    }
+	func manageStretch() {
+		//if timer is paused, stop the timer and wait
+		if managers.isTimerPaused {
+			managers.isTimerActive = false
+		} else {
+			if timeRemaining > 0 {
+				timeRemaining -= 1
+				withAnimation(.easeOut(duration: 1)) {
+					updateEndAngle()
+				}
+				if audio {
+					SoundManager.instance.playTick(sound: .tick)
+				}
+			} else {
+				repsCompleted += 1
+				if repsCompleted < totalReps {
+					if audio {
+						SoundManager.instance.playPrompt(sound: .rest)
+					}
+					withAnimation {
+						managers.stretchPhase = .rest
+					}
+				} else {
+					if !isPlaylistActive {
+						timerFullStop()
+					} else {
+						if playlistIndex != playlist.count - 1 {
+							if audio {
+								SoundManager.instance.playPrompt(sound: .rest)
+							}
+							withAnimation {
+								managers.stretchPhase = .rest
+							}
+						} else {
+							timerFullStop()
+							playlistIndex = 0
+							loadPlaylistItem(playlistIndex ?? 0)
+						}
+					}
+				}
+			}
+		}
+	}
     
     //function to manage rest portion of stretch
     func manageRest() {
-        if timeRemaining != totalRest {
-            timeRemaining += 1
-            withAnimation(.easeOut(duration: 1)) {
-                updateEndAngle()
-            }
-        } else {
-            //not using playlist feature -> throws back to stretch phase
-            if !isPlaylistActive {
-                timeRemaining = totalStretch
-                withAnimation {
-                    managers.stretchPhase = .stretch
-                }
-                if audio {
-                    SoundManager.instance.playPrompt(sound: .stretch)
-                }
-            } else {
-                //using playlist feature -> reps completed, go to next exercise
-                guard var playlistIndex else { return }
-                if repsCompleted == totalReps {
-                    managers.isTimerActive = false
-                    withAnimation(.linear(duration: 0.5)) {
-                        managers.stretchPhase = .stretch
-                        repsCompleted = 0
-                    }
-                    playlistIndex += 1
-                    loadPlaylistItem(playlistIndex)
-                    timeRemaining = totalStretch
-                    if audio {
-                        SoundManager.instance.playPrompt(sound: .countdownExpanded)
-                    }
-                    DispatchQueue.main.asyncAfter(deadline: audio ? .now() + 3 : .now() + 0.25) {
-                        managers.isTimerActive = true
-                    }
-                } else {
-                   // using playlist feature -> reps not completed, go to stretch phase
-                    timeRemaining = totalStretch
-                    withAnimation {
-                        managers.stretchPhase = .stretch
-                    }
-                    if audio {
-                        SoundManager.instance.playPrompt(sound: .stretch)
-                    }
-                }
-            }
-        }
+		if managers.isTimerPaused {
+			if timeRemaining != totalRest {
+				timeRemaining += 1
+				withAnimation(.easeOut(duration: 1)) {
+					updateEndAngle()
+				}
+			} else {
+				managers.isTimerActive = false
+				if !isPlaylistActive {
+					timeRemaining = totalStretch
+					managers.stretchPhase = .stretch
+					withAnimation(.easeOut(duration: 1)) {
+						updateEndAngle()
+					}
+				} else {
+					guard var playlistIndex else { return }
+					if repsCompleted != totalReps {
+						timeRemaining = totalStretch
+						managers.stretchPhase = .stretch
+						withAnimation(.easeOut(duration: 1)) {
+							updateEndAngle()
+						}
+					} else {
+						managers.stretchPhase = .stretch
+						repsCompleted = 0
+						playlistIndex += 1
+						loadPlaylistItem(playlistIndex)
+						timeRemaining = totalStretch
+					}
+				}
+			}
+		} else {
+			if timeRemaining != totalRest {
+				timeRemaining += 1
+				withAnimation(.easeOut(duration: 1)) {
+					updateEndAngle()
+				}
+			} else {
+				if !isPlaylistActive {
+					timeRemaining = totalStretch
+					withAnimation {
+						managers.stretchPhase = .stretch
+					}
+					if audio {
+						SoundManager.instance.playPrompt(sound: .stretch)
+					}
+				} else {
+					guard var playlistIndex else { return }
+					if repsCompleted == totalReps {
+						managers.isTimerActive = false
+						managers.stretchPhase = .stretch
+						repsCompleted = 0
+						playlistIndex += 1
+						loadPlaylistItem(playlistIndex)
+						timeRemaining = totalStretch
+					}
+				}
+			}
+		}
     }
     
     //function to manage timer stop
     func manageStop() {
-        withAnimation(.easeOut(duration: 1)) {
+		withAnimation(.easeOut(duration: 0.5)) {
             managers.stretchPhase = .stop
             managers.isTimerActive = false
             managers.isTimerPaused = false
