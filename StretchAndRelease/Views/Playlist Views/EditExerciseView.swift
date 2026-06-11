@@ -31,101 +31,17 @@ struct EditExerciseView: View {
                 ZStack {
                     Color.clear.gradientBackground()
                     
-                    VStack {
-                        Form {
-                            Section("Stretch name") {
-                                TextField("\(name)", text: $name)
-                            }
-                            .padding(.bottom)
-                            
-                            Section("Stretch duration") {
-                                HStack {
-									Picker("Stretch", selection: $stretch) {
-										ForEach(1...60, id:\.self) {
-											Text("\($0)")
-												.font(.headline)
-												.accessibilityValue(String(stretch))
-												.accessibilityAdjustableAction { direction in
-													switch direction {
-													case .increment: stretch += 1
-													case .decrement: stretch -= 1
-													@unknown default: print("not handled")
-													}
-												}
-										}
-									}
-                                    .pickerStyle(.wheel)
-                                    Text("sec.")
-                                        .font(.headline)
-                                        .accessibilityLabel("seconds")
-                                }
-                                .font(.headline)
-                                .frame(height: 40)
-                                .accessibilityElement(children: .ignore)
-                                .accessibilityLabel("Stretch duration \(stretch) seconds")
-                                .accessibilityHint("Adjust how long you want to hold each stretch")
-                            }
-                            .padding(.bottom)
-                            
-                            Section("Rest duration") {
-                                HStack {
-                                    Picker("Rest Duration", selection: $rest) {
-                                        ForEach(1...30, id:\.self) {
-                                            Text("\($0)")
-                                                .font(.headline)
-                                        }
-                                    }
-                                    .pickerStyle(.wheel)
-                                    Text("sec.")
-                                        .font(.headline)
-                                        .accessibilityLabel("seconds")
-                                }
-                                .font(.subheadline)
-                                .frame(height: 40)
-                                .accessibilityElement(children: .ignore)
-                                .accessibilityLabel("Rest duration \(rest) seconds")
-                                .accessibilityHint("Adjust how long you want to rest between stretches")
-                                .accessibilityValue(String(rest))
-                                .accessibilityAdjustableAction { direction in
-                                    switch direction {
-                                    case .increment: rest += 1
-                                    case .decrement: rest -= 1
-                                    @unknown default: print("not handled")
-                                    }
-                                }
-                            }
-                            .padding(.bottom)
-
-                            
-                            Section("Number of repetitions") {
-                                HStack {
-                                    Picker("Number of Repetitions to Complete", selection: $reps) {
-                                        ForEach(1...20, id:\.self) {
-                                            Text("\($0)").font(.headline)
-                                        }
-                                    }
-                                    .pickerStyle(.wheel)
-                                    Text("reps")
-                                        .font(.headline)
-                                }
-                                .font(.subheadline)
-                                .frame(height: 40)
-                                .accessibilityElement(children: .ignore)
-                                .accessibilityLabel("Repetition count \(reps)")
-                                .accessibilityHint("Set the number of times you want to perform this stretch")
-                                .accessibilityValue(String(reps))
-                                .accessibilityAdjustableAction { direction in
-                                    switch direction {
-                                    case .increment: reps += 1
-                                    case .decrement: reps -= 1
-                                    default: print("not handled")
-                                    }
-                                }
-
-                            }
-                        }
-                        .scrollContentBackground(.hidden)
-                    }
+					VStack {
+						if !sizeCategory.isAccessibilitySize {
+							PhoneAddExerciseViewTypical(name: $name, stretch: $stretch, rest: $rest, reps: $reps)
+						} else {
+							VStack {
+								PhoneAddExerciseViewAccessible(name: $name, stretch: $stretch, rest: $rest, reps: $reps)
+								Spacer()
+							}
+							.padding(.horizontal)
+						}
+					}
                 }
                 .navigationTitle("Edit Exercise")
                 .navigationBarTitleDisplayMode(.inline)

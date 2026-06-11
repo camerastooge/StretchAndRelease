@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E44D73412FDB3F4800EBE7E8 /* PhoneAddExerciseViewTypical.swift in Sources */ = {isa = PBXBuildFile; fileRef = E44D73402FDB3F4700EBE7E8 /* PhoneAddExerciseViewTypical.swift */; };
 		E4F1C1A22DFE0AAF00114B7C /* StretchAndReleaseWatchOS Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = E4F1C1982DFE0AAB00114B7C /* StretchAndReleaseWatchOS Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
@@ -36,6 +37,7 @@
 
 /* Begin PBXFileReference section */
 		E41BF9582DFCDD5800E16C07 /* StretchAndRelease.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = StretchAndRelease.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		E44D73402FDB3F4700EBE7E8 /* PhoneAddExerciseViewTypical.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = PhoneAddExerciseViewTypical.swift; path = "StretchAndRelease/Views/Playlist Views/PhoneAddExerciseViewTypical.swift"; sourceTree = "<group>"; };
 		E4F1C1982DFE0AAB00114B7C /* StretchAndReleaseWatchOS Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "StretchAndReleaseWatchOS Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -110,6 +112,7 @@
 		E41BF94F2DFCDD5800E16C07 = {
 			isa = PBXGroup;
 			children = (
+				E44D73402FDB3F4700EBE7E8 /* PhoneAddExerciseViewTypical.swift */,
 				E41BF95A2DFCDD5800E16C07 /* StretchAndRelease */,
 				E4F1C1992DFE0AAC00114B7C /* StretchAndReleaseWatchOS Watch App */,
 				E41BF9592DFCDD5800E16C07 /* Products */,
@@ -237,6 +240,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E44D73412FDB3F4800EBE7E8 /* PhoneAddExerciseViewTypical.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
