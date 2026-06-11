@@ -80,10 +80,11 @@ struct TimerDisplayView: View {
                             //PREVIOUS EXERCISE BUTTON
                             Button {
                                 guard var playlistIndex else { return }
-                                playlistIndex -= 1
+								playlistIndex -= 1
                                 if playlistIndex < 0 {
                                     playlistIndex = playlist.count - 1
                                 }
+								self.playlistIndex = playlistIndex
                                 loadPlaylistItem(playlistIndex)
                             } label: {
                                 ButtonView(buttonRoles: .previousItem, deviceType: deviceType)
@@ -96,12 +97,13 @@ struct TimerDisplayView: View {
                             
                             //NEXT EXERCISE BUTTON
                             Button {
-                                guard var playlistIndex else { return }
-                                playlistIndex += 1
-                                if playlistIndex == playlist.count {
-                                    playlistIndex = 0
-                                }
-                                loadPlaylistItem(playlistIndex)
+								guard var playlistIndex else { return }
+								playlistIndex += 1
+								if playlistIndex == playlist.count {
+									playlistIndex = 0
+								}
+								self.playlistIndex = playlistIndex
+								loadPlaylistItem(playlistIndex)
                             } label: {
                                 ButtonView(buttonRoles: .nextItem, deviceType: deviceType)
                                     .opacity(0.75)

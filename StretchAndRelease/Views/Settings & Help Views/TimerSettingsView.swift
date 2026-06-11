@@ -112,11 +112,7 @@ struct SettingsView: View {
             .scrollDisabled(true)
             .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.inline)
-            .navigationDestination(isPresented: $showAddExerciseView) {
-                AddExerciseView()
-                    .navigationBarBackButtonHidden()
-            }
-            .alert("Empty Setlists", isPresented: $isShowingEmptyPlaylistAlert) {
+			.alert("Empty Setlists", isPresented: $isShowingEmptyPlaylistAlert) {
                 Button("Add Exercise") {
                     showAddExerciseView = true
                 }
@@ -125,6 +121,18 @@ struct SettingsView: View {
                 Text("There is nothing in the set list. \n Please add some exercises.")
             }
         }
+		.fullScreenCover(isPresented: $showAddExerciseView,
+						 onDismiss: {
+			if !playlist.isEmpty {
+				playlistToggle = true
+			}
+		},
+						 content: {
+			NavigationStack {
+				AddExerciseView()
+					.navigationBarBackButtonHidden()
+			}
+		})
 		.toolbar {
 			ToolbarItem(placement: .topBarLeading) {
 				Button {

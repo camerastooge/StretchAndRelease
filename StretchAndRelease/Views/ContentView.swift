@@ -114,14 +114,14 @@ struct ContentView: View {
             //prep tick audio player when app launches
             SoundManager.instance.prepareTick(sound: .tick)
             SoundManager.instance.volume = promptVolume
-			
-			//updates playlist settings if needed
-			if isPlaylistActive {
-				playlistIndex = 0
-			}
             
             //sends context to Apple Watch if connected
             sendContext(stretch: totalStretch, rest: totalRest, reps: totalRest, playlistIndex: playlistIndex ?? 0, playlist: isPlaylistActive)
+			
+			//set playlistIndex to 0 if isPlaylistActive
+			if isPlaylistActive {
+				playlistIndex = 0
+			}
         }
         
         .onChange(of: connectivity.didStatusChange) {
@@ -139,6 +139,13 @@ struct ContentView: View {
             sendContext(stretch: totalStretch, rest: totalRest, reps: totalReps, playlistIndex: playlistIndex ?? 0, playlist: isPlaylistActive)
 			managers.didSettingsChange = false
         }
+		
+		//set playlistIndex when isPlaylistActive changes
+		.onChange(of: isPlaylistActive) {
+			if isPlaylistActive {
+				playlistIndex = 0
+			}
+		}
     }
     
     //function sends updated settings to Apple Watch

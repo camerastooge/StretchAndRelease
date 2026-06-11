@@ -91,7 +91,6 @@ struct TimerActionViewWatch: View {
 						.accessibilityLabel("\(timeRemaining) seconds remaining")
 						.padding(.bottom, 5)
 					
-					//convert this to a grid to make the name section fixed width?
 					Grid {
 						GridRow {
 							HStack {
@@ -107,7 +106,7 @@ struct TimerActionViewWatch: View {
 											.foregroundStyle(.white)
 									}
 									.buttonStyle(.plain)
-									.accessibilityLabel("Go to the previous stretch")
+									.accessibilityLabel("Previous stretch")
 									.accessibilityInputLabels(["previous", "previous stretch"])
 								} else {
 									Color.clear
