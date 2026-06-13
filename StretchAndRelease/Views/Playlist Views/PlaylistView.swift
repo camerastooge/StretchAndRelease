@@ -57,17 +57,33 @@ struct PlaylistView: View {
                                     EditExerciseView(playlistItem: exercise)
                                         .navigationBarBackButtonHidden()
                                 } label: {
-                                    PlaylistRowView(item: exercise, columns: playlistColumns)
-                                        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                                            Button {
-                                                modelContext.delete(exercise)
-                                            } label: {
-                                                Label("Delete", systemImage: "trash")
-                                                    .tint(.red)
-                                                    .accessibilityLabel("Delete \(exercise.name ?? "exercise")")
-                                                    .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
-                                            }
-                                        }
+									if !sizeCategory.isAccessibilitySize {
+										PlaylistRowView(item: exercise, columns: playlistColumns)
+											.swipeActions(edge: .trailing, allowsFullSwipe: true) {
+												Button {
+													modelContext.delete(exercise)
+												} label: {
+													Label("Delete", systemImage: "trash")
+														.tint(.red)
+														.accessibilityLabel("Delete \(exercise.name ?? "exercise")")
+														.dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+												}
+											}
+
+									} else {
+										PlaylistRowViewAccesible(item: exercise, columns: playlistColumns)
+											.swipeActions(edge: .trailing, allowsFullSwipe: true) {
+												Button {
+													modelContext.delete(exercise)
+												} label: {
+													Label("Delete", systemImage: "trash")
+														.tint(.red)
+														.accessibilityLabel("Delete \(exercise.name ?? "exercise")")
+														.dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+												}
+											}
+
+									}
                                 }
                                 .navigationLinkIndicatorVisibility(.hidden)
                                 .accessibilityLabel("Edit \(exercise.name ?? "exercise")")
