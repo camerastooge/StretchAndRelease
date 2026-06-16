@@ -91,7 +91,7 @@ struct TimerDisplayView: View {
                                     .opacity(0.75)
                             }
                             .accessibilityLabel("Go to previous item in set list")
-							.accessibilityInputLabels(["Previous", "Previous Stretch"])
+							.accessibilityInputLabels(["Previous"])
                             
                             Spacer()
                             
@@ -109,7 +109,7 @@ struct TimerDisplayView: View {
                                     .opacity(0.75)
                             }
                             .accessibilityLabel("Go to next item in set list")
-							.accessibilityInputLabels(["Next", "Next Stretch"])
+							.accessibilityInputLabels(["Next"])
 
                             Spacer()
                         }
@@ -163,7 +163,7 @@ struct TimerDisplayView: View {
                         }
                         .accessibilityLabel(!managers.isTimerActive ? "Start Timer" : "Pause Timer")
 						.accessibilityHint("This button starts or pauses the timer.")
-						.accessibilityInputLabels(["Start", "Start Timer", "Pause", "Pause Timer"])
+						.accessibilityInputLabels(["Start", "Pause"])
                         
                         Spacer()
                         
@@ -182,7 +182,7 @@ struct TimerDisplayView: View {
                         }
                         .accessibilityLabel("Reset Timer")
 						.accessibilityHint("This button reset the timer.")
-						.accessibilityInputLabels(["Reset", "Reset Timer"])
+						.accessibilityInputLabels(["Reset"])
                         
                         Spacer()
                     }

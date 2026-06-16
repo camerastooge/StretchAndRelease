@@ -33,6 +33,10 @@ struct PlaylistRowView: View {
                 .fontWeight(.bold)
         }
         .padding(.vertical, 4)
+		.accessibilityElement(children: .ignore)
+		.accessibilityLabel("Stretch: \(item.name ?? "Exercise") for \(item.stretchDuration ?? 10) seconds, for \(item.repsToComplete ?? 10) repetitions with a rest period of \(item.restDuration ?? 10) seconds.")
+		.accessibilityHint("Tap to edit this stretch")
+		.accessibilityInputLabels(["Edit"])
     }
 }
 

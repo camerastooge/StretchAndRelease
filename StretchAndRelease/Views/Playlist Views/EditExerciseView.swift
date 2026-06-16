@@ -70,7 +70,8 @@ struct EditExerciseView: View {
 							}
 						}
 						.buttonStyle(.plain)
-						.accessibilityLabel("Save changes and return to set list view")
+						.accessibilityLabel("Save button")
+							.accessibilityHint("Save changes and return to the set list view")
 						.accessibilityInputLabels(["save"])
 					}
 					
@@ -90,7 +91,8 @@ struct EditExerciseView: View {
 							}
 						}
 						.buttonStyle(.plain)
-						.accessibilityLabel("Cancel and return to set list view")
+						.accessibilityLabel("Cancel button")
+						.accessibilityHint("Discard your changes and return to the set list view")
 						.accessibilityInputLabels(["cancel"])
 					}
 				}

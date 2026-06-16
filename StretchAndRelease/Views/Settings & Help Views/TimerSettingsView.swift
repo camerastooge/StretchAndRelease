@@ -57,7 +57,7 @@ struct SettingsView: View {
         } onEditingChanged: { editing in
             isEditing = editing
         }
-        .accessibilityLabel("Volume")
+        .accessibilityLabel("Volume: String(volumeValue.formatted(.percent)) percent")
         .accessibilityHint("Adjust volume of voice prompts")
         .accessibilityValue(String(volumeValue.formatted(.percent)))
         .accessibilityAdjustableAction { direction in
@@ -91,15 +91,21 @@ struct SettingsView: View {
                 VStack(spacing: 25) {
                     HStack {
                         Toggle("Use playlist", isOn: $playlistToggle)
-                            .accessibilityHint("Turn playlist on or off")
+							.accessibilityLabel(playlistToggle ? "set list is active" : "set list is not active")
+                            .accessibilityHint("Turn set list on or off")
+							.accessibilityInputLabels(["set list"])
                     }
                     HStack {
                         Toggle("Haptic feedback", isOn: $hapticToggle)
+							.accessibilityLabel(hapticToggle ? "haptic feedback is enabled" : "haptic feedback is disabled")
                             .accessibilityHint("Turn haptic feedback on or off")
+							.accessibilityInputLabels(["feedback", "haptics"])
                     }
                     HStack {
                         Toggle("Audio cues", isOn: $audioToggle)
+							.accessibilityLabel(audio ? "audio cues are enabled" : "audio cues are disabled")
                             .accessibilityHint("Turn audio cues on or off")
+							.accessibilityInputLabels(["audio", "prompts"])
                     }
                     HStack {
                         volumeSlider
@@ -113,7 +119,7 @@ struct SettingsView: View {
             .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.inline)
 			.alert("Empty Setlists", isPresented: $isShowingEmptyPlaylistAlert) {
-                Button("Add Exercise") {
+                Button("Add Stretch") {
                     showAddExerciseView = true
                 }
                 Button("Cancel", role: .cancel) {}
@@ -152,10 +158,12 @@ struct SettingsView: View {
 							.glassEffect(.clear)
 					} else {
 						Image(systemName: "chevron.left")
-							.accessibilityLabel("Save changes and return to set list view")
 					}
 				}
 				.buttonStyle(.plain)
+				.accessibilityElement(children: .ignore)
+				.accessibilityLabel("Save changes")
+				.accessibilityInputLabels(["save"])
 			}
 			
 			ToolbarItem(placement: .topBarTrailing) {
@@ -166,14 +174,15 @@ struct SettingsView: View {
 						Image(systemName: "x.circle")
 							.glassEffect(.clear)
 							.foregroundStyle(.red)
-							.accessibilityLabel("Cancel and return to set list view")
 					} else {
 						Image(systemName: "x.circle.fill")
 							.foregroundStyle(Color.red)
-							.accessibilityLabel("Cancel and return to set list view")
 					}
 				}
 				.buttonStyle(.plain)
+				.accessibilityElement(children: .ignore)
+				.accessibilityLabel("Discard changes")
+				.accessibilityInputLabels(["cancel"])
 			}
 		}
         

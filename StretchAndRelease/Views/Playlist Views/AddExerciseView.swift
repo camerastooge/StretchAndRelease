@@ -50,7 +50,7 @@ struct AddExerciseView: View {
                     isShowingEmptyNameField = false
                 }
             } message: {
-                Text("You must name your exercise.")
+                Text("Please give your stretch a name.")
             }
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
@@ -78,7 +78,8 @@ struct AddExerciseView: View {
                         }
                     }
                     .buttonStyle(.plain)
-					.accessibilityLabel("Save changes and return to set list view")
+					.accessibilityLabel("Save button")
+					.accessibilityHint("Save changes and return to the set list view")
 					.accessibilityInputLabels(["save"])
                 }
                 
@@ -98,7 +99,8 @@ struct AddExerciseView: View {
                         }
                     }
                     .buttonStyle(.plain)
-					.accessibilityLabel("Cancel and return to set list view")
+					.accessibilityLabel("Cancel button")
+					.accessibilityHint("Discard your changes and return to the set list view")
 					.accessibilityInputLabels(["cancel"])
                 }
             }

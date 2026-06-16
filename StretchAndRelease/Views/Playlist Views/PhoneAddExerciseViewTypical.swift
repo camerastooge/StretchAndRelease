@@ -30,6 +30,8 @@ struct PhoneAddExerciseViewTypical: View {
 						.textFieldStyle(.roundedBorder)
 				}
 				.padding(.bottom)
+				.accessibilityElement(children: .combine)
+				.accessibilityLabel("Name your stretch")
 				
 				Section("Stretch duration") {
 					HStack {
@@ -47,7 +49,7 @@ struct PhoneAddExerciseViewTypical: View {
 					.font(.headline)
 					.frame(height: 40)
 					.accessibilityElement(children: .ignore)
-					.accessibilityLabel("Stretch duration \(stretch) seconds")
+					.accessibilityLabel("Stretch duration: \(stretch) seconds")
 					.accessibilityHint("Adjust how long you want to hold each stretch")
 					.accessibilityValue(String(stretch))
 					.accessibilityAdjustableAction { direction in
@@ -76,7 +78,7 @@ struct PhoneAddExerciseViewTypical: View {
 					.font(.subheadline)
 					.frame(height: 40)
 					.accessibilityElement(children: .ignore)
-					.accessibilityLabel("Rest duration \(rest) seconds")
+					.accessibilityLabel("Rest duration: \(rest) seconds")
 					.accessibilityHint("Adjust how long you want to rest between stretches")
 					.accessibilityValue(String(rest))
 					.accessibilityAdjustableAction { direction in
@@ -103,7 +105,7 @@ struct PhoneAddExerciseViewTypical: View {
 					.font(.subheadline)
 					.frame(height: 40)
 					.accessibilityElement(children: .ignore)
-					.accessibilityLabel("Repetition count \(stretch)")
+					.accessibilityLabel("Repetition count: \(stretch)")
 					.accessibilityHint("Set the number of times you want to perform this stretch")
 					.accessibilityValue(String(reps))
 					.accessibilityAdjustableAction { direction in

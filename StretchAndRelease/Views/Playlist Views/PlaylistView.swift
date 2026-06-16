@@ -86,6 +86,7 @@ struct PlaylistView: View {
 									}
                                 }
                                 .navigationLinkIndicatorVisibility(.hidden)
+								.accessibilityElement(children: .ignore)
                                 .accessibilityLabel("Edit \(exercise.name ?? "exercise")")
                                 .listRowBackground(Color.clear)
                             }
@@ -120,6 +121,7 @@ struct PlaylistView: View {
                         }
                         .accessibilityLabel("Add exercise")
                         .accessibilityHint("Add an exercise to the playlist")
+						.accessibilityInputLabels(["Add"])
                     }
                 } else {
                     ContentUnavailableView {
@@ -154,9 +156,10 @@ struct PlaylistView: View {
 									   .foregroundStyle(.black)
 									   .padding(.bottom, 25)
 							}
-                        }
-                        .accessibilityLabel("Add exercise")
-                        .accessibilityHint("Add an exercise to the playlist")
+						}
+						.accessibilityLabel("Add exercise")
+						.accessibilityHint("Add an exercise to the playlist")
+						.accessibilityInputLabels(["Add"])
                     }
                 }
 

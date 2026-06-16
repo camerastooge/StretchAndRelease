@@ -52,7 +52,7 @@ struct MainArcView: View {
                     .scaleEffect(0.75)
                     .accessibilityLabel(!managers.isTimerPaused ? timerTextLabel : "WORKOUT PAUSED")
                 Text("Reps: \(repsCompleted)/\(totalReps)")
-                    .accessibilityLabel("Repetitions Completed \(repsCompleted) of \(totalReps)")
+                    .accessibilityLabel("\(repsCompleted) of \(totalReps) repetitions completed")
                 Spacer()
             }
             .font(.largeTitle)

@@ -72,13 +72,14 @@ struct ContentView: View {
                             Image(systemName: "questionmark.circle")
                                 .foregroundStyle(.blue)
                                 .glassEffect()
-                                .accessibilityLabel("Show playlist")
 
                         } else {
                             Image(systemName: "questionmark.circle")
-                                .accessibilityLabel("Show playlist")
 
-                        }                    }
+                        }
+					}
+					.accessibilityLabel("Show help screen")
+					.accessibilityInputLabels(["help"])
                 }
                 
                 if #available(iOS 26.0, *) {
@@ -99,6 +100,7 @@ struct ContentView: View {
                         }
                     }
                     .accessibilityLabel("Show Settings")
+					.accessibilityInputLabels(["settings"])
                 }
             }
 
