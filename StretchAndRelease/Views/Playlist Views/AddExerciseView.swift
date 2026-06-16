@@ -70,13 +70,16 @@ struct AddExerciseView: View {
                     } label: {
                         if #available(iOS 26.0, *) {
                             Image(systemName: "chevron.left")
-                                .glassEffect(.clear)
+								.glassEffect(.clear)
+								.font(.system(size: !differentiateWithoutColor ? 18 : 24))
                         } else {
                             Image(systemName: "chevron.left")
-                                .accessibilityLabel("Save changes and return to set list view")
+								.font(.system(size: !differentiateWithoutColor ? 18 : 24))
                         }
                     }
                     .buttonStyle(.plain)
+					.accessibilityLabel("Save changes and return to set list view")
+					.accessibilityInputLabels(["save"])
                 }
                 
                 ToolbarItem(placement: .navigationBarTrailing) {
@@ -86,15 +89,17 @@ struct AddExerciseView: View {
                         if #available(iOS 26.0, *) {
                             Image(systemName: "x.circle")
                                 .glassEffect(.clear)
-                                .foregroundStyle(.red)
-                                .accessibilityLabel("Cancel and return to set list view")
+								.font(.system(size: !differentiateWithoutColor ? 18 : 24))
+								.foregroundStyle(!differentiateWithoutColor ? .red : .black)
                         } else {
                             Image(systemName: "x.circle.fill")
-                                .foregroundStyle(Color.red)
-                                .accessibilityLabel("Cancel and return to set list view")
+								.font(.system(size: !differentiateWithoutColor ? 18 : 24))
+								.foregroundStyle(!differentiateWithoutColor ? .red : .black)
                         }
                     }
                     .buttonStyle(.plain)
+					.accessibilityLabel("Cancel and return to set list view")
+					.accessibilityInputLabels(["cancel"])
                 }
             }
         }

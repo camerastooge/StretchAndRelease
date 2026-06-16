@@ -20,6 +20,7 @@ struct EditExerciseView: View {
     @State var stretch = 10
     @State var rest = 5
     @State var reps = 3
+	@State private var isShowingEmptyNameField = false
     
     @Bindable var playlistItem: PlaylistItem
     
@@ -45,6 +46,54 @@ struct EditExerciseView: View {
                 }
                 .navigationTitle("Edit Exercise")
                 .navigationBarTitleDisplayMode(.inline)
+				.toolbar {
+					ToolbarItem(placement: .navigationBarLeading) {
+						Button {
+							if !name.isEmpty {
+							 playlistItem.name = name
+								playlistItem.stretchDuration = stretch
+								playlistItem.restDuration = rest
+								playlistItem.repsToComplete = reps
+								try? modelContext.save()
+								dismiss()
+							} else {
+								isShowingEmptyNameField = true
+							}
+						} label: {
+							if #available(iOS 26.0, *) {
+								Image(systemName: "chevron.left")
+									.glassEffect(.clear)
+									.font(.system(size: !differentiateWithoutColor ? 18 : 24))
+							} else {
+								Image(systemName: "chevron.left")
+									.font(.system(size: !differentiateWithoutColor ? 18 : 24))
+							}
+						}
+						.buttonStyle(.plain)
+						.accessibilityLabel("Save changes and return to set list view")
+						.accessibilityInputLabels(["save"])
+					}
+					
+					ToolbarItem(placement: .navigationBarTrailing) {
+						Button(role: .cancel) {
+							dismiss()
+						} label: {
+							if #available(iOS 26.0, *) {
+								Image(systemName: "x.circle")
+									.glassEffect(.clear)
+									.font(.system(size: !differentiateWithoutColor ? 18 : 24))
+									.foregroundStyle(!differentiateWithoutColor ? .red : .black)
+							} else {
+								Image(systemName: "x.circle.fill")
+									.font(.system(size: !differentiateWithoutColor ? 18 : 24))
+									.foregroundStyle(!differentiateWithoutColor ? .red : .black)
+							}
+						}
+						.buttonStyle(.plain)
+						.accessibilityLabel("Cancel and return to set list view")
+						.accessibilityInputLabels(["cancel"])
+					}
+				}
             }
         }
         .onAppear {
@@ -53,45 +102,13 @@ struct EditExerciseView: View {
             rest = playlistItem.restDuration ?? 5
             reps = playlistItem.repsToComplete ?? 3
         }
-        .toolbar {
-            ToolbarItem(placement: .navigationBarLeading) {
-                Button {
-                    playlistItem.name = name
-                    playlistItem.stretchDuration = stretch
-                    playlistItem.restDuration = rest
-                    playlistItem.repsToComplete = reps
-                    try? modelContext.save()
-                    dismiss()
-                } label: {
-                    if #available(iOS 26.0, *) {
-                        Image(systemName: "chevron.left")
-                            .glassEffect(.clear)
-                    } else {
-                        Image(systemName: "chevron.left")
-                            .accessibilityLabel("Save changes and return to set list view")
-                    }
-                }
-				.buttonStyle(.plain)
-            }
-			
-			ToolbarItem(placement: .navigationBarTrailing) {
-				Button(role: .cancel) {
-					dismiss()
-				} label: {
-					if #available(iOS 26.0, *) {
-						Image(systemName: "x.circle")
-							.glassEffect(.clear)
-							.foregroundStyle(.red)
-							.accessibilityLabel("Cancel and return to set list view")
-					} else {
-						Image(systemName: "x.circle.fill")
-							.foregroundStyle(Color.red)
-							.accessibilityLabel("Cancel and return to set list view")
-					}
-				}
-				.buttonStyle(.plain)
+		.alert("Name Field Is Empty", isPresented: $isShowingEmptyNameField) {
+			Button("OK", role: .cancel) {
+				isShowingEmptyNameField = false
 			}
-        }
+		} message: {
+			Text("You must name your exercise.")
+		}
     }
 }
 
