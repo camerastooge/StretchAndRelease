@@ -27,6 +27,7 @@ struct TimerActionViewWatch: View {
 	// state variables used across views
 	@State private var repsCompleted: Int = 0
 	@State private var endAngle = Angle(degrees: 340)
+	
 	let timer = Timer.publish(every: 1.0, on: .main, in: .common).autoconnect()
 	
 	// state variables only used on main view
@@ -40,9 +41,8 @@ struct TimerActionViewWatch: View {
 	@Query(sort: \PlaylistItem.index) var playlist: [PlaylistItem]
 	
 	// playlist properties
-	@State var playlistItem: PlaylistItem?
-	@State private var currentIndex = 0
-	@State private var isPlaylistInactive = true
+	@Binding var playlistIndex: Int?
+	@Binding var playlistItem: PlaylistItem?
 	
 	//local properties for display
 	var timerTextLabel: String {
@@ -96,11 +96,13 @@ struct TimerActionViewWatch: View {
 							HStack {
 								if isPlaylistActive {
 									Button {
-										currentIndex -= 1
-										if currentIndex < 0 {
-											currentIndex = playlist.count - 1
+										guard var playlistIndex else { return }
+										playlistIndex -= 1
+										if playlistIndex < 0 {
+											playlistIndex = playlist.count - 1
 										}
-										loadPlaylistItem(currentIndex)
+										self.playlistIndex = playlistIndex
+										loadPlaylistItem(playlistIndex)
 									} label: {
 										Image(systemName: "arrowtriangle.left.fill")
 											.foregroundStyle(.white)
@@ -124,19 +126,21 @@ struct TimerActionViewWatch: View {
 										DragGesture()
 											.onEnded { gesture in
 												if isPlaylistActive {
+													guard var playlistIndex else { return }
 													if gesture.translation.width < 0 {
-														currentIndex -= 1
-														if currentIndex < 0 {
-															currentIndex = playlist.count - 1
+														playlistIndex -= 1
+														if playlistIndex < 0 {
+															playlistIndex = playlist.count - 1
 														}
 													} else if gesture.translation.width > 0 {
-														currentIndex += 1
-														if currentIndex == playlist.count {
-															currentIndex = 0
+														playlistIndex += 1
+														if playlistIndex == playlist.count {
+															playlistIndex = 0
 														}
 													}
+													self.playlistIndex = playlistIndex
 													withAnimation(.linear(duration: 0.25)) {
-														loadPlaylistItem(currentIndex)
+														loadPlaylistItem(playlistIndex)
 													}
 												}
 											}
@@ -147,11 +151,13 @@ struct TimerActionViewWatch: View {
 							HStack {
 								if isPlaylistActive {
 									Button {
-										currentIndex += 1
-										if currentIndex == playlist.count {
-											currentIndex = 0
+										guard var playlistIndex else { return }
+										playlistIndex += 1
+										if playlistIndex == playlist.count {
+											playlistIndex = 0
 										}
-										loadPlaylistItem(currentIndex)
+										self.playlistIndex = playlistIndex
+										loadPlaylistItem(playlistIndex)
 									} label: {
 										Image(systemName: "arrowtriangle.right.fill")
 											.foregroundStyle(.white)
@@ -191,30 +197,34 @@ struct TimerActionViewWatch: View {
 		HStack {
 			//play-pause button
 			Button {
-				withAnimation {
-					// timer starting from full stop
-					if managers.stretchPhase == .stop {
-						if audio {
-							SoundManager.instance.playPrompt(sound: .countdownExpanded)
+				//engage from full stop
+				if managers.stretchPhase == .stop {
+					if audio {
+						SoundManager.instance.playPrompt(sound: .countdownExpanded)
+					}
+					
+					DispatchQueue.main.asyncAfter(deadline: audio ? .now() + 3 : .now() + 0.5) {
+						withAnimation(.linear(duration: 0.25)) {
+							managers.startTimer()
+							repsCompleted = 0
 						}
-						DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-							withAnimation(.linear(duration: 0.25)) {
-								repsCompleted = 0
-								managers.startTimer()
-							}
-						}
-					} else if !managers.isTimerPaused {
-						// pause the timer
-						managers.pauseTimer()
-					} else {
-						//unpause the timer
-						if audio {
-							SoundManager.instance.playPrompt(sound: .countdownExpanded)
-						}
-						DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-							withAnimation(.linear(duration: 0.25)) {
-								managers.unpauseTimer()
-							}
+					}
+				}
+				
+				//pause the timer
+				else if !managers.isTimerPaused {
+					managers.isTimerPaused = true
+				}
+				
+				//un-pause the timer
+				else {
+					if audio {
+						SoundManager.instance.playPrompt(sound: .countdown)
+					}
+					DispatchQueue.main.asyncAfter(deadline: audio ? .now() + 2.0 : .now() + 0.5) {
+						withAnimation(.linear(duration: 0.25)) {
+							managers.isTimerActive = true
+							managers.isTimerPaused = false
 						}
 					}
 				}
@@ -233,12 +243,13 @@ struct TimerActionViewWatch: View {
 			
 			//resets timer
 			Button {
-				managers.stopTimer()
+				withAnimation(.easeInOut(duration: 0.25)) {
+					managers.isTimerActive = false
+					managers.isTimerPaused = false
+					managers.stretchPhase = .stop
+				}
 				repsCompleted = 0
 				timeRemaining = totalStretch
-				withAnimation(.linear(duration: 0.5)) {
-					updateEndAngle()
-				}
 			} label: {
                 if #available(watchOS 26.0, *) {
                     ButtonView(buttonRoles: .reset, deviceType: deviceType)
@@ -249,8 +260,9 @@ struct TimerActionViewWatch: View {
 			}
 			.buttonStyle(.plain)
 			.padding(.trailing)
-			.accessibilityInputLabels(["Reset", "Reset Timer"])
 			.accessibilityLabel("Reset Timer")
+			.accessibilityHint("This button reset the timer.")
+			.accessibilityInputLabels(["Reset"])
 			
 			//Settings
 			NavigationLink {
@@ -273,12 +285,12 @@ struct TimerActionViewWatch: View {
 		.containerRelativeFrame(.vertical) { length, _ in
 			length * 0.35
 		}
-		
 		.onChange(of: isPlaylistActive) {
 			if isPlaylistActive {
+				guard var playlistIndex else { return }
 				if !playlist.isEmpty {
-					currentIndex = 0
-					loadPlaylistItem(currentIndex)
+					playlistIndex = 0
+					loadPlaylistItem(playlistIndex)
 				} else {
 					playlistItem = nil
 					isPlaylistActive = false
@@ -295,15 +307,48 @@ struct TimerActionViewWatch: View {
 		
 		//this modifier runs when the timer publishes
 		.onReceive(timer) { _ in
-				if managers.isTimerActive && !managers.isTimerPaused {
-					switch managers.stretchPhase {
-					case .stretch: return manageStretch()
-					case .rest: return manageRest()
-					case .stop: return manageStop()
-					}
-				}
+			switch managers.stretchPhase {
+			case .stretch: return manageStretch()
+			case .rest: return manageRest()
+			case .stop: return manageStop()
+			}
 		}
-    }
+		
+		.onChange(of: isPlaylistActive) {
+			guard var playlistIndex else { return }
+			if isPlaylistActive {
+				playlistIndex = 0
+				loadPlaylistItem(playlistIndex)
+			} else {
+				playlistItem = nil
+			}
+		}
+  
+		.onAppear {
+			if !playlist.isEmpty {
+				if isPlaylistActive {
+					guard let playlistIndex else { return }
+					loadPlaylistItem(playlistIndex)
+				} else {
+					playlistItem = nil
+				}
+			} else {
+				playlistItem = nil
+				isPlaylistActive = false
+			}
+		}
+		
+		.onDisappear {
+			withAnimation(.linear(duration: 0.25)) {
+				managers.stretchPhase = .stop
+				updateEndAngle()
+			}
+			managers.isTimerActive = false
+			managers.isTimerPaused = false
+			timeRemaining = totalStretch
+			repsCompleted = 0
+		}
+	}
 	
 	//function to stop timer
 	func timerFullStop() {
@@ -340,7 +385,8 @@ struct TimerActionViewWatch: View {
 				if !isPlaylistActive {
 					timerFullStop()
 				} else {
-					if currentIndex != playlist.count - 1 {
+					guard let playlistIndex else { return }
+					if playlistIndex != playlist.count - 1 {
 						if audio {
 							SoundManager.instance.playPrompt(sound: .rest)
 						}
@@ -349,8 +395,8 @@ struct TimerActionViewWatch: View {
 						}
 					} else {
 						timerFullStop()
-						currentIndex = 0
-						loadPlaylistItem(currentIndex)
+						self.playlistIndex = 0
+						loadPlaylistItem(playlistIndex)
 					}
 				}
 			}
@@ -376,14 +422,15 @@ struct TimerActionViewWatch: View {
 				}
 			} else {
 				//using playlist feature -> reps completed, go to next exercise
+				guard var playlistIndex else { return }
 				if repsCompleted == totalReps {
 					managers.isTimerActive = false
 					withAnimation(.linear(duration: 0.5)) {
 						managers.stretchPhase = .stretch
 						repsCompleted = 0
 					}
-					currentIndex += 1
-					loadPlaylistItem(currentIndex)
+					self.playlistIndex = playlistIndex + 1
+					loadPlaylistItem(playlistIndex)
 					timeRemaining = totalStretch
 					if audio {
 						SoundManager.instance.playPrompt(sound: .countdownExpanded)
@@ -425,8 +472,8 @@ struct TimerActionViewWatch: View {
 		}
 	}
 	
-	//load playlistItem values into timer properties
 	func loadPlaylistItem(_ index: Int) {
+	//load playlistItem values into timer properties
 		playlistItem = playlist[index]
 		if let playlistItem {
 			totalStretch = playlistItem.stretchDuration ?? 10
@@ -440,8 +487,10 @@ struct TimerActionViewWatch: View {
 #Preview {
 	@Previewable @State var isShowingSettings = false
 	@Previewable @State var timeRemaining = 5
+	@Previewable @State var playlistItem: PlaylistItem? = .sampleData[0]
+	@Previewable @State var playlistIndex: Int? = 0
 	
-	TimerActionViewWatch(timeRemaining: $timeRemaining, isShowingSettings: $isShowingSettings)
+	TimerActionViewWatch(timeRemaining: $timeRemaining, isShowingSettings: $isShowingSettings, playlistIndex: $playlistIndex, playlistItem: $playlistItem)
         .environment(Managers())
 		.modelContainer(previewContainer)
 }

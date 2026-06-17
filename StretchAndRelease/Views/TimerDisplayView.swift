@@ -159,8 +159,12 @@ struct TimerDisplayView: View {
                                 }
 							}
                         } label: {
-                            ButtonView(buttonRoles: !managers.isTimerActive ? .play : .pause, deviceType: deviceType)
-                        }
+							if #available(iOS 26, *) {
+								ButtonView(buttonRoles: !managers.isTimerActive ? .play : .pause, deviceType: deviceType)
+									.glassEffect()
+							} else {
+								ButtonView(buttonRoles: !managers.isTimerActive ? .play : .pause, deviceType: deviceType)
+							}                        }
                         .accessibilityLabel(!managers.isTimerActive ? "Start Timer" : "Pause Timer")
 						.accessibilityHint("This button starts or pauses the timer.")
 						.accessibilityInputLabels(["Start", "Pause"])
@@ -178,8 +182,14 @@ struct TimerDisplayView: View {
                             repsCompleted = 0
                             timeRemaining = totalStretch
                         } label: {
-                            ButtonView(buttonRoles: .reset, deviceType: .phone)
+							if #available(iOS 26, *) {
+								ButtonView(buttonRoles: .reset, deviceType: .phone)
+									.glassEffect()
+							} else {
+								ButtonView(buttonRoles: .reset, deviceType: .phone)
+							}
                         }
+						.buttonStyle(.plain)
                         .accessibilityLabel("Reset Timer")
 						.accessibilityHint("This button reset the timer.")
 						.accessibilityInputLabels(["Reset"])
@@ -192,6 +202,11 @@ struct TimerDisplayView: View {
                 .padding(.bottom, 5)
                 
             }
+			
+			//when user changes totalStretch in SettingsView, or app launches and loads totalStretch from AppStorage, force timeRemaining to reset to TotalStretch
+			.onChange(of: totalStretch, initial: true) {
+				timeRemaining = totalStretch
+			}
             
             //this modifier runs when the timer publishes
             .onReceive(timer) { _ in
@@ -201,11 +216,6 @@ struct TimerDisplayView: View {
 				case .stop: return manageStop()
 				}
 			}
-            
-            //when user changes totalStretch in SettingsView, or app launches and loads totalStretch from AppStorage, force timeRemaining to reset to TotalStretch
-            .onChange(of: totalStretch, initial: true) {
-                timeRemaining = totalStretch
-            }
             
             .onChange(of: isPlaylistActive) {
                 guard var playlistIndex else { return }

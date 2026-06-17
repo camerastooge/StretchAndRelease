@@ -28,7 +28,6 @@ struct ContentView: View {
 	@State private var timeRemaining: Int = 0
 	@State private var repsCompleted: Int = 0
 	@State private var endAngle = Angle(degrees: 340)
-	let timer = Timer.publish(every: 1.0, on: .main, in: .common).autoconnect()
 	
 	// state variables only used on main view
 	@State private var isShowingSettings = false
@@ -39,7 +38,7 @@ struct ContentView: View {
 	
 	// playlist properties
 	@State var playlistItem: PlaylistItem?
-	@State private var currentIndex = 0
+	@State private var playlistIndex: Int? = 0
 	
 	//Connectivity class for communication with phone
 	@State private var connectivity = Connectivity()
@@ -49,7 +48,7 @@ struct ContentView: View {
 			ZStack {
 				TabView {
 					Tab {
-						TimerActionViewWatch(timeRemaining: $timeRemaining, isShowingSettings: $isShowingSettings)
+						TimerActionViewWatch(timeRemaining: $timeRemaining, isShowingSettings: $isShowingSettings, playlistIndex: $playlistIndex, playlistItem: $playlistItem)
 					}
 					Tab {
 						PlaylistViewWatch()
@@ -97,8 +96,9 @@ struct ContentView: View {
 			//load first playlist item, if playlist is active
 			if isPlaylistActive {
 				if !playlist.isEmpty {
-					currentIndex = 0
-					playlistItem = playlist[currentIndex]
+					guard var playlistIndex else { return }
+					playlistIndex = 0
+					playlistItem = playlist[playlistIndex]
 					if let playlistItem {
 						totalStretch = playlistItem.stretchDuration ?? 10
 						totalRest = playlistItem.restDuration ?? 5

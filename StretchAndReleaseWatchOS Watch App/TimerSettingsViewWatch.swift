@@ -10,10 +10,7 @@ import SwiftData
 
 struct TimerSettingsViewWatch: View {
 	//Environment properties
-	@Environment(\.colorScheme) var colorScheme
-	@Environment(\.accessibilityDifferentiateWithoutColor) var differentiateWithoutColor
 	@Environment(\.dismiss) var dismiss
-	@Environment(\.scenePhase) var scenePhase
 	@Environment(Managers.self) var managers
     
 	//State properties
