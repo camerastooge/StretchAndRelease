@@ -219,9 +219,31 @@ struct TimerActionViewWatch: View {
 				//un-pause the timer
 				else {
 					if audio {
-						SoundManager.instance.playPrompt(sound: .countdown)
-					}
-					DispatchQueue.main.asyncAfter(deadline: audio ? .now() + 2.0 : .now() + 0.5) {
+						if managers.stretchPhase == .stretch {
+							if timeRemaining == totalStretch {
+								SoundManager.instance.playPrompt(sound: .countdownExpanded)
+								DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
+									withAnimation(.linear(duration: 0.25)) {
+										managers.isTimerActive = true
+										managers.isTimerPaused = false
+									}
+								}
+							} else {
+								SoundManager.instance.playPrompt(sound: .countdown)
+								DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+									withAnimation(.linear(duration: 0.25)) {
+										managers.isTimerActive = true
+										managers.isTimerPaused = false
+									}
+								}
+							}
+						} else {
+							withAnimation(.linear(duration: 0.25)) {
+								managers.isTimerActive = true
+								managers.isTimerPaused = false
+							}
+						}
+					} else {
 						withAnimation(.linear(duration: 0.25)) {
 							managers.isTimerActive = true
 							managers.isTimerPaused = false
@@ -364,39 +386,43 @@ struct TimerActionViewWatch: View {
 	
 	//function to manage stretch portion of stretch
 	func manageStretch() {
-		if timeRemaining > 0 {
-			timeRemaining -= 1
-			withAnimation(.easeOut(duration: 1)) {
-				updateEndAngle()
-			}
-			if audio {
-				SoundManager.instance.playTick(sound: .tick)
-			}
+		//if timer is paused, stop the timer and wait
+		if managers.isTimerPaused {
+			managers.isTimerActive = false
 		} else {
-			repsCompleted += 1
-			if repsCompleted < totalReps {
-				if audio {
-					SoundManager.instance.playPrompt(sound: .rest)
+			if timeRemaining > 0 {
+				timeRemaining -= 1
+				withAnimation(.easeOut(duration: 1)) {
+					updateEndAngle()
 				}
-				withAnimation {
-					managers.stretchPhase = .rest
+				if audio {
+					SoundManager.instance.playTick(sound: .tick)
 				}
 			} else {
-				if !isPlaylistActive {
-					timerFullStop()
+				repsCompleted += 1
+				if repsCompleted < totalReps {
+					if audio {
+						SoundManager.instance.playPrompt(sound: .rest)
+					}
+					withAnimation {
+						managers.stretchPhase = .rest
+					}
 				} else {
-					guard let playlistIndex else { return }
-					if playlistIndex != playlist.count - 1 {
-						if audio {
-							SoundManager.instance.playPrompt(sound: .rest)
-						}
-						withAnimation {
-							managers.stretchPhase = .rest
-						}
-					} else {
+					if !isPlaylistActive {
 						timerFullStop()
-						self.playlistIndex = 0
-						loadPlaylistItem(playlistIndex)
+					} else {
+						if playlistIndex != playlist.count - 1 {
+							if audio {
+								SoundManager.instance.playPrompt(sound: .rest)
+							}
+							withAnimation {
+								managers.stretchPhase = .rest
+							}
+						} else {
+							timerFullStop()
+							playlistIndex = 0
+							loadPlaylistItem(playlistIndex ?? 0)
+						}
 					}
 				}
 			}
@@ -417,12 +443,12 @@ struct TimerActionViewWatch: View {
 				withAnimation {
 					managers.stretchPhase = .stretch
 				}
-				if audio {
+				if audio && !managers.isTimerPaused {
 					SoundManager.instance.playPrompt(sound: .stretch)
 				}
 			} else {
 				//using playlist feature -> reps completed, go to next exercise
-				guard var playlistIndex else { return }
+				guard let playlistIndex else { return }
 				if repsCompleted == totalReps {
 					managers.isTimerActive = false
 					withAnimation(.linear(duration: 0.5)) {
@@ -454,8 +480,10 @@ struct TimerActionViewWatch: View {
 	
 	//function to manage timer stop
 	func manageStop() {
-		withAnimation(.easeOut(duration: 1)) {
-			timerFullStop()
+		withAnimation(.easeOut(duration: 0.5)) {
+			managers.stretchPhase = .stop
+			managers.isTimerActive = false
+			managers.isTimerPaused = false
 			updateEndAngle()
 		}
 	}

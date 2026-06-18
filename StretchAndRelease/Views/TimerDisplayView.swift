@@ -148,15 +148,37 @@ struct TimerDisplayView: View {
                             
                             //un-pause the timer
                             else {
-                                if audio {
-                                    SoundManager.instance.playPrompt(sound: .countdown)
-                                }
-								DispatchQueue.main.asyncAfter(deadline: audio ? .now() + 2.0 : .now() + 0.5) {
-                                    withAnimation(.linear(duration: 0.25)) {
-                                        managers.isTimerActive = true
-                                        managers.isTimerPaused = false
-                                    }
-                                }
+								if audio {
+									if managers.stretchPhase == .stretch {
+										if timeRemaining == totalStretch {
+											SoundManager.instance.playPrompt(sound: .countdownExpanded)
+											DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
+												withAnimation(.linear(duration: 0.25)) {
+													managers.isTimerActive = true
+													managers.isTimerPaused = false
+												}
+											}
+										} else {
+											SoundManager.instance.playPrompt(sound: .countdown)
+											DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+												withAnimation(.linear(duration: 0.25)) {
+													managers.isTimerActive = true
+													managers.isTimerPaused = false
+												}
+											}
+										}
+									} else {
+										withAnimation(.linear(duration: 0.25)) {
+											managers.isTimerActive = true
+											managers.isTimerPaused = false
+										}
+									}
+								} else {
+									withAnimation(.linear(duration: 0.25)) {
+										managers.isTimerActive = true
+										managers.isTimerPaused = false
+									}
+								}
 							}
                         } label: {
 							if #available(iOS 26, *) {
