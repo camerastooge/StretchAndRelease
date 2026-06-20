@@ -10,7 +10,6 @@ struct PhoneTimerSettingsAccessibleView: View {
     @Binding var stretch: Int
     @Binding var rest: Int
     @Binding var reps: Int
-    @Binding var isEditing: Bool
     
     var body: some View {
         VStack {
@@ -110,5 +109,5 @@ struct PhoneTimerSettingsAccessibleView: View {
     @Previewable @State var reps = 3
     @Previewable @State var isEditing = true
     
-    PhoneTimerSettingsAccessibleView(stretch: $stretch, rest: $rest, reps: $reps, isEditing: $isEditing)
+    PhoneTimerSettingsAccessibleView(stretch: $stretch, rest: $rest, reps: $reps)
 }

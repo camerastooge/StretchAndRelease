@@ -366,27 +366,33 @@ struct TimerDisplayView: View {
 			} else {
 				managers.isTimerActive = false
 				if !isPlaylistActive {
-					timeRemaining = totalStretch
-					managers.stretchPhase = .stretch
 					withAnimation(.easeOut(duration: 1)) {
+                        timeRemaining = totalStretch
+                        managers.stretchPhase = .stretch
 						updateEndAngle()
 					}
 				} else {
 					guard var playlistIndex else { return }
 					if repsCompleted != totalReps {
-						timeRemaining = totalStretch
-						managers.stretchPhase = .stretch
 						withAnimation(.easeOut(duration: 1)) {
+                            timeRemaining = totalStretch
+                            managers.stretchPhase = .stretch
 							updateEndAngle()
 						}
 						managers.isTimerActive = true
 					} else {
-						managers.stretchPhase = .stretch
-						repsCompleted = 0
-						playlistIndex += 1
-						loadPlaylistItem(playlistIndex)
-						timeRemaining = totalStretch
-						managers.isTimerActive = true
+                        //reps completed == total reps, goes to next stretch
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+                            playlistIndex += 1
+                            self.playlistIndex = playlistIndex
+                            loadPlaylistItem(playlistIndex)
+                            timeRemaining = totalStretch
+                            repsCompleted = 0
+                            withAnimation {
+                                managers.stretchPhase = .stretch
+                            }
+                            managers.isTimerActive = true
+                        }
 					}
 				}
 			}
@@ -406,22 +412,32 @@ struct TimerDisplayView: View {
 						SoundManager.instance.playPrompt(sound: .stretch)
 					}
 				} else {
-					guard var playlistIndex else { return }
-					if repsCompleted == totalReps {
-						managers.stretchPhase = .stretch
-						repsCompleted = 0
-						playlistIndex += 1
-						loadPlaylistItem(playlistIndex)
-						timeRemaining = totalStretch
-					} else {
-						timeRemaining = totalStretch
-						withAnimation {
-							managers.stretchPhase = .stretch
-						}
-						if audio {
-							SoundManager.instance.playPrompt(sound: .stretch)
-						}
-					}
+                    guard var playlistIndex else { return }
+                    if repsCompleted != totalReps {
+                        timeRemaining = totalStretch
+                        withAnimation {
+                            managers.stretchPhase = .stretch
+                        }
+                        if audio {
+                            SoundManager.instance.playPrompt(sound: .stretch)
+                        }
+                    } else {
+                        //reps completed == total reps, goes to next stretch
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+                            playlistIndex += 1
+                            self.playlistIndex = playlistIndex
+                            loadPlaylistItem(playlistIndex)
+                            timeRemaining = totalStretch
+                            repsCompleted = 0
+                            withAnimation {
+                                managers.stretchPhase = .stretch
+                            }
+                            managers.isTimerActive = true
+                        }
+                        if audio {
+                            SoundManager.instance.playPrompt(sound: .stretch)
+                        }
+                    }
 				}
 			}
 		}

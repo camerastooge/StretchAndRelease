@@ -74,13 +74,13 @@ struct SettingsView: View {
             ScrollView {
                 VStack(spacing: 0) {
                     if !dynamicTypeSize.isAccessibilitySize {
-                        PhoneTimerSettingsTypicalView(stretch: $stretch, rest: $rest, reps: $reps, isEditing: $isEditing)
+                        PhoneTimerSettingsTypicalView(stretch: $stretch, rest: $rest, reps: $reps)
                             .scrollDisabled(true)
                             .containerRelativeFrame(.vertical) { height, _ in
                                 height * 0.55
                             }
                     } else {
-                        PhoneTimerSettingsAccessibleView(stretch: $stretch, rest: $rest, reps: $reps, isEditing: $isEditing)
+                        PhoneTimerSettingsAccessibleView(stretch: $stretch, rest: $rest, reps: $reps)
                             .scrollDisabled(false)
                             .containerRelativeFrame(.vertical) { height, _ in
                                 height * 0.55
@@ -145,11 +145,11 @@ struct SettingsView: View {
 					totalStretch = stretch
 					totalRest = rest
 					totalReps = reps
-					SoundManager.instance.volume = promptVolume
                     audio = audioToggle
                     haptics = hapticToggle
                     isPlaylistActive = playlistToggle
                     promptVolume = volumeValue
+                    SoundManager.instance.volume = promptVolume
 					managers.didSettingsChange = true
 					dismiss()
 				} label: {
