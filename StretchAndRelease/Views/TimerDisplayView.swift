@@ -52,7 +52,6 @@ struct TimerDisplayView: View {
 				return managers.stretchPhase.phaseText
 			}
 		}
-		
 	}
     
     var body: some View {

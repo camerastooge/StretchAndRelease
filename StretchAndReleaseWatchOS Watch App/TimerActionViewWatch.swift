@@ -45,13 +45,21 @@ struct TimerActionViewWatch: View {
 	@Binding var playlistItem: PlaylistItem?
 	
 	//local properties for display
-	var timerTextLabel: String {
-		if !managers.isTimerPaused {
-			playlistItem?.name ?? managers.stretchPhase.phaseText
-		} else {
-			"PAUSED"
-		}
-	}
+    var timerTextLabel: String {
+        if isPlaylistActive {
+            guard let playlistItem else { return managers.stretchPhase.phaseText }
+            return playlistItem.name ?? managers.stretchPhase.phaseText
+        } else {
+            if managers.isTimerPaused {
+                return "PAUSED"
+            } else {
+                return managers.stretchPhase.phaseText
+            }
+        }
+    }
+    
+    var buttonRoles: ButtonRoles = .play
+    var deviceType: DeviceType = .watch
 	
 	var displayColor: Color {
 		if !managers.isTimerPaused {
@@ -68,11 +76,6 @@ struct TimerActionViewWatch: View {
 			"This is the current stretch phase."
 		}
 	}
-	
-	// variables for button view
-	var buttonRoles: ButtonRoles = .play
-	var deviceType: DeviceType = .watch
-
 	
     var body: some View {
 		ZStack {
@@ -448,22 +451,20 @@ struct TimerActionViewWatch: View {
 				}
 			} else {
 				//using playlist feature -> reps completed, go to next exercise
-				guard let playlistIndex else { return }
+				guard var playlistIndex else { return }
 				if repsCompleted == totalReps {
-					managers.isTimerActive = false
-					withAnimation(.linear(duration: 0.5)) {
-						managers.stretchPhase = .stretch
-						repsCompleted = 0
-					}
-					self.playlistIndex = playlistIndex + 1
-					loadPlaylistItem(playlistIndex)
-					timeRemaining = totalStretch
-					if audio {
-						SoundManager.instance.playPrompt(sound: .countdownExpanded)
-					}
-					DispatchQueue.main.asyncAfter(deadline: audio ? .now() + 3 : .now() + 0.25) {
-						managers.isTimerActive = true
-					}
+                    managers.isTimerActive = false
+                    if audio {
+                        SoundManager.instance.playPrompt(sound: .countdownExpanded)
+                    }
+                    DispatchQueue.main.asyncAfter(deadline: audio ? .now() + 3.0 : .now() + 0.25) {
+                        playlistIndex += 1
+                        loadPlaylistItem(playlistIndex)
+                        self.playlistIndex = playlistIndex
+                        timeRemaining = totalStretch
+                        repsCompleted = 0
+                        managers.isTimerActive = true
+                    }
 				} else {
 				   // using playlist feature -> reps not completed, go to stretch phase
 					timeRemaining = totalStretch
