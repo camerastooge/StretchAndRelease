@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct EditExerciseViewWatch: View {
 	//Environment properties
@@ -15,10 +16,10 @@ struct EditExerciseViewWatch: View {
 	@Environment(\.dismiss) var dismiss
 	@Environment(\.modelContext) var modelContext
 	
-	@State var name = ""
-	@State var stretch = 10
-	@State var rest = 5
-	@State var reps = 3
+	@State private var name = ""
+	@State private var stretch = 10
+	@State private var rest = 5
+	@State private var reps = 3
 	
 	@Bindable var playlistItem: PlaylistItem
 	@Binding var isComingFromParentView: Bool
@@ -31,13 +32,14 @@ struct EditExerciseViewWatch: View {
 				Section {
 					TextField(name, text: $name)
 						.accessibilityHint("Change the name of the stretch")
+						.accessibilityValue(name)
+					
 					NavigationLink {
 						Picker("Stretch", selection: $stretch) {
 							ForEach(1...60, id:\.self) {
 								Text("\($0)")
 									.font(.headline)
 									.fontWeight(.bold)
-									.accessibilityHint("Adjust the duration of the stretch period")
 									.accessibilityValue(String(stretch))
 									.accessibilityAdjustableAction { direction in
 										switch direction {
@@ -59,7 +61,6 @@ struct EditExerciseViewWatch: View {
 								Text("\($0)")
 									.font(.headline)
 									.fontWeight(.bold)
-									.accessibilityHint("Adjust the duration of the rest period")
 									.accessibilityValue(String(rest))
 									.accessibilityAdjustableAction { direction in
 										switch direction {
@@ -81,7 +82,6 @@ struct EditExerciseViewWatch: View {
 								Text("\($0)")
 									.font(.headline)
 									.fontWeight(.bold)
-									.accessibilityHint("Adjust the number of repetitions in this set")
 									.accessibilityValue(String(reps))
 									.accessibilityAdjustableAction { direction in
 										switch direction {
@@ -126,8 +126,27 @@ struct EditExerciseViewWatch: View {
 								.dynamicTypeSize(...DynamicTypeSize.accessibility2)
 						}
 					}
+					.accessibilityLabel("Save changes")
+					.accessibilityHint("Save your changes and return to the previous screen.")
+					.accessibilityInputLabels(["Save"])
 				}
-				
+				ToolbarItem(placement: .topBarTrailing) {
+					Button {
+						dismiss()
+					} label: {
+						if #available(watchOS 26.0, *) {
+							Image(systemName: "x.circle")
+								.foregroundColor(.red)
+								.glassEffect(.clear)
+						} else {
+							Image(systemName: "chevron.left")
+								.backgroundStyle(.red)
+						}
+					}
+					.buttonStyle(.plain)
+					.accessibilityLabel("Cancel changes and return to previous screen")
+					.accessibilityInputLabels(["Cancel"])
+				}
 			}
 		}
 		.onAppear {

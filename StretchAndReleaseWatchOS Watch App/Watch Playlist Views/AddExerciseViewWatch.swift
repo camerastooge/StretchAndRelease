@@ -31,13 +31,13 @@ struct AddExerciseViewWatch: View {
 				Section {
 					TextField("Name your stretch", text: $name)
 						.accessibilityHint("Enter a name for this stretch")
+					
 					NavigationLink {
 						Picker("Stretch", selection: $stretch) {
 							ForEach(1...60, id:\.self) {
 								Text("\($0)")
 									.font(.headline)
 									.fontWeight(.bold)
-									.accessibilityHint("Set the duration for the stretch")
 									.accessibilityValue(String(stretch))
 									.accessibilityAdjustableAction { direction in
 										switch direction {
@@ -59,7 +59,6 @@ struct AddExerciseViewWatch: View {
 								Text("\($0)")
 									.font(.headline)
 									.fontWeight(.bold)
-									.accessibilityHint("Set the duration of the rest period")
 									.accessibilityValue(String(rest))
 									.accessibilityAdjustableAction { direction in
 										switch direction {
@@ -81,7 +80,6 @@ struct AddExerciseViewWatch: View {
 								Text("\($0)")
 									.font(.headline)
 									.fontWeight(.bold)
-									.accessibilityHint("Set the number of repetitions in this set")
 									.accessibilityValue(String(reps))
 									.accessibilityAdjustableAction { direction in
 										switch direction {
@@ -132,7 +130,8 @@ struct AddExerciseViewWatch: View {
 						}
 					}
 					.buttonStyle(.plain)
-					.accessibilityLabel("Save changes and return to set list view")
+					.accessibilityLabel("Save changes and return to previous screen")
+					.accessibilityInputLabels(["Save"])
 				}
 				ToolbarItem(placement: .topBarTrailing) {
 					Button {
@@ -148,6 +147,8 @@ struct AddExerciseViewWatch: View {
 						}
 					}
 					.buttonStyle(.plain)
+					.accessibilityLabel("Cancel changes and return to previous screen")
+					.accessibilityInputLabels(["Cancel"])
 				}
 			}
 		}

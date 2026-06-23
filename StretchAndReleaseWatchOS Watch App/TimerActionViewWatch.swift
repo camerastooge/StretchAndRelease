@@ -112,7 +112,7 @@ struct TimerActionViewWatch: View {
 									}
 									.buttonStyle(.plain)
 									.accessibilityLabel("Previous stretch")
-									.accessibilityInputLabels(["previous", "previous stretch"])
+									.accessibilityInputLabels(["previous"])
 								} else {
 									Color.clear
 								}
@@ -167,7 +167,7 @@ struct TimerActionViewWatch: View {
 									}
 									.buttonStyle(.plain)
 									.accessibilityLabel("Go to the next stretch")
-									.accessibilityInputLabels(["next", "next stretch"])
+									.accessibilityInputLabels(["next"])
 								} else {
 									Color.clear
 								}
@@ -179,7 +179,7 @@ struct TimerActionViewWatch: View {
 					}
 					
 					Text("Reps: \(repsCompleted)/\(totalReps)")
-						.accessibilityLabel("Repetitions Completed \(repsCompleted) of \(totalReps)")
+						.accessibilityLabel("\(repsCompleted) completed out of \(totalReps)")
 				}
 				.font(.caption)
 				.fontWeight(.bold)
@@ -263,8 +263,8 @@ struct TimerActionViewWatch: View {
 			}
 			.buttonStyle(.plain)
 			.padding(.trailing)
-			.accessibilityInputLabels(["Start", "Pause", "Start Timer", "Pause Timer"])
-			.accessibilityLabel("Start or Pause Timer")
+			.accessibilityLabel(!managers.isTimerPaused ? "Pause Timer" : "Start Timer")
+			.accessibilityInputLabels(["Start", "Pause"])
 			
 			//resets timer
 			Button {
@@ -286,7 +286,6 @@ struct TimerActionViewWatch: View {
 			.buttonStyle(.plain)
 			.padding(.trailing)
 			.accessibilityLabel("Reset Timer")
-			.accessibilityHint("This button reset the timer.")
 			.accessibilityInputLabels(["Reset"])
 			
 			//Settings
