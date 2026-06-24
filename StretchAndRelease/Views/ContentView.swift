@@ -101,7 +101,7 @@ struct ContentView: View {
                     }
                     .accessibilityLabel("Show Settings")
 					.accessibilityInputLabels(["settings"])
-                }
+				}
             }
 
         }
