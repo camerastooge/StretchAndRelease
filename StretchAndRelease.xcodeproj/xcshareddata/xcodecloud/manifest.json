@@ -1,0 +1,9 @@
+{
+  "id" : "6b9ccb2c-ad9a-48ac-a688-29d351e7e7ce",
+  "targets" : [
+    {
+      "id" : "4800005F-ECFA-4937-B854-0EA31471C0CA",
+      "name" : "StretchAndRelease"
+    }
+  ]
+}
