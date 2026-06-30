@@ -16,8 +16,33 @@ struct TimerSettingsViewWatch: View {
 	@Environment(\.scenePhase) var scenePhase
 	@Environment(Managers.self) var managers
     
-	//State properties
-	@State private var showAddExerciseview = false
+    // Properties stored in UserDefaults
+    @AppStorage("stretch") private var totalStretch = 10
+    @AppStorage("rest") private var totalRest = 5
+    @AppStorage("reps") private var totalReps = 3
+    
+    @AppStorage("audio") private var audio = true
+    @AppStorage("haptics") private var haptics = true
+    @AppStorage("promptVolume") private var promptVolume = 1.0
+    @AppStorage("playlist") private var isPlaylistActive = false
+    
+    //SwiftData query
+    @Query(sort: \PlaylistItem.index) var playlist: [PlaylistItem]
+    
+    //local variables
+    @State private var stretch = 0
+    @State private var rest = 0
+    @State private var reps = 0
+    @State private var isEditing = false
+    @State private var playlistToggle = false
+    @State private var hapticToggle = false
+    @State private var audioToggle = false
+    @State private var volumeValue = 0.0
+    
+    @State private var isShowingEmptyPlaylistAlert = false
+    @State private var showAddExerciseView = false
+    
+    @Binding var didTriggerSettingsFromContentView: Bool
 	
     // variable for button view
     var buttonRoles: ButtonRoles = .save
@@ -30,23 +55,41 @@ struct TimerSettingsViewWatch: View {
                 
                 VStack {
 					TabView {
-                        WatchAppSettingsView()
+                        WatchAppSettingsView(stretch: $stretch, rest: $rest, reps: $reps)
                         
-						WatchDeviceSettingsView(showAddExerciseView: $showAddExerciseview)
+                        WatchDeviceSettingsView(audioToggle: $audioToggle, hapticToggle: $hapticToggle, playlistToggle: $playlistToggle, volumeValue: $volumeValue, showAddExerciseView: $showAddExerciseView)
                     }
 					.tabViewStyle(.page)
                 }
 				.navigationTitle("SETTINGS")
 				.navigationBarTitleDisplayMode(.inline)
-				.navigationDestination(isPresented: $showAddExerciseview) {
+				.navigationDestination(isPresented: $showAddExerciseView) {
 					AddExerciseViewWatch()
 						.navigationBarBackButtonHidden()
 				}
+            }
+        }.onAppear {
+            if didTriggerSettingsFromContentView {
+                stretch = totalStretch
+                rest = totalRest
+                reps = totalReps
+                audioToggle = audio
+                hapticToggle = haptics
+                playlistToggle = isPlaylistActive
+                volumeValue = promptVolume
+                didTriggerSettingsFromContentView = false
             }
         }
 		.toolbar {
 			ToolbarItem(placement: .topBarLeading) {
 				Button {
+                    totalStretch = stretch
+                    totalRest = rest
+                    totalReps = reps
+                    audio = audioToggle
+                    haptics = hapticToggle
+                    isPlaylistActive = playlistToggle
+                    promptVolume = volumeValue
 					managers.didSettingsChange = true
 					dismiss()
 				} label: {
@@ -84,43 +127,43 @@ struct TimerSettingsViewWatch: View {
 
 struct WatchAppSettingsView: View {
     
-	// Properties stored in UserDefaults
-	@AppStorage("stretch") private var totalStretch = 10
-	@AppStorage("rest") private var totalRest = 5
-	@AppStorage("reps") private var totalReps = 3
+	//Bindings passed from parent view
+    @Binding var stretch: Int
+    @Binding var rest: Int
+    @Binding var reps: Int
     
     var body: some View {
         List {
-			NavigationLink(destination: StretchPickerView()) {
+            NavigationLink(destination: StretchPickerView(stretch: $stretch)) {
 				HStack {
 					Text("Stretch")
 						.font(.caption2)
 					Spacer()
-					Text("\(totalStretch) sec")
+					Text("\(stretch) sec")
 						.foregroundColor(.white)
 				}
 				.accessibilityElement(children: .combine)
 				.accessibilityHint("Change the length of the time you hold each stretch")
 			}
 			
-			NavigationLink(destination: RestPickerView()) {
+            NavigationLink(destination: RestPickerView(rest: $rest)) {
 				HStack {
 					Text("Rest")
 						.font(.caption2)
 					Spacer()
-					Text("\(totalRest) sec")
+					Text("\(rest) sec")
 						.foregroundColor(.white)
 				}
 				.accessibilityElement(children: .combine)
 				.accessibilityHint("Change the length of the rest period between stretches")
 			}
             
-            NavigationLink(destination: RepsPickerView()) {
+            NavigationLink(destination: RepsPickerView(reps: $reps)) {
                 HStack {
                     Text("Reps")
                         .font(.caption2)
                     Spacer()
-                    Text("\(totalReps) reps")
+                    Text("\(reps) reps")
                     .foregroundColor(.white)
                 }
                 .accessibilityElement(children: .combine)
@@ -131,11 +174,11 @@ struct WatchAppSettingsView: View {
 }
 
 struct WatchDeviceSettingsView: View {
-	// Properties stored in UserDefaults
-	@AppStorage("audio") private var audio = true
-	@AppStorage("haptics") private var haptics = true
-	@AppStorage("promptVolume") private var promptVolume = 1.0
-	@AppStorage("playlist") private var isPlaylistActive = false
+    //Binding passed from parent view
+    @Binding var audioToggle: Bool
+    @Binding var hapticToggle: Bool
+    @Binding var playlistToggle: Bool
+    @Binding var volumeValue: Double
 	
 	//SwiftData query
 	@Query(sort: \PlaylistItem.index) var playlist: [PlaylistItem]
@@ -148,15 +191,15 @@ struct WatchDeviceSettingsView: View {
     
     var body: some View {
         VStack {
-			Toggle("Set list: \(haptics ? "on" : "off")", isOn: $isPlaylistActive)
+			Toggle("Set list: \(playlistToggle ? "on" : "off")", isOn: $playlistToggle)
 				.padding(.top, 10)
-            Toggle("Audio: \(audio ? "on" : "off")", isOn: $audio)
+            Toggle("Audio: \(audioToggle ? "on" : "off")", isOn: $audioToggle)
                 .accessibilityHint("Turn audio cues on or off")
-            Toggle("Haptics: \(haptics ? "on" : "off")", isOn: $haptics)
+            Toggle("Haptics: \(hapticToggle ? "on" : "off")", isOn: $hapticToggle)
                 .accessibilityHint("Turn haptic feedback on or off")
             HStack {
                 Slider(
-                    value: $promptVolume,
+                    value: $volumeValue,
                     in: 0.0...1.0
                 ) {
                     Text("Prompt Volume")
@@ -169,24 +212,23 @@ struct WatchDeviceSettingsView: View {
                 }
                 .accessibilityLabel("Volume")
                 .accessibilityHint("Adjust volume of voice prompts")
-                .accessibilityValue(String(promptVolume.formatted(.percent)))
+                .accessibilityValue(String(volumeValue.formatted(.percent)))
                 .accessibilityAdjustableAction { direction in
                     switch direction {
-                    case .increment: promptVolume += 0.1
-                    case .decrement: promptVolume -= 0.1
+                    case .increment: volumeValue += 0.1
+                    case .decrement: volumeValue -= 0.1
                     @unknown default: print("not handled")
                     }
                 }
             }
         }
         .padding([.horizontal, .vertical])
-		.onChange(of: isPlaylistActive) {
-			if isPlaylistActive && playlist.isEmpty {
+		.onChange(of: playlistToggle) {
+			if playlistToggle && playlist.isEmpty {
 				DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
 					isShowingEmptyPlaylistAlert = true
 				}
-				
-					isPlaylistActive = false
+					playlistToggle = false
 			}
 		}
 		.alert("Empty Setlists", isPresented: $isShowingEmptyPlaylistAlert) {
@@ -202,24 +244,24 @@ struct WatchDeviceSettingsView: View {
 
 // Subview for Stretch Picker
 struct StretchPickerView: View {
-	@AppStorage("stretch") var totalStretch = 10
+    @Binding var stretch: Int
 	
 	var body: some View {
 		VStack {
 			Text("Stretch Duration").font(.headline)
-			Picker("Stretch Duration", selection: $totalStretch) {
+			Picker("Stretch Duration", selection: $stretch) {
 				ForEach(1...60, id: \.self) { Text("\($0) sec") }
 			}
 			.pickerStyle(.wheel)
 			.labelsHidden()
 			.accessibilityElement(children: .ignore)
-			.accessibilityLabel("Stretch period \(totalStretch) seconds")
+			.accessibilityLabel("Stretch period \(stretch) seconds")
 			.accessibilityHint("Adjust how long to hold each stretch")
-			.accessibilityValue(String(totalStretch))
+			.accessibilityValue(String(stretch))
 			.accessibilityAdjustableAction { direction in
 				switch direction {
-				case .increment: totalStretch += 1
-				case .decrement: totalStretch -= 1
+				case .increment: stretch += 1
+				case .decrement: stretch -= 1
 				@unknown default: print("not handled")
 				}
 			}
@@ -229,24 +271,24 @@ struct StretchPickerView: View {
 
 // Subview for Rest Picker
 struct RestPickerView: View {
-	@AppStorage("rest") private var totalRest = 5
+    @Binding var rest: Int
 	
 	var body: some View {
 		VStack {
 			Text("Rest Duration").font(.headline)
-			Picker("Rest Duration", selection: $totalRest) {
+			Picker("Rest Duration", selection: $rest) {
 				ForEach(1...60, id: \.self) { Text("\($0) sec") }
 			}
 			.pickerStyle(.wheel)
 			.labelsHidden()
 			.accessibilityElement(children: .ignore)
-			.accessibilityLabel("Rest period \(totalRest) seconds")
+			.accessibilityLabel("Rest period \(rest) seconds")
 			.accessibilityHint("Adjust rest period between stretches")
-			.accessibilityValue(String(totalRest))
+			.accessibilityValue(String(rest))
 			.accessibilityAdjustableAction { direction in
 				switch direction {
-				case .increment: totalRest += 1
-				case .decrement: totalRest -= 1
+				case .increment: rest += 1
+				case .decrement: rest -= 1
 				@unknown default: print("not handled")
 				}
 			}
@@ -256,12 +298,12 @@ struct RestPickerView: View {
 
 //Subview for Reps picker
 struct RepsPickerView: View {
-	@AppStorage("reps") private var totalReps = 0
+    @Binding var reps: Int
 	
 	var body: some View {
 		VStack {
 			Text("Reps").font(.headline)
-            Picker("Number of Reps", selection: $totalReps) {
+            Picker("Number of Reps", selection: $reps) {
                 ForEach(1...60, id:\.self) {
                     Text("\($0) reps")
                 }
@@ -269,13 +311,13 @@ struct RepsPickerView: View {
             .pickerStyle(.wheel)
             .labelsHidden()
             .accessibilityElement(children: .ignore)
-            .accessibilityLabel("Reps \(totalReps)")
+            .accessibilityLabel("Reps \(reps)")
             .accessibilityHint("Adjust number of reps for each exercise")
-            .accessibilityValue(String(totalReps))
+            .accessibilityValue(String(reps))
             .accessibilityAdjustableAction { direction in
                 switch direction {
-                case .increment: totalReps += 1
-                case .decrement: totalReps -= 1
+                case .increment: reps += 1
+                case .decrement: reps -= 1
                 @unknown default: print("not handled")
                 }
             }
@@ -285,10 +327,9 @@ struct RepsPickerView: View {
 
 
 #Preview {
-	@Previewable @State var showExerciseView = false
-	
+	@Previewable @State var didTriggerSettingsFromContentView = false
     
-	TimerSettingsViewWatch()
+    TimerSettingsViewWatch(didTriggerSettingsFromContentView: $didTriggerSettingsFromContentView)
         .environment(Managers())
 		.modelContainer(previewContainer)
 }

@@ -7,6 +7,7 @@
 
 import SwiftUI
 import SwiftData
+import Combine
 
 struct TimerDisplayView: View {
     //Environment properties
@@ -159,10 +160,14 @@ struct TimerDisplayView: View {
                                 }
 							}
                         } label: {
-                            ButtonView(buttonRoles: !managers.isTimerActive ? .play : .pause, deviceType: deviceType)
+                            if #available(iOS 26.0, *) {
+                                ButtonView(buttonRoles: !managers.isTimerActive ? .play : .pause, deviceType: deviceType)
+                            } else {
+                                ButtonView(buttonRoles: !managers.isTimerActive ? .play : .pause, deviceType: deviceType)
+                            }
                         }
+                        .buttonStyle(.plain)
                         .accessibilityLabel(!managers.isTimerActive ? "Start Timer" : "Pause Timer")
-						.accessibilityHint("This button starts or pauses the timer.")
 						.accessibilityInputLabels(["Start", "Start Timer", "Pause", "Pause Timer"])
                         
                         Spacer()
@@ -336,8 +341,8 @@ struct TimerDisplayView: View {
 				managers.isTimerActive = false
 				if !isPlaylistActive {
 					timeRemaining = totalStretch
-					managers.stretchPhase = .stretch
 					withAnimation(.easeOut(duration: 1)) {
+                        managers.stretchPhase = .stretch
 						updateEndAngle()
 					}
 				} else {

@@ -7,6 +7,7 @@
 
 import SwiftUI
 import SwiftData
+import Combine
 
 struct ContentView: View {
 	//Environment properties
@@ -27,7 +28,7 @@ struct ContentView: View {
 	// state variables used across views
 	@State private var timeRemaining: Int = 0
 	@State private var repsCompleted: Int = 0
-	@State private var endAngle = Angle(degrees: 340)
+	@State private var endAngle = Angle(degrees: 340) 
 	let timer = Timer.publish(every: 1.0, on: .main, in: .common).autoconnect()
 	
 	// state variables only used on main view
@@ -80,8 +81,10 @@ struct ContentView: View {
 		
 		//sends updated settings to iOS app
 		.onChange(of: managers.didSettingsChange) {
-			sendContext(stretch: totalStretch, rest: totalRest, reps: totalReps, playlist: isPlaylistActive)
-			managers.didSettingsChange = false
+            if managers.didSettingsChange {
+                sendContext(stretch: totalStretch, rest: totalRest, reps: totalReps, playlist: isPlaylistActive)
+                managers.didSettingsChange = false
+            }
 		}
 		
 		//when user changes totalStretch in SettingsView, force timeRemaining to reset to TotalStretch
