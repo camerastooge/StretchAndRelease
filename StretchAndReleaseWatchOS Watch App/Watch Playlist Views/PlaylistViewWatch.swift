@@ -88,6 +88,7 @@ struct PlaylistViewWatch: View {
                                 }
                                 .buttonStyle(.plain)
                                 .accessibilityLabel("Add an item to the set list")
+								.accessibilityInputLabels(["Add", "Create"])
                             }
                         }
                     }
@@ -109,10 +110,12 @@ struct PlaylistViewWatch: View {
                                 }
                             }
                             .buttonStyle(.plain)
-                            .accessibilityLabel("Add an item to the set list")
+							.accessibilityLabel("Add an item to the set list")
+							.accessibilityInputLabels(["Add", "Create"])
                             Text("Press \(Image(systemName: "plus.circle")) to add a stretch to your set list")
                                 .font(.system(size: 16))
                                 .foregroundStyle(colorScheme == .dark ? .white : .black)
+								.accessibilityLabel("Press the button to add a stretch to your stretch list")
                         }
                         }
                         .containerRelativeFrame([.vertical, .horizontal])

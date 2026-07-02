@@ -119,10 +119,11 @@ struct TimerSettingsViewWatch: View {
 							.glassEffect(.clear)
 					} else {
 						Image(systemName: "chevron.left")
-							.accessibilityLabel("Save changes and return to set list view")
 					}
 				}
 				.buttonStyle(.plain)
+				.accessibilityLabel("Save changes and return to set list view")
+				.accessibilityInputLabels(["Save"])
 			}
 			
 			ToolbarItem(placement: .topBarTrailing) {
@@ -133,14 +134,14 @@ struct TimerSettingsViewWatch: View {
 						Image(systemName: "x.circle")
 							.glassEffect(.clear)
 							.foregroundStyle(.red)
-							.accessibilityLabel("Cancel and return to set list view")
 					} else {
 						Image(systemName: "x.circle.fill")
 							.foregroundStyle(Color.red)
-							.accessibilityLabel("Cancel and return to set list view")
 					}
 				}
 				.buttonStyle(.plain)
+				.accessibilityLabel("Cancel and return to set list view")
+				.accessibilityInputLabels(["Cancel"])
 			}
 		}
         .onAppear {
@@ -299,7 +300,7 @@ struct StretchPickerView: View {
 			.pickerStyle(.wheel)
 			.labelsHidden()
 			.accessibilityElement(children: .ignore)
-			.accessibilityLabel("Stretch period \(stretch) seconds")
+			.accessibilityLabel("Stretch period is \(stretch) seconds")
 			.accessibilityHint("Adjust how long to hold each stretch")
 			.accessibilityValue(String(stretch))
 			.accessibilityAdjustableAction { direction in
@@ -331,7 +332,7 @@ struct RestPickerView: View {
 			.pickerStyle(.wheel)
 			.labelsHidden()
 			.accessibilityElement(children: .ignore)
-			.accessibilityLabel("Rest period \(rest) seconds")
+			.accessibilityLabel("Rest period is \(rest) seconds")
 			.accessibilityHint("Adjust rest period between stretches")
 			.accessibilityValue(String(rest))
 			.accessibilityAdjustableAction { direction in
@@ -360,7 +361,7 @@ struct RepsPickerView: View {
             .pickerStyle(.wheel)
             .labelsHidden()
             .accessibilityElement(children: .ignore)
-            .accessibilityLabel("Reps \(reps)")
+            .accessibilityLabel("\(reps) repetitions")
             .accessibilityHint("Adjust number of reps for each exercise")
             .accessibilityValue(String(reps))
             .accessibilityAdjustableAction { direction in

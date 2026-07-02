@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		E44D73412FDB3F4800EBE7E8 /* PhoneAddExerciseViewTypical.swift in Sources */ = {isa = PBXBuildFile; fileRef = E44D73402FDB3F4700EBE7E8 /* PhoneAddExerciseViewTypical.swift */; };
 		E4F1C1A22DFE0AAF00114B7C /* StretchAndReleaseWatchOS Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = E4F1C1982DFE0AAB00114B7C /* StretchAndReleaseWatchOS Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
@@ -241,7 +240,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E44D73412FDB3F4800EBE7E8 /* PhoneAddExerciseViewTypical.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
