@@ -25,11 +25,6 @@ class Connectivity: NSObject, WCSessionDelegate {
     
     #if os(iOS)
     func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
-		if activationState == .activated {
-			print("phone connection established")
-		} else {
-			print("phone connection failed")
-		}
     }
     
     func sessionDidBecomeInactive(_ session: WCSession) {
@@ -42,11 +37,6 @@ class Connectivity: NSObject, WCSessionDelegate {
     
     #else
     func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
-		if activationState == .activated {
-			print("watch connection established")
-		} else {
-			print("watch connection failed")
-		}
     }
     
     #endif
@@ -56,7 +46,6 @@ class Connectivity: NSObject, WCSessionDelegate {
         if session.activationState == .activated {
             do {
                 try session.updateApplicationContext(data)
-				print("context function fired \(Date.now.formatted(date: .omitted, time: .shortened))")
             } catch {
                 print("Error: \(error.localizedDescription)")
             }
@@ -68,7 +57,6 @@ class Connectivity: NSObject, WCSessionDelegate {
             self.statusText = "CS \(Date.now.formatted(date: .omitted, time: .shortened))"
             self.statusContext = applicationContext
             self.didStatusChange = true
-			print(self.statusText)
         }
     }
     

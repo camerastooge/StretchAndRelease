@@ -23,6 +23,12 @@ struct TimerSettingsViewWatch: View {
     @AppStorage("promptVolume") private var promptVolume = 1.0
     @AppStorage("playlist") private var isPlaylistActive = false
     
+<<<<<<< HEAD
+=======
+    //SwiftData query
+    @Query(sort: \PlaylistItem.index) var playlist: [PlaylistItem]
+    
+>>>>>>> c35eb462b881b88c8861c9e560c4c61aaf30eb8f
     //local variables
     @State private var stretch = 0
     @State private var rest = 0
@@ -31,10 +37,19 @@ struct TimerSettingsViewWatch: View {
     @State private var playlistToggle = false
     @State private var hapticToggle = false
     @State private var audioToggle = false
+<<<<<<< HEAD
     @State private var volumeValue = 0.5
     
     @State private var isShowingEmptyPlaylistAlert = false
     @State private var showAddExerciseView = false
+=======
+    @State private var volumeValue = 0.0
+    
+    @State private var isShowingEmptyPlaylistAlert = false
+    @State private var showAddExerciseView = false
+    
+    @Binding var didTriggerSettingsFromContentView: Bool
+>>>>>>> c35eb462b881b88c8861c9e560c4c61aaf30eb8f
 	
     // variable for button view
     var buttonRoles: ButtonRoles = .save
@@ -49,7 +64,11 @@ struct TimerSettingsViewWatch: View {
 					TabView {
                         WatchAppSettingsView(stretch: $stretch, rest: $rest, reps: $reps)
                         
+<<<<<<< HEAD
                         WatchDeviceSettingsView(playlistToggle: $playlistToggle, hapticToggle: $hapticToggle, audioToggle: $audioToggle, volumeValue: $volumeValue, showAddExerciseView: $showAddExerciseView)
+=======
+                        WatchDeviceSettingsView(audioToggle: $audioToggle, hapticToggle: $hapticToggle, playlistToggle: $playlistToggle, volumeValue: $volumeValue, showAddExerciseView: $showAddExerciseView)
+>>>>>>> c35eb462b881b88c8861c9e560c4c61aaf30eb8f
                     }
 					.tabViewStyle(.page)
                 }
@@ -60,20 +79,40 @@ struct TimerSettingsViewWatch: View {
 						.navigationBarBackButtonHidden()
 				}
             }
+        }.onAppear {
+            if didTriggerSettingsFromContentView {
+                stretch = totalStretch
+                rest = totalRest
+                reps = totalReps
+                audioToggle = audio
+                hapticToggle = haptics
+                playlistToggle = isPlaylistActive
+                volumeValue = promptVolume
+                didTriggerSettingsFromContentView = false
+            }
         }
 		.toolbar {
 			ToolbarItem(placement: .topBarLeading) {
 				Button {
+<<<<<<< HEAD
 					totalStretch = stretch
+=======
+                    totalStretch = stretch
+>>>>>>> c35eb462b881b88c8861c9e560c4c61aaf30eb8f
                     totalRest = rest
                     totalReps = reps
                     audio = audioToggle
                     haptics = hapticToggle
                     isPlaylistActive = playlistToggle
                     promptVolume = volumeValue
+<<<<<<< HEAD
                     SoundManager.instance.volume = promptVolume
                     managers.didSettingsChange = true
                     dismiss()
+=======
+					managers.didSettingsChange = true
+					dismiss()
+>>>>>>> c35eb462b881b88c8861c9e560c4c61aaf30eb8f
 				} label: {
 					if #available(watchOS 26.0, *) {
 						Image(systemName: "chevron.left")
@@ -117,6 +156,11 @@ struct TimerSettingsViewWatch: View {
 }
 
 struct WatchAppSettingsView: View {
+<<<<<<< HEAD
+=======
+    
+	//Bindings passed from parent view
+>>>>>>> c35eb462b881b88c8861c9e560c4c61aaf30eb8f
     @Binding var stretch: Int
     @Binding var rest: Int
     @Binding var reps: Int
@@ -163,10 +207,17 @@ struct WatchAppSettingsView: View {
 }
 
 struct WatchDeviceSettingsView: View {
+<<<<<<< HEAD
 	// Properties stored in UserDefaults
     @Binding var playlistToggle: Bool
     @Binding var hapticToggle: Bool
     @Binding var audioToggle: Bool
+=======
+    //Binding passed from parent view
+    @Binding var audioToggle: Bool
+    @Binding var hapticToggle: Bool
+    @Binding var playlistToggle: Bool
+>>>>>>> c35eb462b881b88c8861c9e560c4c61aaf30eb8f
     @Binding var volumeValue: Double
 	
 	//SwiftData query
@@ -217,7 +268,10 @@ struct WatchDeviceSettingsView: View {
 				DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
 					isShowingEmptyPlaylistAlert = true
 				}
+<<<<<<< HEAD
 				
+=======
+>>>>>>> c35eb462b881b88c8861c9e560c4c61aaf30eb8f
 					playlistToggle = false
 			}
 		}
@@ -250,8 +304,13 @@ struct StretchPickerView: View {
 			.accessibilityValue(String(stretch))
 			.accessibilityAdjustableAction { direction in
 				switch direction {
+<<<<<<< HEAD
 				case .increment:stretch += 1
 				case .decrement:stretch -= 1
+=======
+				case .increment: stretch += 1
+				case .decrement: stretch -= 1
+>>>>>>> c35eb462b881b88c8861c9e560c4c61aaf30eb8f
 				@unknown default: print("not handled")
 				}
 			}
@@ -317,10 +376,9 @@ struct RepsPickerView: View {
 
 
 #Preview {
-	@Previewable @State var showExerciseView = false
-	
+	@Previewable @State var didTriggerSettingsFromContentView = false
     
-	TimerSettingsViewWatch()
+    TimerSettingsViewWatch(didTriggerSettingsFromContentView: $didTriggerSettingsFromContentView)
         .environment(Managers())
 		.modelContainer(previewContainer)
 }

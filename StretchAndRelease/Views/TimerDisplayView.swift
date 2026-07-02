@@ -7,6 +7,7 @@
 
 import SwiftUI
 import SwiftData
+import Combine
 
 struct TimerDisplayView: View {
     //Environment properties
@@ -180,6 +181,7 @@ struct TimerDisplayView: View {
 								}
 							}
                         } label: {
+<<<<<<< HEAD
 							if #available(iOS 26, *) {
 								ButtonView(buttonRoles: !managers.isTimerActive ? .play : .pause, deviceType: deviceType)
 									.glassEffect()
@@ -189,6 +191,17 @@ struct TimerDisplayView: View {
                         .accessibilityLabel(!managers.isTimerActive ? "Start Timer" : "Pause Timer")
 						.accessibilityHint("This button starts or pauses the timer.")
 						.accessibilityInputLabels(["Start", "Pause"])
+=======
+                            if #available(iOS 26.0, *) {
+                                ButtonView(buttonRoles: !managers.isTimerActive ? .play : .pause, deviceType: deviceType)
+                            } else {
+                                ButtonView(buttonRoles: !managers.isTimerActive ? .play : .pause, deviceType: deviceType)
+                            }
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel(!managers.isTimerActive ? "Start Timer" : "Pause Timer")
+						.accessibilityInputLabels(["Start", "Start Timer", "Pause", "Pause Timer"])
+>>>>>>> c35eb462b881b88c8861c9e560c4c61aaf30eb8f
                         
                         Spacer()
                         
@@ -366,8 +379,13 @@ struct TimerDisplayView: View {
 			} else {
 				managers.isTimerActive = false
 				if !isPlaylistActive {
+<<<<<<< HEAD
 					withAnimation(.easeOut(duration: 1)) {
                         timeRemaining = totalStretch
+=======
+					timeRemaining = totalStretch
+					withAnimation(.easeOut(duration: 1)) {
+>>>>>>> c35eb462b881b88c8861c9e560c4c61aaf30eb8f
                         managers.stretchPhase = .stretch
 						updateEndAngle()
 					}

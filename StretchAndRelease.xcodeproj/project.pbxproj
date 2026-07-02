@@ -46,6 +46,7 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
+				"Views/Playlist Views/PhoneAddExerciseViewTypical.swift",
 			);
 			target = E41BF9572DFCDD5800E16C07 /* StretchAndRelease */;
 		};
@@ -188,7 +189,7 @@
 					New,
 				);
 				LastSwiftUpdateCheck = 1640;
-				LastUpgradeCheck = 2600;
+				LastUpgradeCheck = 2700;
 				TargetAttributes = {
 					E41BF9572DFCDD5800E16C07 = {
 						CreatedOnToolsVersion = 16.4;

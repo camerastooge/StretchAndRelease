@@ -27,11 +27,6 @@ class Managers {
         isTimerPaused = true
     }
     
-    func unpauseTimer() {
-        isTimerActive = true
-        isTimerPaused = false
-    }
-    
     func stopTimer() {
         isTimerActive = false
         isTimerPaused = false
