@@ -9,6 +9,7 @@ import SwiftUI
 import SwiftData
 
 struct AddExerciseView: View {
+    
     //Environment properties
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.accessibilityDifferentiateWithoutColor) var differentiateWithoutColor

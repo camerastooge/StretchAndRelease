@@ -9,6 +9,7 @@ import SwiftUI
 import SwiftData
 
 struct PhoneAddExerciseViewTypical: View {
+    
 	//Environment properties
 	@Environment(\.colorScheme) var colorScheme
 	@Environment(\.accessibilityDifferentiateWithoutColor) var differentiateWithoutColor
@@ -19,7 +20,6 @@ struct PhoneAddExerciseViewTypical: View {
 	@Binding var stretch: Int
 	@Binding var rest: Int
 	@Binding var reps: Int
-	
 	@ScaledMetric var buttonWidth = 100
 	
     var body: some View {
