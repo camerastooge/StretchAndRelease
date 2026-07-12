@@ -21,12 +21,14 @@ struct PhoneAddExerciseViewTypical: View {
 	@Binding var rest: Int
 	@Binding var reps: Int
 	@ScaledMetric var buttonWidth = 100
+    @FocusState private var focus: Bool
 	
     var body: some View {
 		VStack {
 			Form {
 				Section("Stretch name") {
 					TextField("Name your stretch", text: $name)
+                        .focused($focus)
 						.textFieldStyle(.roundedBorder)
 				}
 				.padding(.bottom)
@@ -118,6 +120,7 @@ struct PhoneAddExerciseViewTypical: View {
 			}
 			.scrollContentBackground(.hidden)
 		}
+        .onTapGesture(perform: focus = false)
     }
 }
 
