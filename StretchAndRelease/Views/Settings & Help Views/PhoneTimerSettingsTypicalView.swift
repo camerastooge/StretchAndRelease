@@ -85,7 +85,7 @@ struct PhoneTimerSettingsTypicalView: View {
                         .font(.subheadline)
                         .frame(height: 40)
                         .accessibilityElement(children: .ignore)
-                        .accessibilityLabel("Repetition count \(stretch)")
+                        .accessibilityLabel("Repetition count \(reps)")
                         .accessibilityHint("Set the number of times you want to perform this stretch")
                         .accessibilityValue(String(reps))
                         .accessibilityAdjustableAction { direction in

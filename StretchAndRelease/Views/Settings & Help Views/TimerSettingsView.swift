@@ -150,6 +150,7 @@ struct SettingsView: View {
 					if #available(iOS 26.0, *) {
 						Image(systemName: "chevron.left")
 							.glassEffect(.clear)
+							.accessibilityLabel("Save changes and return to set list view")
 					} else {
 						Image(systemName: "chevron.left")
 							.accessibilityLabel("Save changes and return to set list view")

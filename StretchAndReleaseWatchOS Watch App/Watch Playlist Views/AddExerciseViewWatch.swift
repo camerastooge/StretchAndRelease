@@ -63,8 +63,8 @@ struct AddExerciseViewWatch: View {
 									.accessibilityValue(String(rest))
 									.accessibilityAdjustableAction { direction in
 										switch direction {
-										case .increment: stretch += 1
-										case .decrement: stretch -= 1
+										case .increment: rest += 1
+										case .decrement: rest -= 1
 										@unknown default: print("not handled")
 										}
 									}
@@ -148,6 +148,7 @@ struct AddExerciseViewWatch: View {
 						}
 					}
 					.buttonStyle(.plain)
+					.accessibilityLabel("Cancel and return to set list view")
 				}
 			}
 		}
