@@ -9,20 +9,20 @@ import SwiftUI
 import SwiftData
 
 struct PhoneAddExerciseViewTypical: View {
-    
+
 	//Environment properties
 	@Environment(\.colorScheme) var colorScheme
 	@Environment(\.accessibilityDifferentiateWithoutColor) var differentiateWithoutColor
 	@Environment(\.dynamicTypeSize) var sizeCategory
 	@Environment(\.dismiss) var dismiss
-	
+
 	@Binding var name: String
 	@Binding var stretch: Int
 	@Binding var rest: Int
 	@Binding var reps: Int
 	@ScaledMetric var buttonWidth = 100
     @FocusState private var focus: Bool
-	
+
     var body: some View {
 		VStack {
 			Form {
@@ -32,7 +32,7 @@ struct PhoneAddExerciseViewTypical: View {
 						.textFieldStyle(.roundedBorder)
 				}
 				.padding(.bottom)
-				
+
 				Section("Stretch duration") {
 					HStack {
 						Picker("Stretch", selection: $stretch) {
@@ -61,7 +61,7 @@ struct PhoneAddExerciseViewTypical: View {
 					}
 				}
 				.padding(.bottom)
-				
+
 				Section("Rest duration") {
 					HStack {
 						Picker("Rest Duration", selection: $rest) {
@@ -90,7 +90,7 @@ struct PhoneAddExerciseViewTypical: View {
 					}
 				}
 				.padding(.bottom)
-				
+
 				Section("Number of repetitions") {
 					HStack {
 						Picker("Number of Repetitions to Complete", selection: $reps) {
@@ -115,7 +115,7 @@ struct PhoneAddExerciseViewTypical: View {
 						default: print("not handled")
 						}
 					}
-					
+
 				}
 			}
 			.scrollContentBackground(.hidden)
@@ -131,6 +131,6 @@ struct PhoneAddExerciseViewTypical: View {
 	@Previewable @State var stretch = 10
 	@Previewable @State var rest = 5
 	@Previewable @State var reps = 4
-	
+
 	PhoneAddExerciseViewTypical(name: $name, stretch: $stretch, rest: $rest, reps: $reps)
 }
