@@ -72,11 +72,11 @@ struct ContentView: View {
                             Image(systemName: "questionmark.circle")
                                 .foregroundStyle(.blue)
                                 .glassEffect()
-                                .accessibilityLabel("Show playlist")
+                                .accessibilityLabel("Show help")
 
                         } else {
                             Image(systemName: "questionmark.circle")
-                                .accessibilityLabel("Show playlist")
+                                .accessibilityLabel("Show help")
 
                         }                    }
                 }
