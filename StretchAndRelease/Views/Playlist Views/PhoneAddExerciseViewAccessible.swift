@@ -28,6 +28,7 @@ struct PhoneAddExerciseViewAccessible: View {
                 
                 Section {
                     TextField("Name Your Stretch", text: $name)
+                        .focused($focus)
                         .textFieldStyle(.roundedBorder)
                 }
                 
