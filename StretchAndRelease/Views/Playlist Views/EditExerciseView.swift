@@ -56,12 +56,20 @@ struct EditExerciseView: View {
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
                 Button {
-                    playlistItem.name = name
-                    playlistItem.stretchDuration = stretch
-                    playlistItem.restDuration = rest
-                    playlistItem.repsToComplete = reps
-                    try? modelContext.save()
-                    dismiss()
+                    if !name.isEmpty {
+                        playlistItem.name = name
+                        playlistItem.stretchDuration = stretch
+                        playlistItem.restDuration = rest
+                        playlistItem.repsToComplete = reps
+                        try? modelContext.save()
+                        dismiss()
+                    } else {
+                        playlistItem.stretchDuration = stretch
+                        playlistItem.restDuration = rest
+                        playlistItem.repsToComplete = reps
+                        try? modelContext.save()
+                        dismiss()
+                    }
                 } label: {
                     if #available(iOS 26.0, *) {
                         Image(systemName: "chevron.left")

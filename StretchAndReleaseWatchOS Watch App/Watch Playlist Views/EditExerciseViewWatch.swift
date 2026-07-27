@@ -98,6 +98,31 @@ struct EditExerciseViewWatch: View {
 							.accessibilityLabel("Number of repetitions: \(reps)")
 							.accessibilityHint("Adjust the number of repetitions")
 					}
+                    HStack {
+                        Spacer()
+                        Button {
+                            dismiss()
+                        } label: {
+                            if #available(watchOS 26.0, *) {
+                                Text("CANCEL")
+                                    .frame(width: 100, height: 35, alignment: .center)
+                                    .font(.headline)
+                                    .fontWeight(.bold)
+                                    .background(.red)
+                                    .clipShape(.capsule)
+                                    .glassEffect()
+                            } else {
+                                Text("CANCEL")
+                                    .frame(width: 100, height: 35, alignment: .center)
+                                    .font(.headline)
+                                    .fontWeight(.bold)
+                                    .background(.red)
+                                    .clipShape(.capsule)
+                            }
+                        }
+                        .buttonStyle(.plain)
+                        Spacer()
+                    }
 				}
 			}
 			.navigationTitle("Edit Stretch")
@@ -106,11 +131,18 @@ struct EditExerciseViewWatch: View {
 			.toolbar {
 				ToolbarItem(placement: .topBarLeading) {
 					Button {
-						playlistItem.name = name
-						playlistItem.stretchDuration = stretch
-						playlistItem.restDuration = rest
-						playlistItem.repsToComplete = reps
-						modelContext.insert(playlistItem)
+                        if !name.isEmpty {
+                            playlistItem.name = name
+                            playlistItem.stretchDuration = stretch
+                            playlistItem.restDuration = rest
+                            playlistItem.repsToComplete = reps
+                            modelContext.insert(playlistItem)
+                        } else {
+                            playlistItem.stretchDuration = stretch
+                            playlistItem.restDuration = rest
+                            playlistItem.repsToComplete = reps
+                            modelContext.insert(playlistItem)
+                        }
 						do {
 							try modelContext.save()
 						} catch {

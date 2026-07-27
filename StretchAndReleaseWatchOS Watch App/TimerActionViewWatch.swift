@@ -23,7 +23,7 @@ struct TimerActionViewWatch: View {
 	@AppStorage("audio") private var audio = true
 	@AppStorage("haptics") private var haptics = true
 	@AppStorage("promptVolume") private var promptVolume = 1.0
-	@AppStorage("playlist") private var isPlaylistActive = false
+	@AppStorage("playlist") private var isPlaylistActive = true
 	
 	// state variables used across views
 	@State private var repsCompleted: Int = 0
@@ -116,11 +116,12 @@ struct TimerActionViewWatch: View {
 									Color.clear
 								}
 							}
-							.frame(width: 15)
+							.frame(width: 8)
 							
 							Text(timerTextLabel)
-								.frame(width: 90)
-								.lineLimit(1)
+                                .frame(width: 80, height: 25)
+                                .lineLimit(2)
+                                .multilineTextAlignment(.center)
 								.minimumScaleFactor(0.5)
 								.offset(x: offset)
 								.transition(.slide)
@@ -171,7 +172,7 @@ struct TimerActionViewWatch: View {
 									Color.clear
 								}
 							}
-							.frame(width: 15)
+							.frame(width: 8)
 
 						}
 						.frame(height: 20)
@@ -289,7 +290,7 @@ struct TimerActionViewWatch: View {
             didSettingsTriggerFromContentView = true
         }
         
-		.onChange(of: isPlaylistActive) {
+        .onChange(of: isPlaylistActive, initial: true) {
 			if isPlaylistActive {
                 guard var playlistIndex else { return }
 				if !playlist.isEmpty {
