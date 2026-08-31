@@ -54,7 +54,7 @@ struct EditExerciseView: View {
             reps = playlistItem.repsToComplete ?? 3
         }
         .toolbar {
-            ToolbarItem(placement: .navigationBarLeading) {
+            ToolbarItem(placement: .topBarTrailing) {
                 Button {
                     if !name.isEmpty {
                         playlistItem.name = name
@@ -71,32 +71,21 @@ struct EditExerciseView: View {
                         dismiss()
                     }
                 } label: {
-                    if #available(iOS 26.0, *) {
-                        Image(systemName: "chevron.left")
-                            .glassEffect(.clear)
-                            .accessibilityLabel("Save changes and return to set list view")
-                    } else {
-                        Image(systemName: "chevron.left")
-                            .accessibilityLabel("Save changes and return to set list view")
-                    }
-                }
-				.buttonStyle(.plain)
+                    Image(systemName: "checkmark.circle.fill")
+                        .font(.title)
+                        .foregroundStyle(.green)
+                    .accessibilityLabel("Save changes")                }
+                .buttonStyle(.plain)
             }
 			
-			ToolbarItem(placement: .navigationBarTrailing) {
+			ToolbarItem(placement: .topBarLeading) {
 				Button(role: .cancel) {
 					dismiss()
 				} label: {
-					if #available(iOS 26.0, *) {
-						Image(systemName: "x.circle")
-							.glassEffect(.clear)
-							.foregroundStyle(.red)
-							.accessibilityLabel("Cancel and return to set list view")
-					} else {
-						Image(systemName: "x.circle.fill")
-							.foregroundStyle(Color.red)
-							.accessibilityLabel("Cancel and return to set list view")
-					}
+                    Image(systemName: "x.circle.fill")
+                        .font(.title)
+                        .foregroundStyle(.red)
+                        .accessibilityLabel("Cancel and return to set list view")
 				}
 				.buttonStyle(.plain)
 			}

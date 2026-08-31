@@ -54,7 +54,7 @@ struct AddExerciseView: View {
                 Text("You must name your exercise.")
             }
             .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
+                ToolbarItem(placement: .topBarTrailing) {
                     Button {
                         if !name.isEmpty {
                             let playlistItem = PlaylistItem(index: playlist.isEmpty ? 0 : playlist.count + 1, name: name, stretchDuration: stretch, restDuration: rest, repsToComplete: reps)
@@ -69,36 +69,24 @@ struct AddExerciseView: View {
                             isShowingEmptyNameField = true
                         }
                     } label: {
-                        if #available(iOS 26.0, *) {
-                            Image(systemName: "chevron.left")
-                                .glassEffect(.clear)
-                                .accessibilityLabel("Save changes and return to set list view")
-                        } else {
-                            Image(systemName: "chevron.left")
-                                .accessibilityLabel("Save changes and return to set list view")
-                        }
+                        Image(systemName: "checkmark.circle.fill")
+                            .foregroundStyle(.green)
+                            .accessibilityLabel("Save changes")
                     }
-                    .buttonStyle(.plain)
                 }
                 
-                ToolbarItem(placement: .navigationBarTrailing) {
+                ToolbarItem(placement: .topBarLeading) {
                     Button(role: .cancel) {
                         dismiss()
                     } label: {
-                        if #available(iOS 26.0, *) {
-                            Image(systemName: "x.circle")
-                                .glassEffect(.clear)
-                                .foregroundStyle(.red)
-                                .accessibilityLabel("Cancel and return to set list view")
-                        } else {
-                            Image(systemName: "x.circle.fill")
-                                .foregroundStyle(Color.red)
-                                .accessibilityLabel("Cancel and return to set list view")
-                        }
+                        Image(systemName: "x.circle.fill")
+                            .foregroundStyle(.red)
+                            .accessibilityLabel("Cancel and return to set list view")
                     }
-                    .buttonStyle(.plain)
                 }
             }
+            .font(.largeTitle)
+            .buttonStyle(.plain)
         }
     }
 }
