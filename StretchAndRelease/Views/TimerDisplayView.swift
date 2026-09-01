@@ -57,7 +57,6 @@ struct TimerDisplayView: View {
 	}
     
     var body: some View {
-        GeometryReader { proxy in
             Color.clear.gradientBackground()
             
             VStack(spacing: 0) {
@@ -65,11 +64,7 @@ struct TimerDisplayView: View {
                     MainArcView(endAngle: $endAngle, timeRemaining: $timeRemaining, totalReps: $totalReps, repsCompleted: $repsCompleted, timerTextLabel: timerTextLabel)
                         
                 }
-                .containerRelativeFrame(.horizontal, alignment: .center) { length, _ in
-                    length * 0.9
-                }
-                .frame(minHeight: 0, maxHeight: .infinity)
-                .layoutPriority(1)
+                .coordinateSpace(.named("timer"))
                 
                 // playlist button row
                 if isPlaylistActive {
@@ -247,7 +242,6 @@ struct TimerDisplayView: View {
 				repsCompleted = 0
             }
         }
-    }
     
     //load playlistItem values into timer properties
     func loadPlaylistItem(_ index: Int) {

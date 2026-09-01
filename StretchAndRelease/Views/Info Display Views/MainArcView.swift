@@ -25,50 +25,48 @@ struct MainArcView: View {
     @Binding var repsCompleted: Int
     
     var timerTextLabel: String
-
+    
     
     var body: some View {
-        ZStack {
-            if !differentiateWithoutColor {
-                Arc(endAngle: endAngle)
-                    .stroke(managers.stretchPhase.phaseColor, style: StrokeStyle(lineWidth: 25, lineCap: .round))
-                    .rotationEffect(Angle(degrees: 90))
-                    .shadow(color: colorScheme == .dark ? .gray.opacity(0) : .black.opacity(0.35), radius: 5, x: 8, y: 5)
-                    .padding(.bottom)
-            } else {
-                Arc(endAngle: endAngle)
-                    .stroke(.black, style: StrokeStyle(lineWidth: 25, lineCap: .round))
-                    .rotationEffect(Angle(degrees: 90))
-                    .padding(.bottom)
-            }
-            
-            VStack {
-                Spacer()
-                Text("\(String(format: "%02d", Int(timeRemaining)))")
-                    .kerning(2)
-                    .contentTransition(.numericText(countsDown: true))
-                    .accessibilityLabel("\(timeRemaining) seconds remaining")
-                Text(timerTextLabel)
-                    .scaleEffect(0.75)
-                    .multilineTextAlignment(.center)
-                    .accessibilityLabel(!managers.isTimerPaused ? timerTextLabel : "WORKOUT PAUSED")
-                Text("Reps: \(repsCompleted)/\(totalReps)")
-                    .accessibilityLabel("Repetitions Completed \(repsCompleted) of \(totalReps)")
-                Spacer()
-            }
-            .font(.largeTitle)
-            .foregroundStyle(differentiateWithoutColor ? .black : managers.isTimerPaused ? .gray : managers.stretchPhase.phaseColor)
-            .fontWeight(.bold)
-            .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
-            .sensoryFeedback(.impact(intensity: managers.stretchPhase.phaseIntensity), trigger: endAngle) { oldValue, newValue in
+        GeometryReader { proxy in
+            ZStack {
+                if !differentiateWithoutColor {
+                    Arc(endAngle: endAngle)
+                        .stroke(managers.stretchPhase.phaseColor, style: StrokeStyle(lineWidth: 25, lineCap: .round))
+                        .rotationEffect(Angle(degrees: 90))
+                        .shadow(color: colorScheme == .dark ? .gray.opacity(0) : .black.opacity(0.35), radius: 5, x: 8, y: 5)
+                        .padding(.bottom)
+                } else {
+                    Arc(endAngle: endAngle)
+                        .stroke(.black, style: StrokeStyle(lineWidth: 25, lineCap: .round))
+                        .rotationEffect(Angle(degrees: 90))
+                        .padding(.bottom)
+                }
+                
+                VStack {
+                    Spacer()
+                    Text("\(String(format: "%02d", Int(timeRemaining)))")
+                        .kerning(2)
+                        .contentTransition(.numericText(countsDown: true))
+                        .accessibilityLabel("\(timeRemaining) seconds remaining")
+                    Text(timerTextLabel)
+                        .scaleEffect(0.75)
+                        .multilineTextAlignment(.center)
+                        .accessibilityLabel(!managers.isTimerPaused ? timerTextLabel : "WORKOUT PAUSED")
+                    Text("Reps: \(repsCompleted)/\(totalReps)")
+                        .accessibilityLabel("Repetitions Completed \(repsCompleted) of \(totalReps)")
+                    Spacer()
+                }
+                .font(.largeTitle)
+                .foregroundStyle(differentiateWithoutColor ? .black : managers.isTimerPaused ? .gray : managers.stretchPhase.phaseColor)
+                .fontWeight(.bold)
+                .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                .sensoryFeedback(.impact(intensity: managers.stretchPhase.phaseIntensity), trigger: endAngle) { oldValue, newValue in
                     return haptics
-            }
-            .padding(.bottom)
-            .containerRelativeFrame(.vertical, alignment: .bottom) { length, _ in
-                length / 1.15
+                }
+                .padding(.bottom)
             }
         }
-        .frame(maxWidth: .infinity)
     }
 }
 
