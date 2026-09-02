@@ -28,8 +28,7 @@ struct MainArcView: View {
     
     
     var body: some View {
-        GeometryReader { proxy in
-            ZStack {
+        ZStack {
                 if !differentiateWithoutColor {
                     Arc(endAngle: endAngle)
                         .stroke(managers.stretchPhase.phaseColor, style: StrokeStyle(lineWidth: 25, lineCap: .round))
@@ -66,7 +65,6 @@ struct MainArcView: View {
                 }
                 .padding(.bottom)
             }
-        }
     }
 }
 
