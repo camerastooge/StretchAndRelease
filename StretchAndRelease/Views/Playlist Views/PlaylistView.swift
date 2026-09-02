@@ -78,21 +78,38 @@ struct PlaylistView: View {
                     }
                     .listStyle(.plain)
                     .scrollContentBackground(.hidden)
+                    .safeAreaPadding(.leading, 15.0)
                     .safeAreaInset(edge: .bottom) {
                         NavigationLink {
                             AddExerciseView()
                                 .navigationBarBackButtonHidden()
                         } label: {
-                            Text("ADD")
-                                .frame(width: 200, height: 65)
-                                .font(.system(size: 32))
-                                .fontWeight(.bold)
-                                .shadow(color: .gray, radius: 0.2, x: 0.5, y: 1)
-                                .foregroundStyle(.white)
-                                .background(.green)
-                                .clipShape(.capsule)
-                                .padding(.bottom, 5)
-                                .dynamicTypeSize(...DynamicTypeSize.accessibility2)
+                            if #available(iOS 26.0, *) {
+                                Text("ADD")
+                                    .frame(width: 200, height: 65)
+                                    .font(.system(size: 32))
+                                    .fontWeight(.bold)
+                                    .shadow(color: .gray, radius: 0.2, x: 0.5, y: 1)
+                                    .foregroundStyle(.white)
+                                    .background(.green)
+                                    .clipShape(.capsule)
+                                    .padding(.bottom, 5)
+                                    .glassEffect()
+                                    .dynamicTypeSize(...DynamicTypeSize.accessibility2)
+                                
+                            } else {
+                                Text("ADD")
+                                    .frame(width: 200, height: 65)
+                                    .font(.system(size: 32))
+                                    .fontWeight(.bold)
+                                    .shadow(color: .gray, radius: 0.2, x: 0.5, y: 1)
+                                    .foregroundStyle(.white)
+                                    .background(.green)
+                                    .clipShape(.capsule)
+                                    .padding(.bottom, 5)
+                                    .dynamicTypeSize(...DynamicTypeSize.accessibility2)
+                                
+                            }
                         }
                         .accessibilityLabel("Add exercise")
                         .accessibilityHint("Add an exercise to the playlist")
