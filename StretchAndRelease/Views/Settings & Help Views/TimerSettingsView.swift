@@ -120,6 +120,50 @@ struct SettingsView: View {
             } message: {
                 Text("There is nothing in the set list. \n Please add some exercises.")
             }
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button {
+                        totalStretch = stretch
+                        totalRest = rest
+                        totalReps = reps
+                        SoundManager.instance.volume = promptVolume
+                        audio = audioToggle
+                        haptics = hapticToggle
+                        isPlaylistActive = playlistToggle
+                        promptVolume = volumeValue
+                        managers.didSettingsChange = true
+                        dismiss()
+                    } label: {
+                        if #available(iOS 26.0, *) {
+                            Image(systemName: "chevron.left")
+                                .glassEffect(.clear)
+                                .accessibilityLabel("Save changes and return to set list view")
+                        } else {
+                            Image(systemName: "chevron.left")
+                                .accessibilityLabel("Save changes and return to set list view")
+                        }
+                    }
+                    .buttonStyle(.plain)
+                }
+                
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        dismiss()
+                    } label: {
+                        if #available(iOS 26.0, *) {
+                            Image(systemName: "x.circle")
+                                .glassEffect(.clear)
+                                .foregroundStyle(.red)
+                                .accessibilityLabel("Cancel and return to set list view")
+                        } else {
+                            Image(systemName: "x.circle.fill")
+                                .foregroundStyle(Color.red)
+                                .accessibilityLabel("Cancel and return to set list view")
+                        }
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
         }
 		.fullScreenCover(isPresented: $showAddExerciseView,
 						 onDismiss: {
@@ -133,50 +177,6 @@ struct SettingsView: View {
 					.navigationBarBackButtonHidden()
 			}
 		})
-		.toolbar {
-			ToolbarItem(placement: .topBarLeading) {
-				Button {
-					totalStretch = stretch
-					totalRest = rest
-					totalReps = reps
-					SoundManager.instance.volume = promptVolume
-                    audio = audioToggle
-                    haptics = hapticToggle
-                    isPlaylistActive = playlistToggle
-                    promptVolume = volumeValue
-					managers.didSettingsChange = true
-					dismiss()
-				} label: {
-					if #available(iOS 26.0, *) {
-						Image(systemName: "chevron.left")
-							.glassEffect(.clear)
-							.accessibilityLabel("Save changes and return to set list view")
-					} else {
-						Image(systemName: "chevron.left")
-							.accessibilityLabel("Save changes and return to set list view")
-					}
-				}
-				.buttonStyle(.plain)
-			}
-			
-			ToolbarItem(placement: .topBarTrailing) {
-				Button {
-					dismiss()
-				} label: {
-					if #available(iOS 26.0, *) {
-						Image(systemName: "x.circle")
-							.glassEffect(.clear)
-							.foregroundStyle(.red)
-							.accessibilityLabel("Cancel and return to set list view")
-					} else {
-						Image(systemName: "x.circle.fill")
-							.foregroundStyle(Color.red)
-							.accessibilityLabel("Cancel and return to set list view")
-					}
-				}
-				.buttonStyle(.plain)
-			}
-		}
         
         .onAppear {
             stretch = totalStretch

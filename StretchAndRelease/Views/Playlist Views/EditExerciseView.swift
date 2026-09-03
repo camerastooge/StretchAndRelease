@@ -28,10 +28,7 @@ struct EditExerciseView: View {
     var body: some View {
         ZStack {
             NavigationStack {
-                ZStack {
-                    Color.clear.gradientBackground()
-                    
-					VStack {
+                VStack {
 						if !sizeCategory.isAccessibilitySize {
 							PhoneAddExerciseViewTypical(name: $name, stretch: $stretch, rest: $rest, reps: $reps)
 						} else {
@@ -42,6 +39,9 @@ struct EditExerciseView: View {
 							.padding(.horizontal)
 						}
 					}
+                .background {
+                    Color.clear.gradientBackground()
+                        .ignoresSafeArea()
                 }
                 .navigationTitle("Edit Exercise")
                 .navigationBarTitleDisplayMode(.inline)
