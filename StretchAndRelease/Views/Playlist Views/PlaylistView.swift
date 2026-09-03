@@ -111,6 +111,7 @@ struct PlaylistView: View {
                                 
                             }
                         }
+                        .buttonStyle(.plain)
                         .accessibilityLabel("Add exercise")
                         .accessibilityHint("Add an exercise to the playlist")
                     }
@@ -129,16 +130,34 @@ struct PlaylistView: View {
                             AddExerciseView()
                                 .navigationBarBackButtonHidden()
                         } label: {
-                            Text("ADD")
-                                .frame(width: 200, height: 65)
-                                .font(.system(size: 32))
-                                .fontWeight(.bold)
-                                .foregroundStyle(.white)
-                                .background(.green)
-                                .clipShape(.capsule)
-                                .padding(.bottom, 5)
-                                .dynamicTypeSize(...DynamicTypeSize.accessibility2)
+                            if #available(iOS 26.0, *) {
+                                Text("ADD")
+                                    .frame(width: 200, height: 65)
+                                    .font(.system(size: 32))
+                                    .fontWeight(.bold)
+                                    .shadow(color: .gray, radius: 0.2, x: 0.5, y: 1)
+                                    .foregroundStyle(.white)
+                                    .background(.green)
+                                    .clipShape(.capsule)
+                                    .padding(.bottom, 5)
+                                    .glassEffect()
+                                    .dynamicTypeSize(...DynamicTypeSize.accessibility2)
+                                
+                            } else {
+                                Text("ADD")
+                                    .frame(width: 200, height: 65)
+                                    .font(.system(size: 32))
+                                    .fontWeight(.bold)
+                                    .shadow(color: .gray, radius: 0.2, x: 0.5, y: 1)
+                                    .foregroundStyle(.white)
+                                    .background(.green)
+                                    .clipShape(.capsule)
+                                    .padding(.bottom, 5)
+                                    .dynamicTypeSize(...DynamicTypeSize.accessibility2)
+                                
+                            }
                         }
+                        .buttonStyle(.plain)
                         .accessibilityLabel("Add exercise")
                         .accessibilityHint("Add an exercise to the playlist")
                     }
@@ -218,6 +237,7 @@ struct playlistHeaderView: View {
                 .accessibilityLabel("Number of repetitions")
                 .accessibilityHint("How many times to perform this stretch in the set")
         }
+        .safeAreaPadding(.leading, 15.0)
 
     }
 }

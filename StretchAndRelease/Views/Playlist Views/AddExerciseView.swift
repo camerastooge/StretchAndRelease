@@ -32,9 +32,7 @@ struct AddExerciseView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                Color.clear.gradientBackground()
-                
-				if !sizeCategory.isAccessibilitySize {
+                if !sizeCategory.isAccessibilitySize {
 					PhoneAddExerciseViewTypical(name: $name, stretch: $stretch, rest: $rest, reps: $reps)
 				} else {
 					VStack {
@@ -43,6 +41,9 @@ struct AddExerciseView: View {
 					}
 					.padding(.horizontal)
 				}
+            }
+            .background {
+                Color.clear.gradientBackground()
             }
             .navigationTitle("Add Exercise")
             .navigationBarTitleDisplayMode(.inline)
@@ -85,7 +86,6 @@ struct AddExerciseView: View {
                     }
                 }
             }
-            .font(.largeTitle)
             .buttonStyle(.plain)
         }
     }
