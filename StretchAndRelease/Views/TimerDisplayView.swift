@@ -57,7 +57,7 @@ struct TimerDisplayView: View {
     }
     
     var body: some View {
-        VStack {
+        ScrollView {
             VStack(spacing: 0) {
                 ZStack {
                     MainArcView(endAngle: $endAngle, timeRemaining: $timeRemaining, totalReps: $totalReps, repsCompleted: $repsCompleted, timerTextLabel: timerTextLabel)
@@ -71,138 +71,145 @@ struct TimerDisplayView: View {
                 }
             }
             
-            // playlist button row
-            if isPlaylistActive {
+            Group {
+                // playlist button row
+                if isPlaylistActive {
+                    ZStack {
+                        Color.gray.opacity(differentiateWithoutColor ? 0 : 0.25)
+                        HStack {
+                            Spacer()
+                            
+                            //PREVIOUS EXERCISE BUTTON
+                            Button {
+                                guard var playlistIndex else { return }
+                                playlistIndex -= 1
+                                if playlistIndex < 0 {
+                                    playlistIndex = playlist.count - 1
+                                }
+                                self.playlistIndex = playlistIndex
+                                loadPlaylistItem(playlistIndex)
+                            } label: {
+                                ButtonView(buttonRoles: .previousItem, deviceType: deviceType)
+                                    .opacity(0.75)
+                            }
+                            .accessibilityLabel("Go to previous item in set list")
+                            .accessibilityInputLabels(["Previous", "Previous Stretch"])
+                            
+                            Spacer()
+                            
+                            //NEXT EXERCISE BUTTON
+                            Button {
+                                guard var playlistIndex else { return }
+                                playlistIndex += 1
+                                if playlistIndex == playlist.count {
+                                    playlistIndex = 0
+                                }
+                                self.playlistIndex = playlistIndex
+                                loadPlaylistItem(playlistIndex)
+                            } label: {
+                                ButtonView(buttonRoles: .nextItem, deviceType: deviceType)
+                                    .opacity(0.75)
+                            }
+                            .accessibilityLabel("Go to next item in set list")
+                            .accessibilityInputLabels(["Next", "Next Stretch"])
+                            
+                            Spacer()
+                        }
+                        .padding(.horizontal)
+                        .padding(.vertical, 10)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .containerRelativeFrame(.vertical) { size, axis in
+                        size * 0.1
+                    }
+                    .padding(.bottom, 10)
+                } else {
+                    Color.clear
+                        .containerRelativeFrame(.vertical) { size, axis in
+                            size * 0.1
+                        }
+                }
+                
+                //Normal Button Row
                 ZStack {
-                    Color.gray.opacity(differentiateWithoutColor ? 0 : 0.25)
+                    Color.black.opacity(differentiateWithoutColor ? 0.0 : 0.25)
                     HStack {
                         Spacer()
                         
-                        //PREVIOUS EXERCISE BUTTON
+                        //START - PAUSE BUTTON
                         Button {
-                            guard var playlistIndex else { return }
-                            playlistIndex -= 1
-                            if playlistIndex < 0 {
-                                playlistIndex = playlist.count - 1
+                            //engage from full stop
+                            if managers.stretchPhase == .stop {
+                                if audio {
+                                    SoundManager.instance.playPrompt(sound: .countdownExpanded)
+                                }
+                                
+                                DispatchQueue.main.asyncAfter(deadline: audio ? .now() + 3 : .now() + 0.5) {
+                                    withAnimation(.linear(duration: 0.25)) {
+                                        managers.startTimer()
+                                        repsCompleted = 0
+                                    }
+                                }
                             }
-                            self.playlistIndex = playlistIndex
-                            loadPlaylistItem(playlistIndex)
+                            
+                            //pause the timer
+                            else if !managers.isTimerPaused {
+                                managers.isTimerPaused = true
+                            }
+                            
+                            //un-pause the timer
+                            else {
+                                if audio {
+                                    SoundManager.instance.playPrompt(sound: .countdown)
+                                }
+                                DispatchQueue.main.asyncAfter(deadline: audio ? .now() + 2.0 : .now() + 0.5) {
+                                    withAnimation(.linear(duration: 0.25)) {
+                                        managers.isTimerActive = true
+                                        managers.isTimerPaused = false
+                                    }
+                                }
+                            }
                         } label: {
-                            ButtonView(buttonRoles: .previousItem, deviceType: deviceType)
-                                .opacity(0.75)
+                            if #available(iOS 26.0, *) {
+                                ButtonView(buttonRoles: !managers.isTimerActive ? .play : .pause, deviceType: deviceType)
+                            } else {
+                                ButtonView(buttonRoles: !managers.isTimerActive ? .play : .pause, deviceType: deviceType)
+                            }
                         }
-                        .accessibilityLabel("Go to previous item in set list")
-                        .accessibilityInputLabels(["Previous", "Previous Stretch"])
+                        .buttonStyle(.plain)
+                        .accessibilityLabel(!managers.isTimerActive ? "Start Timer" : "Pause Timer")
+                        .accessibilityInputLabels(["Start", "Start Timer", "Pause", "Pause Timer"])
                         
                         Spacer()
                         
-                        //NEXT EXERCISE BUTTON
+                        //RESET BUTTON
+                        
                         Button {
-                            guard var playlistIndex else { return }
-                            playlistIndex += 1
-                            if playlistIndex == playlist.count {
-                                playlistIndex = 0
+                            withAnimation(.easeInOut(duration: 0.25)) {
+                                managers.isTimerActive = false
+                                managers.isTimerPaused = false
+                                managers.stretchPhase = .stop
                             }
-                            self.playlistIndex = playlistIndex
-                            loadPlaylistItem(playlistIndex)
+                            repsCompleted = 0
+                            timeRemaining = totalStretch
                         } label: {
-                            ButtonView(buttonRoles: .nextItem, deviceType: deviceType)
-                                .opacity(0.75)
+                            ButtonView(buttonRoles: .reset, deviceType: .phone)
                         }
-                        .accessibilityLabel("Go to next item in set list")
-                        .accessibilityInputLabels(["Next", "Next Stretch"])
+                        .accessibilityLabel("Reset Timer")
+                        .accessibilityHint("This button reset the timer.")
+                        .accessibilityInputLabels(["Reset", "Reset Timer"])
                         
                         Spacer()
                     }
                     .padding(.horizontal)
-                    .padding(.vertical, 10)
+                    .padding(.vertical, 5)
                 }
                 .frame(maxWidth: .infinity)
                 .containerRelativeFrame(.vertical) { size, axis in
                     size * 0.1
                 }
-                .padding(.bottom, 10)
+                .padding(.bottom, 15)
             }
-            
-            //Normal Button Row
-            ZStack {
-                Color.black.opacity(differentiateWithoutColor ? 0.0 : 0.25)
-                HStack {
-                    Spacer()
-                    
-                    //START - PAUSE BUTTON
-                    Button {
-                        //engage from full stop
-                        if managers.stretchPhase == .stop {
-                            if audio {
-                                SoundManager.instance.playPrompt(sound: .countdownExpanded)
-                            }
-                            
-                            DispatchQueue.main.asyncAfter(deadline: audio ? .now() + 3 : .now() + 0.5) {
-                                withAnimation(.linear(duration: 0.25)) {
-                                    managers.startTimer()
-                                    repsCompleted = 0
-                                }
-                            }
-                        }
-                        
-                        //pause the timer
-                        else if !managers.isTimerPaused {
-                            managers.isTimerPaused = true
-                        }
-                        
-                        //un-pause the timer
-                        else {
-                            if audio {
-                                SoundManager.instance.playPrompt(sound: .countdown)
-                            }
-                            DispatchQueue.main.asyncAfter(deadline: audio ? .now() + 2.0 : .now() + 0.5) {
-                                withAnimation(.linear(duration: 0.25)) {
-                                    managers.isTimerActive = true
-                                    managers.isTimerPaused = false
-                                }
-                            }
-                        }
-                    } label: {
-                        if #available(iOS 26.0, *) {
-                            ButtonView(buttonRoles: !managers.isTimerActive ? .play : .pause, deviceType: deviceType)
-                        } else {
-                            ButtonView(buttonRoles: !managers.isTimerActive ? .play : .pause, deviceType: deviceType)
-                        }
-                    }
-                    .buttonStyle(.plain)
-                    .accessibilityLabel(!managers.isTimerActive ? "Start Timer" : "Pause Timer")
-                    .accessibilityInputLabels(["Start", "Start Timer", "Pause", "Pause Timer"])
-                    
-                    Spacer()
-                    
-                    //RESET BUTTON
-                    
-                    Button {
-                        withAnimation(.easeInOut(duration: 0.25)) {
-                            managers.isTimerActive = false
-                            managers.isTimerPaused = false
-                            managers.stretchPhase = .stop
-                        }
-                        repsCompleted = 0
-                        timeRemaining = totalStretch
-                    } label: {
-                        ButtonView(buttonRoles: .reset, deviceType: .phone)
-                    }
-                    .accessibilityLabel("Reset Timer")
-                    .accessibilityHint("This button reset the timer.")
-                    .accessibilityInputLabels(["Reset", "Reset Timer"])
-                    
-                    Spacer()
-                }
-                .padding(.horizontal)
-                .padding(.vertical, 5)
-            }
-            .frame(maxWidth: .infinity)
-            .containerRelativeFrame(.vertical) { size, axis in
-                size * 0.1
-            }
-            .padding(.bottom, 15)
         }
         .background {
             Color.clear

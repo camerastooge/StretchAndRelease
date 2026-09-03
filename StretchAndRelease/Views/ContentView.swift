@@ -32,7 +32,7 @@ struct ContentView: View {
     @State private var isShowingHelpView: Bool = false
     @State private var isShowingSettings: Bool = false
     @State private var playlistIndex: Int? = nil
-	@State private var playlistItem: PlaylistItem? = nil
+    @State private var playlistItem: PlaylistItem? = nil
     
     // Connectivity class for communication with Apple Watch
     @State private var connectivity = Connectivity()
@@ -48,12 +48,12 @@ struct ContentView: View {
         default: "Stretch & Release"
         }
     }
-
+    
     var body: some View {
         NavigationStack {
             TabView() {
                 Tab("Timer", systemImage: "timer") {
-					TimerDisplayView(playlistIndex: $playlistIndex, playlistItem: $playlistItem)
+                    TimerDisplayView(playlistIndex: $playlistIndex, playlistItem: $playlistItem)
                 }
                 
                 Tab("Set list", systemImage: "list.bullet") {
@@ -73,11 +73,11 @@ struct ContentView: View {
                                 .foregroundStyle(.blue)
                                 .glassEffect()
                                 .accessibilityLabel("Show help")
-
+                            
                         } else {
                             Image(systemName: "questionmark.circle")
                                 .accessibilityLabel("Show help")
-
+                            
                         }                    }
                 }
                 
@@ -88,7 +88,7 @@ struct ContentView: View {
                 ToolbarItem {
                     NavigationLink {
                         SettingsView()
-							.navigationBarBackButtonHidden()
+                            .navigationBarBackButtonHidden()
                     } label: {
                         if #available(iOS 26.0, *) {
                             Image(systemName: "gear")
@@ -101,7 +101,7 @@ struct ContentView: View {
                     .accessibilityLabel("Show Settings")
                 }
             }
-
+            
         }
         
         .sheet(isPresented: $isShowingHelpView) {
@@ -117,42 +117,42 @@ struct ContentView: View {
             
             //sends context to Apple Watch if connected
             sendContext(stretch: totalStretch, rest: totalRest, reps: totalRest, playlistIndex: playlistIndex ?? 0, playlist: isPlaylistActive)
-			
-			//set playlistIndex to 0 if isPlaylistActive
-			if isPlaylistActive {
-				playlistIndex = 0
-			}
+            
+            //set playlistIndex to 0 if isPlaylistActive
+            if isPlaylistActive {
+                playlistIndex = 0
+            }
         }
         
         .onChange(of: connectivity.didStatusChange) {
-        //receives changed settings from Apple Watch app
+            //receives changed settings from Apple Watch app
             totalStretch = connectivity.statusContext["stretch"] as? Int ?? 10
             totalRest = connectivity.statusContext["rest"] as? Int ?? 5
             totalReps = connectivity.statusContext["reps"] as? Int ?? 5
             playlistIndex = connectivity.statusContext["playlistIndex"] as? Int ?? 0
-			isPlaylistActive = connectivity.statusContext["playlist"] as? Bool ?? false
+            isPlaylistActive = connectivity.statusContext["playlist"] as? Bool ?? false
             connectivity.didStatusChange = false
         }
         
         //when settings change, updates main display and sends updated settings to Apple Watch app
         .onChange(of: managers.didSettingsChange) {
             sendContext(stretch: totalStretch, rest: totalRest, reps: totalReps, playlistIndex: playlistIndex ?? 0, playlist: isPlaylistActive)
-			managers.didSettingsChange = false
+            managers.didSettingsChange = false
         }
-		
-		//set playlistIndex when isPlaylistActive changes
-		.onChange(of: isPlaylistActive) {
-			if isPlaylistActive {
-				playlistIndex = 0
-			}
-		}
+        
+        //set playlistIndex when isPlaylistActive changes
+        .onChange(of: isPlaylistActive) {
+            if isPlaylistActive {
+                playlistIndex = 0
+            }
+        }
     }
     
     //function sends updated settings to Apple Watch
     func sendContext(stretch: Int, rest: Int, reps: Int, playlistIndex: Int, playlist: Bool) {
         let settingsUpdate: [String : Any] = ["stretch" : stretch, "rest" : rest, "reps" : reps, "playlistIndex" : playlistIndex, "playlist" : playlist]
         connectivity.setContext(to: settingsUpdate)
-		print("context sent")
+        print("context sent")
     }
 }
         
