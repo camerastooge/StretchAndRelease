@@ -62,6 +62,7 @@
 				Assets/SFX/tick.mp3,
 				Managers/Managers.swift,
 				Managers/SoundManager.swift,
+				Managers/TimerManager.swift,
 				"Models and Settings/ButtonSettings.swift",
 				"Models and Settings/Connectivity.swift",
 				"Models and Settings/PlaylistItem.swift",

@@ -312,6 +312,7 @@ struct TimerActionViewWatch: View {
 		
 		//this modifier runs when the timer publishes
 		.onReceive(timer) { _ in
+            
             switch managers.stretchPhase {
             case .stretch: return manageStretch()
             case .rest: return manageRest()

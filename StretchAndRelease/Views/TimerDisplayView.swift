@@ -220,6 +220,13 @@ struct TimerDisplayView: View {
         
         //this modifier runs when the timer publishes
         .onReceive(timer) { _ in
+            //if isTimerActive && !isTimerPaused then hit TimerManager
+            //if isPlaylistActive then hit a playlist routine in TimerManager?
+            //one rep routine for non playlist operation and another for playlist operation?
+            //
+            //separate switching function for advancing to next playlist item?
+            //toggle isPlaylistActive while advancing to next playlist item? -- stops TimerManager from activating/executing?
+            //but how do I pause/stop timer while executing TimerManager functions?
             switch managers.stretchPhase {
             case .stretch: return manageStretch()
             case .rest: return manageRest()
