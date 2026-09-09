@@ -220,13 +220,6 @@ struct TimerDisplayView: View {
         
         //this modifier runs when the timer publishes
         .onReceive(timer) { _ in
-            //if isTimerActive && !isTimerPaused then hit TimerManager
-            //if isPlaylistActive then hit a playlist routine in TimerManager?
-            //one rep routine for non playlist operation and another for playlist operation?
-            //
-            //separate switching function for advancing to next playlist item?
-            //toggle isPlaylistActive while advancing to next playlist item? -- stops TimerManager from activating/executing?
-            //but how do I pause/stop timer while executing TimerManager functions?
             switch managers.stretchPhase {
             case .stretch: return manageStretch()
             case .rest: return manageRest()
@@ -379,14 +372,14 @@ struct TimerDisplayView: View {
                         withAnimation(.easeOut(duration: 1)) {
                             updateEndAngle()
                         }
-                        managers.isTimerActive = true
                     } else {
-                        managers.stretchPhase = .stretch
-                        repsCompleted = 0
                         playlistIndex += 1
+                        self.playlistIndex = playlistIndex
                         loadPlaylistItem(playlistIndex)
                         timeRemaining = totalStretch
-                        managers.isTimerActive = true
+                        repsCompleted = 0
+                        repsCompleted = 0
+                        managers.stretchPhase = .stretch
                     }
                 }
             }
@@ -399,20 +392,26 @@ struct TimerDisplayView: View {
             } else {
                 if !isPlaylistActive {
                     timeRemaining = totalStretch
-                    withAnimation {
-                        managers.stretchPhase = .stretch
-                    }
                     if audio {
                         SoundManager.instance.playPrompt(sound: .stretch)
+                    }
+                    withAnimation {
+                        managers.stretchPhase = .stretch
                     }
                 } else {
                     guard var playlistIndex else { return }
                     if repsCompleted == totalReps {
-                        managers.stretchPhase = .stretch
-                        repsCompleted = 0
                         playlistIndex += 1
+                        self.playlistIndex = playlistIndex
                         loadPlaylistItem(playlistIndex)
+                        repsCompleted = 0
                         timeRemaining = totalStretch
+                        if audio {
+                            SoundManager.instance.playPrompt(sound: .stretch)
+                        }
+                        withAnimation {
+                            managers.stretchPhase = .stretch
+                        }
                     } else {
                         timeRemaining = totalStretch
                         withAnimation {
