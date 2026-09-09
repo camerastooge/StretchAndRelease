@@ -312,7 +312,6 @@ struct TimerActionViewWatch: View {
 		
 		//this modifier runs when the timer publishes
 		.onReceive(timer) { _ in
-            
             switch managers.stretchPhase {
             case .stretch: return manageStretch()
             case .rest: return manageRest()
@@ -320,20 +319,45 @@ struct TimerActionViewWatch: View {
             }
 		}
     }
-	
-	//function to stop timer
-	func timerFullStop() {
-		if audio {
-			SoundManager.instance.playPrompt(sound: .relax)
-		}
-		withAnimation(.easeOut(duration: 0.5)) {
-			managers.stopTimer()
-			updateEndAngle()
-		}
-		timeRemaining = totalStretch
-	}
-	
-	//function to manage stretch portion of stretch
+    
+    //load playlistItem values into timer properties
+    func loadPlaylistItem(_ index: Int) {
+        guard !playlist.isEmpty else { return }
+        playlistItem = playlist[index]
+        if let playlistItem {
+            totalStretch = playlistItem.stretchDuration ?? 10
+            totalRest = playlistItem.restDuration ?? 5
+            totalReps = playlistItem.repsToComplete ?? 3
+        }
+    }
+    
+    //function to set end angle of arc
+    func updateEndAngle() {
+        switch managers.stretchPhase {
+        case .stretch:
+            let calculatedAngle = Double(timeRemaining) / Double(totalStretch) * 320 + 20
+            endAngle = Angle(degrees: min(calculatedAngle, 340))
+        case .rest:
+            let calculatedAngle = Double(timeRemaining) / Double(totalRest) * 320 + 20
+            endAngle = Angle(degrees: min(calculatedAngle, 340))
+        case .stop:
+            endAngle = Angle(degrees: 340)
+        }
+    }
+    
+    //function to stop timer
+    func timerFullStop() {
+        if audio {
+            SoundManager.instance.playPrompt(sound: .relax)
+        }
+        withAnimation(.easeOut(duration: 0.5)) {
+            managers.stretchPhase = .stop
+            updateEndAngle()
+        }
+        timeRemaining = totalStretch
+    }
+    
+    //function to manage stretch portion of stretch
     func manageStretch() {
         //if timer is paused, stop the timer and wait
         if managers.isTimerPaused {
@@ -377,8 +401,8 @@ struct TimerActionViewWatch: View {
             }
         }
     }
-	
-	//function to manage rest portion of stretch
+    
+    //function to manage rest portion of stretch
     func manageRest() {
         if managers.isTimerPaused {
             if timeRemaining != totalRest {
@@ -402,40 +426,52 @@ struct TimerActionViewWatch: View {
                         withAnimation(.easeOut(duration: 1)) {
                             updateEndAngle()
                         }
-                        managers.isTimerActive = true
                     } else {
-                        managers.stretchPhase = .stretch
-                        repsCompleted = 0
                         playlistIndex += 1
+                        self.playlistIndex = playlistIndex
                         loadPlaylistItem(playlistIndex)
                         timeRemaining = totalStretch
-                        managers.isTimerActive = true
+                        repsCompleted = 0
+                        repsCompleted = 0
+                        managers.stretchPhase = .stretch
                     }
                 }
             }
         } else {
             if timeRemaining != totalRest {
-                timeRemaining += 1
-                withAnimation(.easeOut(duration: 1)) {
-                    updateEndAngle()
+                if managers.isTimerActive {
+                    timeRemaining += 1
+                    withAnimation(.easeOut(duration: 1)) {
+                        updateEndAngle()
+                    }
                 }
             } else {
                 if !isPlaylistActive {
                     timeRemaining = totalStretch
-                    withAnimation {
-                        managers.stretchPhase = .stretch
-                    }
                     if audio {
                         SoundManager.instance.playPrompt(sound: .stretch)
+                    }
+                    withAnimation {
+                        managers.stretchPhase = .stretch
                     }
                 } else {
                     guard var playlistIndex else { return }
                     if repsCompleted == totalReps {
-                        managers.stretchPhase = .stretch
-                        repsCompleted = 0
+                        managers.isTimerActive = false
                         playlistIndex += 1
+                        self.playlistIndex = playlistIndex
                         loadPlaylistItem(playlistIndex)
                         timeRemaining = totalStretch
+                        repsCompleted = 0
+                        if audio {
+                            SoundManager.instance.playPrompt(sound: .countdownExpanded)
+                        }
+                        DispatchQueue.main.asyncAfter(deadline: audio ? .now() + 3.0 : .now() + 0.25) {
+                            withAnimation {
+                                managers.stretchPhase = .stretch
+                                managers.isTimerActive = true
+                            }
+                        }
                     } else {
                         timeRemaining = totalStretch
                         withAnimation {
@@ -449,39 +485,16 @@ struct TimerActionViewWatch: View {
             }
         }
     }
-	
-	//function to manage timer stop
-	func manageStop() {
+    
+    //function to manage timer stop
+    func manageStop() {
         withAnimation(.easeOut(duration: 0.5)) {
             managers.stretchPhase = .stop
             managers.isTimerActive = false
             managers.isTimerPaused = false
             updateEndAngle()
         }
-	}
-	
-	//function to set end angle of arc
-	func updateEndAngle() {
-		switch managers.stretchPhase {
-		case .stretch:
-			endAngle = Angle(degrees: Double(timeRemaining) / Double(totalStretch) * 320 + 20)
-		case .rest:
-			endAngle = Angle(degrees: Double(timeRemaining) / Double(totalRest) * 320 + 20)
-		case .stop:
-			endAngle = Angle(degrees: 340)
-		}
-	}
-	
-	//load playlistItem values into timer properties
-	func loadPlaylistItem(_ index: Int) {
-		playlistItem = playlist[index]
-		if let playlistItem {
-			totalStretch = playlistItem.stretchDuration ?? 10
-			totalRest = playlistItem.restDuration ?? 5
-			totalReps = playlistItem.repsToComplete ?? 3
-		}
-		timeRemaining = totalStretch
-	}
+    }
 }
 
 #Preview {

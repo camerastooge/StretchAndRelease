@@ -283,9 +283,11 @@ struct TimerDisplayView: View {
     func updateEndAngle() {
         switch managers.stretchPhase {
         case .stretch:
-            endAngle = Angle(degrees: Double(timeRemaining) / Double(totalStretch) * 320 + 20)
+            let calculatedAngle = Double(timeRemaining) / Double(totalStretch) * 320 + 20
+            endAngle = Angle(degrees: min(calculatedAngle, 340))
         case .rest:
-            endAngle = Angle(degrees: Double(timeRemaining) / Double(totalRest) * 320 + 20)
+            let calculatedAngle = Double(timeRemaining) / Double(totalRest) * 320 + 20
+            endAngle = Angle(degrees: min(calculatedAngle, 340))
         case .stop:
             endAngle = Angle(degrees: 340)
         }
@@ -385,9 +387,11 @@ struct TimerDisplayView: View {
             }
         } else {
             if timeRemaining != totalRest {
-                timeRemaining += 1
-                withAnimation(.easeOut(duration: 1)) {
-                    updateEndAngle()
+                if managers.isTimerActive {
+                    timeRemaining += 1
+                    withAnimation(.easeOut(duration: 1)) {
+                        updateEndAngle()
+                    }
                 }
             } else {
                 if !isPlaylistActive {
@@ -401,16 +405,20 @@ struct TimerDisplayView: View {
                 } else {
                     guard var playlistIndex else { return }
                     if repsCompleted == totalReps {
+                        managers.isTimerActive = false
                         playlistIndex += 1
                         self.playlistIndex = playlistIndex
                         loadPlaylistItem(playlistIndex)
-                        repsCompleted = 0
                         timeRemaining = totalStretch
+                        repsCompleted = 0
                         if audio {
-                            SoundManager.instance.playPrompt(sound: .stretch)
+                            SoundManager.instance.playPrompt(sound: .countdownExpanded)
                         }
-                        withAnimation {
-                            managers.stretchPhase = .stretch
+                        DispatchQueue.main.asyncAfter(deadline: audio ? .now() + 3.0 : .now() + 0.25) {
+                            withAnimation {
+                                managers.stretchPhase = .stretch
+                                managers.isTimerActive = true
+                            }
                         }
                     } else {
                         timeRemaining = totalStretch
