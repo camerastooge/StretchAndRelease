@@ -25,10 +25,20 @@ private final class AudioSessionController: @unchecked Sendable {
     func activate() {
         queue.async {
             self.applyCategory(duck: false)
-            do {
-                try AVAudioSession.sharedInstance().setActive(true)
-            } catch {
-                print("Audio session activation error: \(error.localizedDescription)")
+            // `setActive` logs a warning recommending the async activate/deactivate API
+            // regardless of calling thread, so prefer it where the deployment target allows.
+            if #available(iOS 27.0, *) {
+                AVAudioSession.sharedInstance().activate(options: []) { _, error in
+                    if let error {
+                        print("Audio session activation error: \(error.localizedDescription)")
+                    }
+                }
+            } else {
+                do {
+                    try AVAudioSession.sharedInstance().setActive(true)
+                } catch {
+                    print("Audio session activation error: \(error.localizedDescription)")
+                }
             }
         }
     }
@@ -67,6 +77,25 @@ class SoundManager: NSObject {
 
     @ObservationIgnored private let session = AudioSessionController()
     @ObservationIgnored private var preparedTick: SoundOption?
+    /// AVAudioPlayer's init(contentsOf:) and prepareToPlay() can implicitly activate the
+    /// audio session, which trips the same main-thread warning as AudioSessionController's
+    /// calls. Run them here, then hop back to the caller's thread to assign properties.
+    @ObservationIgnored private let playbackQueue = DispatchQueue(label: "com.LucasBarker.StretchAndRelease.playback")
+
+    /// `DispatchQueue.sync` onto an idle serial queue can run the block inline on the
+    /// calling thread instead of hopping to the queue's own thread, which silently defeats
+    /// the point when the caller is main. `.async` is never inlined, so pairing it with a
+    /// semaphore guarantees `work` actually runs off whatever thread called this.
+    private func runOffMainThread<T>(_ work: @escaping () throws -> T) throws -> T {
+        let semaphore = DispatchSemaphore(value: 0)
+        var result: Result<T, Error>!
+        playbackQueue.async {
+            result = Result(catching: work)
+            semaphore.signal()
+        }
+        semaphore.wait()
+        return try result.get()
+    }
 
     enum SoundOption: String {
         case relax = "and_relax"
@@ -87,8 +116,11 @@ class SoundManager: NSObject {
     func prepareTick(sound: SoundOption) {
         guard let url = Bundle.main.url(forResource: sound.rawValue, withExtension: "mp3") else { return }
         do {
-            let newPlayer = try AVAudioPlayer(contentsOf: url)
-            newPlayer.prepareToPlay()
+            let newPlayer = try runOffMainThread {
+                let newPlayer = try AVAudioPlayer(contentsOf: url)
+                newPlayer.prepareToPlay()
+                return newPlayer
+            }
             tickPlayer = newPlayer
             preparedTick = sound
         } catch {
@@ -103,9 +135,11 @@ class SoundManager: NSObject {
         }
 
         guard let tickPlayer = tickPlayer else { return }
-        tickPlayer.currentTime = 0.0
-        tickPlayer.volume = Float(volume)
-        tickPlayer.play()
+        try? runOffMainThread {
+            tickPlayer.currentTime = 0.0
+            tickPlayer.volume = Float(self.volume)
+            tickPlayer.play()
+        }
     }
 
     // MARK: - Prompts
@@ -116,11 +150,14 @@ class SoundManager: NSObject {
         session.setDucking(true)
 
         do {
-            let newPlayer = try AVAudioPlayer(contentsOf: url)
-            newPlayer.volume = Float(volume)
-            newPlayer.delegate = self
-            newPlayer.prepareToPlay()
-            newPlayer.play()
+            let newPlayer = try runOffMainThread {
+                let newPlayer = try AVAudioPlayer(contentsOf: url)
+                newPlayer.volume = Float(self.volume)
+                newPlayer.delegate = self
+                newPlayer.prepareToPlay()
+                newPlayer.play()
+                return newPlayer
+            }
             player = newPlayer
         } catch {
             print("Error: \(error.localizedDescription)")
