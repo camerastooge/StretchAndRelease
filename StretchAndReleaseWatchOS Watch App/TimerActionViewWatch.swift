@@ -87,7 +87,7 @@ struct TimerActionViewWatch: View {
 				
 				VStack {
 					Text("\(String(format: "%02d", Int(timeRemaining)))")
-						.font(.largeTitle)
+                        .font(.largeTitle.monospacedDigit())
 						.kerning(2)
 						.contentTransition(.numericText(countsDown: true))
 						.accessibilityLabel("\(timeRemaining) seconds remaining")
