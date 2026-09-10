@@ -101,9 +101,7 @@ struct ContentView: View {
                     .accessibilityLabel("Show Settings")
                 }
             }
-            
         }
-        
         .sheet(isPresented: $isShowingHelpView) {
             MainHelpScreenView()
                 .presentationDetents([.large])

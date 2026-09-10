@@ -16,6 +16,9 @@ struct StretchAndReleaseApp: App {
         WindowGroup {
             ContentView()
                 .environment(managers)
+                .onChange(of: managers.isTimerActive) { _, newvalue in
+                    UIApplication.shared.isIdleTimerDisabled = newvalue
+                }
         }
         .modelContainer(for: PlaylistItem.self)
     }
