@@ -89,7 +89,7 @@ struct TimerActionViewWatch: View {
 					Text("\(String(format: "%02d", Int(timeRemaining)))")
                         .font(.largeTitle.monospacedDigit())
 						.kerning(2)
-						.contentTransition(.numericText(countsDown: true))
+						.contentTransition(.numericText())
 						.accessibilityLabel("\(timeRemaining) seconds remaining")
 						.padding(.bottom, 5)
 					
@@ -124,7 +124,7 @@ struct TimerActionViewWatch: View {
                                 .multilineTextAlignment(.center)
 								.minimumScaleFactor(0.5)
 								.offset(x: offset)
-								.transition(.slide)
+								.contentTransition(.opacity)
 								.gesture(
 										DragGesture()
 											.onEnded { gesture in

@@ -271,7 +271,9 @@ struct TimerDisplayView: View {
     //load playlistItem values into timer properties
     func loadPlaylistItem(_ index: Int) {
         guard !playlist.isEmpty else { return }
-        playlistItem = playlist[index]
+        withAnimation(.default) {
+            playlistItem = playlist[index]
+        }
         if let playlistItem {
             totalStretch = playlistItem.stretchDuration ?? 10
             totalRest = playlistItem.restDuration ?? 5
@@ -284,12 +286,18 @@ struct TimerDisplayView: View {
         switch managers.stretchPhase {
         case .stretch:
             let calculatedAngle = Double(timeRemaining) / Double(totalStretch) * 320 + 20
-            endAngle = Angle(degrees: min(calculatedAngle, 340))
+            withAnimation(.default) {
+                endAngle = Angle(degrees: min(calculatedAngle, 340))
+            }
         case .rest:
             let calculatedAngle = Double(timeRemaining) / Double(totalRest) * 320 + 20
-            endAngle = Angle(degrees: min(calculatedAngle, 340))
+            withAnimation(.default) {
+                endAngle = Angle(degrees: min(calculatedAngle, 340))
+            }
         case .stop:
-            endAngle = Angle(degrees: 340)
+            withAnimation(.default) {
+                endAngle = Angle(degrees: 340)
+            }
         }
     }
     
@@ -336,7 +344,7 @@ struct TimerDisplayView: View {
                             if audio {
                                 SoundManager.instance.playPrompt(sound: .rest)
                             }
-                            withAnimation {
+                            withAnimation(.default) {
                                 managers.stretchPhase = .rest
                             }
                         } else {
@@ -370,7 +378,9 @@ struct TimerDisplayView: View {
                     guard var playlistIndex else { return }
                     if repsCompleted != totalReps {
                         timeRemaining = totalStretch
-                        managers.stretchPhase = .stretch
+                        withAnimation(.default) {
+                            managers.stretchPhase = .stretch
+                        }
                         withAnimation(.easeOut(duration: 1)) {
                             updateEndAngle()
                         }
@@ -381,7 +391,9 @@ struct TimerDisplayView: View {
                         timeRemaining = totalStretch
                         repsCompleted = 0
                         repsCompleted = 0
-                        managers.stretchPhase = .stretch
+                        withAnimation(.default) {
+                            managers.stretchPhase = .stretch
+                        }
                     }
                 }
             }
@@ -399,7 +411,7 @@ struct TimerDisplayView: View {
                     if audio {
                         SoundManager.instance.playPrompt(sound: .stretch)
                     }
-                    withAnimation {
+                    withAnimation(.default) {
                         managers.stretchPhase = .stretch
                     }
                 } else {
@@ -415,14 +427,14 @@ struct TimerDisplayView: View {
                             SoundManager.instance.playPrompt(sound: .countdownExpanded)
                         }
                         DispatchQueue.main.asyncAfter(deadline: audio ? .now() + 3.0 : .now() + 0.25) {
-                            withAnimation {
+                            withAnimation(.default) {
                                 managers.stretchPhase = .stretch
                                 managers.isTimerActive = true
                             }
                         }
                     } else {
                         timeRemaining = totalStretch
-                        withAnimation {
+                        withAnimation(.default) {
                             managers.stretchPhase = .stretch
                         }
                         if audio {
