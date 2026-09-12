@@ -295,6 +295,7 @@ struct TimerActionViewWatch: View {
                 guard var playlistIndex else { return }
 				if !playlist.isEmpty {
 					playlistIndex = 0
+                    self.playlistIndex = playlistIndex
 					loadPlaylistItem(playlistIndex)
 				} else {
 					playlistItem = nil
@@ -322,7 +323,7 @@ struct TimerActionViewWatch: View {
     
     //load playlistItem values into timer properties
     func loadPlaylistItem(_ index: Int) {
-        guard !playlist.isEmpty else { return }
+        guard playlist.indices.contains(index) else { return }
         playlistItem = playlist[index]
         if let playlistItem {
             totalStretch = playlistItem.stretchDuration ?? 10
