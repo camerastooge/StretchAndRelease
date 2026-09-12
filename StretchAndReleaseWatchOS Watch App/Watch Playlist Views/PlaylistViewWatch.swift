@@ -147,5 +147,5 @@ extension PlaylistViewWatch {
 	
 	PlaylistViewWatch()
 		.environment(Managers())
-		.modelContainer(previewContainer)
+        .modelContainer(previewContainer)
 }

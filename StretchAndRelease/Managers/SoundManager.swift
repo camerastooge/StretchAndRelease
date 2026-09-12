@@ -26,20 +26,25 @@ private final class AudioSessionController: @unchecked Sendable {
         queue.async {
             self.applyCategory(duck: false)
             // `setActive` logs a warning recommending the async activate/deactivate API
-            // regardless of calling thread, so prefer it where the deployment target allows.
-            if #available(iOS 27.0, *) {
-                AVAudioSession.sharedInstance().activate(options: []) { _, error in
-                    if let error {
-                        print("Audio session activation error: \(error.localizedDescription)")
-                    }
-                }
-            } else {
-                do {
-                    try AVAudioSession.sharedInstance().setActive(true)
-                } catch {
+            // regardless of calling thread, so prefer it where it exists.
+            //
+            // `activate(options:completionHandler:)` is watchOS-only through the iOS 26 SDK:
+            // it is declared `@available(iOS, unavailable)` there. Unavailability is a hard
+            // compile-time error that an `#available` version check cannot unlock, so this
+            // has to split by platform at compile time rather than by version at runtime.
+            #if os(watchOS)
+            AVAudioSession.sharedInstance().activate(options: []) { _, error in
+                if let error {
                     print("Audio session activation error: \(error.localizedDescription)")
                 }
             }
+            #else
+            do {
+                try AVAudioSession.sharedInstance().setActive(true)
+            } catch {
+                print("Audio session activation error: \(error.localizedDescription)")
+            }
+            #endif
         }
     }
 

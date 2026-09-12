@@ -157,4 +157,5 @@ struct AddExerciseViewWatch: View {
 
 #Preview {
     AddExerciseViewWatch()
+        .modelContainer(previewContainer)
 }
