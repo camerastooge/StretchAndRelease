@@ -12,7 +12,7 @@ struct ButtonView: View {
     //Environment properties
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.accessibilityDifferentiateWithoutColor) var differentiateWithoutColor
-    @Environment(\.sizeCategory) var sizeCategory
+    @Environment(\.dynamicTypeSize) var sizeCategory
     
     var buttonRoles: ButtonRoles
     var deviceType: DeviceType
@@ -22,15 +22,17 @@ struct ButtonView: View {
             if !differentiateWithoutColor {
                 Image(systemName: buttonRoles.buttonImage)
                     .phoneFrame()
-                    .font(.system(size: 30))
+                    .font(.largeTitle)
                     .foregroundStyle(.white)
+                    .padding([.vertical, .horizontal])
                     .background(buttonRoles.buttonColor)
                     .clipShape(.capsule)
             } else {
                 Image(systemName: buttonRoles.buttonImage)
                     .phoneFrame()
-                    .font(.system(size: 30))
+                    .font(.largeTitle)
                     .foregroundStyle(.black)
+                    .padding([.vertical, .horizontal])
             }
         } else {
             if !differentiateWithoutColor {

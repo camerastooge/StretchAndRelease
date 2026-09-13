@@ -14,12 +14,16 @@ struct BackGroundGradientView: ViewModifier {
     private var gradientChoice: [Color] {
         if colorScheme == .dark {
             if differentiateWithoutColor {
-                [.gray, .gray]
+                [.secondary, .secondary]
             } else {
                 [.black, .gray]
             }
         } else {
-            [.gray, .white]
+            if differentiateWithoutColor {
+                [.white, .white]
+            } else {
+                [.gray, .white]
+            }
         }
     }
     
