@@ -72,22 +72,26 @@ struct PlaylistViewWatch: View {
                                     }
                                 }
                             }
-                            
                             VStack {
-                                Spacer()
-                                NavigationLink {
-                                    AddExerciseViewWatch()
-                                        .navigationBarBackButtonHidden()
-                                } label: {
-                                    if #available(watchOS 26.0, *) {
-                                        ButtonView(buttonRoles: .add, deviceType: .watch)
-                                            .glassEffect(.clear)
-                                    } else {
-                                        ButtonView(buttonRoles: .add, deviceType: .watch)
+                                HStack {
+                                    Spacer()
+                                    NavigationLink {
+                                        AddExerciseViewWatch()
+                                            .navigationBarBackButtonHidden()
+                                    } label: {
+                                        if #available(watchOS 26.0, *) {
+                                            ButtonView(buttonRoles: .add, deviceType: .watch)
+                                                .glassEffect(.clear)
+                                        } else {
+                                            ButtonView(buttonRoles: .add, deviceType: .watch)
+                                        }
                                     }
+                                    .buttonStyle(.plain)
+                                    .padding(.trailing, 15)
+                                    .accessibilityLabel("Add an item to the set list")
                                 }
-                                .buttonStyle(.plain)
-                                .accessibilityLabel("Add an item to the set list")
+                                .offset(x: 8,y: -20)
+                                Spacer()
                             }
                         }
                     }
