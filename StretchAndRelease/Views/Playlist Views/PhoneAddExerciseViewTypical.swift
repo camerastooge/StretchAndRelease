@@ -48,7 +48,7 @@ struct PhoneAddExerciseViewTypical: View {
 							.accessibilityLabel("seconds")
 					}
 					.font(.headline)
-					.frame(height: 40)
+					.frame(height: 50)
 					.accessibilityElement(children: .ignore)
 					.accessibilityLabel("Stretch duration \(stretch) seconds")
 					.accessibilityHint("Adjust how long you want to hold each stretch")
@@ -77,7 +77,7 @@ struct PhoneAddExerciseViewTypical: View {
 							.accessibilityLabel("seconds")
 					}
 					.font(.subheadline)
-					.frame(height: 40)
+					.frame(height: 50)
 					.accessibilityElement(children: .ignore)
 					.accessibilityLabel("Rest duration \(rest) seconds")
 					.accessibilityHint("Adjust how long you want to rest between stretches")
@@ -104,7 +104,7 @@ struct PhoneAddExerciseViewTypical: View {
 							.font(.headline)
 					}
 					.font(.subheadline)
-					.frame(height: 40)
+					.frame(height: 50)
 					.accessibilityElement(children: .ignore)
 					.accessibilityLabel("Repetition count \(reps)")
 					.accessibilityHint("Set the number of times you want to perform this stretch")

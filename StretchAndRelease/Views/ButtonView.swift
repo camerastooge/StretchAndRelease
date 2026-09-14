@@ -16,6 +16,12 @@ struct ButtonView: View {
     
     var buttonRoles: ButtonRoles
     var deviceType: DeviceType
+    var buttonPadding: CGFloat {
+        switch sizeCategory {
+        case .accessibility1, .accessibility2, .accessibility3, .accessibility4, .accessibility5: 2
+        default: 5
+        }
+    }
     
     var body: some View {
         if deviceType == .phone {
@@ -24,9 +30,10 @@ struct ButtonView: View {
                     .phoneFrame()
                     .font(.largeTitle)
                     .foregroundStyle(.white)
-                    .padding([.vertical, .horizontal])
+                    .padding([.vertical, .horizontal], buttonPadding)
                     .background(buttonRoles.buttonColor)
                     .clipShape(.capsule)
+                    .dynamicTypeSize(...DynamicTypeSize.accessibility4)
             } else {
                 Image(systemName: buttonRoles.buttonImage)
                     .phoneFrame()

@@ -65,7 +65,7 @@ struct TimerDisplayView: View {
             }
             .containerRelativeFrame([.horizontal, .vertical]) { size, axis in
                 if axis == .vertical {
-                    size * 0.75
+                    size * 0.70
                 } else {
                     size * 0.85
                 }
@@ -116,7 +116,6 @@ struct TimerDisplayView: View {
                             Spacer()
                         }
                         .padding(.horizontal)
-                        .padding(.vertical, 10)
                     }
                     .frame(maxWidth: .infinity)
                     .containerRelativeFrame(.vertical) { size, axis in
@@ -208,7 +207,6 @@ struct TimerDisplayView: View {
                 .containerRelativeFrame(.vertical) { size, axis in
                     size * 0.1
                 }
-                .padding(.bottom, 15)
             }
         }
         .background {

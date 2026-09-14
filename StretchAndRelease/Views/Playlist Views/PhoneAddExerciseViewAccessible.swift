@@ -31,6 +31,7 @@ struct PhoneAddExerciseViewAccessible: View {
                         .focused($focus)
                         .textFieldStyle(.roundedBorder)
                 }
+                .frame(minHeight: 40)
                 
                 Spacer()
                 
@@ -50,7 +51,7 @@ struct PhoneAddExerciseViewAccessible: View {
                     }
                     .padding(.bottom, 25)
                     .font(.headline)
-                    .frame(height: 40)
+                    .frame(minHeight: 40)
                 }
                 .accessibilityElement(children: .ignore)
                 .accessibilityLabel("Stretch duration \(stretch) seconds")
@@ -82,7 +83,7 @@ struct PhoneAddExerciseViewAccessible: View {
                     }
                     .padding(.bottom, 25)
                     .font(.headline)
-                    .frame(height: 40)
+                    .frame(minHeight: 40)
                 }
                 .accessibilityElement(children: .ignore)
                 .accessibilityLabel("Rest duration \(rest) seconds")
@@ -114,7 +115,7 @@ struct PhoneAddExerciseViewAccessible: View {
                     }
                     .padding(.bottom, 25)
                     .font(.headline)
-                    .frame(height: 40)
+                    .frame(minHeight: 40)
                 }
                 .accessibilityElement(children: .ignore)
                 .accessibilityLabel("Repetition count \(reps)")
