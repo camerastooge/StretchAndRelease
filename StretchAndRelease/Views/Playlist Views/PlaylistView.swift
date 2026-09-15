@@ -87,7 +87,7 @@ struct PlaylistView: View {
                             if #available(iOS 26.0, *) {
                                 Text("ADD")
                                     .frame(width: 200, height: 65)
-                                    .font(.system(size: 32))
+                                    .font(.largeTitle)
                                     .fontWeight(.bold)
                                     .shadow(color: .gray, radius: 0.2, x: 0.5, y: 1)
                                     .foregroundStyle(differentiateWithoutColor ? .black : .white)
@@ -100,7 +100,7 @@ struct PlaylistView: View {
                             } else {
                                 Text("ADD")
                                     .frame(width: 200, height: 65)
-                                    .font(.system(size: 32))
+                                    .font(.largeTitle)
                                     .fontWeight(.bold)
                                     .shadow(color: .gray, radius: 0.2, x: 0.5, y: 1)
                                     .foregroundStyle(differentiateWithoutColor ? .black : .white)
@@ -122,7 +122,7 @@ struct PlaylistView: View {
                             .padding(.bottom)
                     } description: {
                         Text("Press ADD to add a stretch to your playlist")
-                            .font(.system(size: 24))
+                            .font(.title2)
                             .foregroundStyle(colorScheme == .dark ? .white : .black)
                     }
                     .safeAreaInset(edge: .bottom) {
@@ -133,7 +133,7 @@ struct PlaylistView: View {
                             if #available(iOS 26.0, *) {
                                 Text("ADD")
                                     .frame(width: 200, height: 65)
-                                    .font(.system(size: 32))
+                                    .font(.largeTitle)
                                     .fontWeight(.bold)
                                     .shadow(color: .gray, radius: 0.2, x: 0.5, y: 1)
                                     .foregroundStyle(.white)
@@ -146,7 +146,7 @@ struct PlaylistView: View {
                             } else {
                                 Text("ADD")
                                     .frame(width: 200, height: 65)
-                                    .font(.system(size: 32))
+                                    .font(.largeTitle)
                                     .fontWeight(.bold)
                                     .shadow(color: .gray, radius: 0.2, x: 0.5, y: 1)
                                     .foregroundStyle(.white)
@@ -208,6 +208,7 @@ struct playlistHeaderView: View {
                 .font(.headline)
                 .fontWeight(.bold)
                 .foregroundStyle(colorScheme == .dark ? .secondary : differentiateWithoutColor ? Color.black : Color.white.opacity(0.7))
+                .shadow(color: differentiateWithoutColor ? .clear : .black, radius: 1, x: 2, y: 2)
                 .lineLimit(1)
                 .padding(.leading, 5)
                 .accessibilityLabel("Name")
@@ -217,6 +218,7 @@ struct playlistHeaderView: View {
                 .font(.headline)
                 .fontWeight(.semibold)
                 .foregroundStyle(differentiateWithoutColor ? Color.black : Color.green)
+                .shadow(color: differentiateWithoutColor ? .clear : .black, radius: 1, x: 2, y: 2)
                 .lineLimit(1)
                 .accessibilityLabel("Stretch Duration")
                 .accessibilityHint("The length of time to hold the selected stretch")
@@ -225,6 +227,7 @@ struct playlistHeaderView: View {
                 .font(.headline)
                 .fontWeight(.semibold)
                 .foregroundStyle(differentiateWithoutColor ? Color.black : Color.yellow)
+                .shadow(color: differentiateWithoutColor ? .clear : .black, radius: 1, x: 2, y: 2)
                 .lineLimit(1)
                 .accessibilityLabel("Rest Duration")
                 .accessibilityHint("The length of time to rest between stretches")
@@ -233,11 +236,17 @@ struct playlistHeaderView: View {
                 .font(.headline)
                 .fontWeight(.semibold)
                 .foregroundStyle(differentiateWithoutColor ? Color.black : Color.red)
+                .shadow(color: differentiateWithoutColor ? .clear : .black, radius: 1, x: 2, y: 2)
                 .lineLimit(1)
                 .accessibilityLabel("Number of repetitions")
                 .accessibilityHint("How many times to perform this stretch in the set")
         }
+        .padding(.vertical, 5)
         .safeAreaPadding(.leading, 15.0)
+//        .background {
+//            Color.black.opacity(0.25)
+//                .ignoresSafeArea()
+//        }
 
     }
 }
@@ -245,4 +254,5 @@ struct playlistHeaderView: View {
 #Preview {
     PlaylistView()
         .modelContainer(previewContainer)
+//        .modelContainer(for: PlaylistItem.self)
 }

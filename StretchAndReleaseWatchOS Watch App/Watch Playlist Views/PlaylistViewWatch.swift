@@ -98,7 +98,7 @@ struct PlaylistViewWatch: View {
                     else {
                         ContentUnavailableView {
                             Text("Set list is Empty")
-                                .font(.system(size: 32))
+                                .font(.body)
                         } description: {
                         VStack {
                             NavigationLink {
@@ -113,9 +113,10 @@ struct PlaylistViewWatch: View {
                                 }
                             }
                             .buttonStyle(.plain)
+                            .padding(.vertical, 5)
                             .accessibilityLabel("Add an item to the set list")
                             Text("Press \(Image(systemName: "plus.circle")) to add a stretch to your set list")
-                                .font(.system(size: 16))
+                                .font(.caption)
                                 .foregroundStyle(colorScheme == .dark ? .white : .black)
                         }
                         }

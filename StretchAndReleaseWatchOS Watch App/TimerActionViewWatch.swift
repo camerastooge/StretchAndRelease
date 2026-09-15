@@ -13,6 +13,7 @@ struct TimerActionViewWatch: View {
 	//Environment properties
 	@Environment(\.colorScheme) var colorScheme
 	@Environment(\.accessibilityDifferentiateWithoutColor) var differentiateWithoutColor
+    @Environment(\.dynamicTypeSize) var dynamicTypeSize
 	@Environment(Managers.self) var managers
 	
 	// Properties stored in UserDefaults
@@ -70,6 +71,13 @@ struct TimerActionViewWatch: View {
 			"This is the current stretch phase."
 		}
 	}
+    
+    var repetitionsLabel: String {
+        switch dynamicTypeSize {
+        case .xxLarge, .xxxLarge, .accessibility1, .accessibility2, .accessibility3, .accessibility4, .accessibility5: return "\(repsCompleted)/\(totalReps)"
+        default: return "Reps: \(repsCompleted)/\(totalReps)"
+        }
+    }
 	
 	// variables for button view
 	var buttonRoles: ButtonRoles = .play
@@ -85,6 +93,7 @@ struct TimerActionViewWatch: View {
 					.stroke(displayColor, style: StrokeStyle(lineWidth: 10, lineCap: .round))
 					.rotationEffect(Angle(degrees: 90))
 				
+                //Information display in center of arc
 				VStack {
 					Text("\(String(format: "%02d", Int(timeRemaining)))")
                         .font(.largeTitle.monospacedDigit())
@@ -93,6 +102,7 @@ struct TimerActionViewWatch: View {
 						.accessibilityLabel("\(timeRemaining) seconds remaining")
 						.padding(.bottom, 5)
 					
+                    //Playlist buttons and Exercise text label
 					Grid {
 						GridRow {
 							HStack {
@@ -177,8 +187,11 @@ struct TimerActionViewWatch: View {
 						}
 						.frame(height: 20)
 					}
+                    .offset(y: -8)
 					
-					Text("Reps: \(repsCompleted)/\(totalReps)")
+					Text(repetitionsLabel)
+                        .font(.title3)
+                        .offset(y: -5)
 						.accessibilityLabel("Repetitions Completed \(repsCompleted) of \(totalReps)")
 				}
 				.font(.caption)
@@ -281,7 +294,7 @@ struct TimerActionViewWatch: View {
 			.accessibilityLabel("show settings")
 			.accessibilityInputLabels(["settings"])
 		}
-		.dynamicTypeSize(DynamicTypeSize.xxxLarge)
+        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
 		.containerRelativeFrame(.vertical) { length, _ in
 			length * 0.35
 		}
