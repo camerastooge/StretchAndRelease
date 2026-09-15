@@ -40,6 +40,7 @@ struct PhoneAddExerciseViewAccessible: View {
                         Spacer()
                         Text("Stretch")
                             .font(.largeTitle)
+                            .dynamicTypeSize(...DynamicTypeSize.accessibility4)
                         Picker("Stretch", selection: $stretch) {
                             ForEach(1...60, id:\.self) {
                                 Text("\($0)")

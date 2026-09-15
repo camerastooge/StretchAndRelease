@@ -16,23 +16,26 @@ struct PlaylistRowView: View {
             Text(item.name ?? "Exercise")
                 .font(.headline)
                 .fontWeight(.bold)
-                .lineLimit(1)
                 .layoutPriority(1)
                 .padding(.leading, 5)
             
             Text("\(item.stretchDuration ?? 10)")
                 .font(.headline)
                 .fontWeight(.bold)
+                .lineLimit(1)
             
             Text("\(item.restDuration ?? 10)")
                 .font(.headline)
                 .fontWeight(.bold)
+                .lineLimit(1)
             
             Text("\(item.repsToComplete ?? 10)")
                 .font(.headline)
                 .fontWeight(.bold)
+                .lineLimit(1)
         }
         .padding(.vertical, 4)
+        .dynamicTypeSize(...DynamicTypeSize.accessibility4  )
     }
 }
 

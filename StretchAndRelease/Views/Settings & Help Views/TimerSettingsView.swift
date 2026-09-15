@@ -13,7 +13,7 @@ struct SettingsView: View {
     @Environment(\.colorScheme) var colorScheme
 	@Environment(\.dismiss) var dismiss
     @Environment(\.accessibilityDifferentiateWithoutColor) var differentiateWithoutColor
-    @Environment(\.dynamicTypeSize) var dynamicTypeSize
+    @Environment(\.dynamicTypeSize) var sizeCategory
     @Environment(Managers.self) var managers
     
     // Properties stored in UserDefaults
@@ -44,6 +44,14 @@ struct SettingsView: View {
     
     @ScaledMetric var buttonWidth = 100
     
+    
+    var isScrollDisabled: Bool {
+        switch sizeCategory {
+        case .accessibility3, .accessibility4, .accessibility5: return false
+        default: return true
+        }
+    }
+    
     private var volumeSlider: some View {
         Slider(
             value: $volumeValue,
@@ -73,7 +81,7 @@ struct SettingsView: View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: 0) {
-                    if !dynamicTypeSize.isAccessibilitySize {
+                    if !sizeCategory.isAccessibilitySize {
                         PhoneTimerSettingsTypicalView(stretch: $stretch, rest: $rest, reps: $reps, isEditing: $isEditing)
                             .scrollDisabled(true)
                             .containerRelativeFrame(.vertical) { height, _ in
@@ -107,9 +115,8 @@ struct SettingsView: View {
                 }
                 .padding(.horizontal)
                 .padding(.bottom)
-                .dynamicTypeSize(...DynamicTypeSize.xxLarge)
             }
-            .scrollDisabled(true)
+            .scrollDisabled(isScrollDisabled)
             .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.inline)
 			.alert("Empty Setlists", isPresented: $isShowingEmptyPlaylistAlert) {

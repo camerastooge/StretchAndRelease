@@ -243,10 +243,6 @@ struct playlistHeaderView: View {
         }
         .padding(.vertical, 5)
         .safeAreaPadding(.leading, 15.0)
-//        .background {
-//            Color.black.opacity(0.25)
-//                .ignoresSafeArea()
-//        }
 
     }
 }
