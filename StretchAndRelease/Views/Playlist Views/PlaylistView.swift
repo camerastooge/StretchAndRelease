@@ -58,20 +58,20 @@ struct PlaylistView: View {
                                         .navigationBarBackButtonHidden()
                                 } label: {
                                     PlaylistRowView(item: exercise, columns: playlistColumns)
-                                        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                                            Button {
-                                                modelContext.delete(exercise)
-                                            } label: {
-                                                Label("Delete", systemImage: "trash")
-                                                    .tint(.red)
-                                                    .accessibilityLabel("Delete \(exercise.name ?? "exercise")")
-                                                    .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
-                                            }
-                                        }
                                 }
                                 .navigationLinkIndicatorVisibility(.hidden)
                                 .accessibilityLabel("Edit \(exercise.name ?? "exercise")")
                                 .listRowBackground(Color.clear)
+                                .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                                    Button {
+                                        modelContext.delete(exercise)
+                                    } label: {
+                                        Label("Delete", systemImage: "trash")
+                                            .tint(.red)
+                                            .accessibilityLabel("Delete \(exercise.name ?? "exercise")")
+                                            .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                                    }
+                                }
                             }
                             .onMove(perform: move)
                         }

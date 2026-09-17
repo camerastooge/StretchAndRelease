@@ -39,7 +39,9 @@ struct ButtonView: View {
                     .phoneFrame()
                     .font(.largeTitle)
                     .foregroundStyle(.black)
-                    .padding([.vertical, .horizontal])
+                    .padding([.horizontal, .vertical], buttonPadding)
+                    .background(colorScheme == .dark ? Color(white: 0.85) : Color.clear, in: .capsule)
+                    .dynamicTypeSize(...DynamicTypeSize.accessibility4)
             }
         } else {
             if !differentiateWithoutColor {

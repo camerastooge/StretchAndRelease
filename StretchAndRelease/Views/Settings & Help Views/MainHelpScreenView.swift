@@ -13,13 +13,6 @@ struct MainHelpScreenView: View {
     var deviceType: DeviceType = .phone
     var buttonRole: ButtonRoles = .play
     
-    var isScrollDisabled: Bool {
-        switch sizeCategory {
-        case .accessibility3, .accessibility4, .accessibility5: return false
-        default: return true
-        }
-    }
-    
     var privacyPolicyString: String {
         switch sizeCategory {
         case .accessibility3, .accessibility4, .accessibility5: return "Privacy Policy"
@@ -77,8 +70,8 @@ struct MainHelpScreenView: View {
                     .accessibilityLabel("Next set list item button")
                 }
             }
+            .safeAreaPadding(.horizontal)
             .padding(.vertical, 10)
-            .scrollDisabled(isScrollDisabled)
             
             Section {
                 HStack {
