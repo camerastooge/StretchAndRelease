@@ -28,8 +28,7 @@ struct ContentView: View {
 	// state variables used across views
 	@State private var timeRemaining: Int = 0
 	@State private var repsCompleted: Int = 0
-	@State private var endAngle = Angle(degrees: 340) 
-	let timer = Timer.publish(every: 1.0, on: .main, in: .common).autoconnect()
+	@State private var endAngle = Angle(degrees: 340)
 	
 	// state variables only used on main view
 	@State private var isShowingSettings = false

@@ -30,7 +30,8 @@ struct TimerDisplayView: View {
     @State private var timeRemaining: Int = 0
     @State private var repsCompleted: Int = 0
     @State private var endAngle = Angle(degrees: 340)
-    @State private var timer = Timer.publish(every: 1.0, on: .main, in: .common).autoconnect()
+    @State private var timer = Timer.publish(every: 1.0, on: .main, in: .common)
+    @State private var cancellable: Cancellable? = nil
     
     //SwiftData query
     @Query(sort: \PlaylistItem.index) var playlist: [PlaylistItem]
@@ -139,37 +140,7 @@ struct TimerDisplayView: View {
                         
                         //START - PAUSE BUTTON
                         Button {
-                            //engage from full stop
-                            if managers.stretchPhase == .stop {
-                                if audio {
-                                    SoundManager.instance.playPrompt(sound: .countdownExpanded)
-                                }
-                                
-                                DispatchQueue.main.asyncAfter(deadline: audio ? .now() + 3 : .now() + 0.5) {
-                                    withAnimation(.linear(duration: 0.25)) {
-                                        managers.startTimer()
-                                        repsCompleted = 0
-                                    }
-                                }
-                            }
-                            
-                            //pause the timer
-                            else if !managers.isTimerPaused {
-                                managers.isTimerPaused = true
-                            }
-                            
-                            //un-pause the timer
-                            else {
-                                if audio {
-                                    SoundManager.instance.playPrompt(sound: .countdown)
-                                }
-                                DispatchQueue.main.asyncAfter(deadline: audio ? .now() + 2.0 : .now() + 0.5) {
-                                    withAnimation(.linear(duration: 0.25)) {
-                                        managers.isTimerActive = true
-                                        managers.isTimerPaused = false
-                                    }
-                                }
-                            }
+                            togglePlayPause()
                         } label: {
                             if #available(iOS 26.0, *) {
                                 ButtonView(buttonRoles: !managers.isTimerActive ? .play : .pause, deviceType: deviceType)
@@ -186,13 +157,7 @@ struct TimerDisplayView: View {
                         //RESET BUTTON
                         
                         Button {
-                            withAnimation(.easeInOut(duration: 0.25)) {
-                                managers.isTimerActive = false
-                                managers.isTimerPaused = false
-                                managers.stretchPhase = .stop
-                            }
-                            repsCompleted = 0
-                            timeRemaining = totalStretch
+                            resetTimer()
                         } label: {
                             ButtonView(buttonRoles: .reset, deviceType: .phone)
                         }
@@ -445,6 +410,59 @@ struct TimerDisplayView: View {
             }
         }
     }
+    //function to disconnect and recreate timer
+    func destroyOldTimer() {
+        cancellable?.cancel()
+        cancellable = nil
+        timer = Timer.publish(every: 1.0, on: .main, in: .common)
+    }
+    
+    //function to reset timer when button is pressed
+    func resetTimer() {
+        managers.stopTimer()
+        destroyOldTimer()
+        repsCompleted = 0
+        timeRemaining = totalStretch
+        withAnimation(.linear(duration: 0.5)) {
+            updateEndAngle()
+        }
+    }
+    
+    //function to toggle the play/pause button
+    func togglePlayPause() {
+        //engage from full stop
+        if managers.stretchPhase == .stop {
+            if audio {
+                SoundManager.instance.playPrompt(sound: .countdownExpanded)
+            }
+            
+            DispatchQueue.main.asyncAfter(deadline: audio ? .now() + 3 : .now() + 0.5) {
+                withAnimation(.linear(duration: 0.25)) {
+                    managers.startTimer()
+                    cancellable = timer.connect()
+                    repsCompleted = 0
+                }
+            }
+        }
+        
+        //pause the timer
+        else if !managers.isTimerPaused {
+            managers.isTimerPaused = true
+        }
+        
+        //un-pause the timer
+        else {
+            if audio {
+                SoundManager.instance.playPrompt(sound: .countdown)
+            }
+            DispatchQueue.main.asyncAfter(deadline: audio ? .now() + 2.0 : .now() + 0.5) {
+                withAnimation(.linear(duration: 0.25)) {
+                    managers.isTimerActive = true
+                    managers.isTimerPaused = false
+                }
+            }
+        }
+    }
     
     //function to manage timer stop
     func manageStop() {
@@ -452,6 +470,7 @@ struct TimerDisplayView: View {
             managers.stretchPhase = .stop
             managers.isTimerActive = false
             managers.isTimerPaused = false
+            destroyOldTimer()
             updateEndAngle()
         }
     }
