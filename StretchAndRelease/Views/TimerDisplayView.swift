@@ -88,6 +88,7 @@ struct TimerDisplayView: View {
                                 }
                                 self.playlistIndex = playlistIndex
                                 loadPlaylistItem(playlistIndex)
+                                announceCurrentExercise()
                             } label: {
                                 ButtonView(buttonRoles: .previousItem, deviceType: deviceType)
                                     .opacity(0.75)
@@ -106,6 +107,7 @@ struct TimerDisplayView: View {
                                 }
                                 self.playlistIndex = playlistIndex
                                 loadPlaylistItem(playlistIndex)
+                                announceCurrentExercise()
                             } label: {
                                 ButtonView(buttonRoles: .nextItem, deviceType: deviceType)
                                     .opacity(0.75)
@@ -451,6 +453,19 @@ struct TimerDisplayView: View {
             managers.isTimerActive = false
             managers.isTimerPaused = false
             updateEndAngle()
+        }
+    }
+    
+    //function to announce change in exercise when using VoiceOver
+    func announceCurrentExercise() {
+        guard let name = playlistItem?.name else { return }
+        
+        var announcement = AttributedString("\(name), \(totalStretch) second stretch, \(totalReps) reps.")
+        announcement.accessibilitySpeechAnnouncementPriority = .high
+        
+        //short delay so VoiceOver finishes its button tap feedback first
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            AccessibilityNotification.Announcement(announcement).post()
         }
     }
 }

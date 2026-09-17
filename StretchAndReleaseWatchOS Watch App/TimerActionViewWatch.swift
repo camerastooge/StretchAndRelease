@@ -66,7 +66,7 @@ struct TimerActionViewWatch: View {
 	
 	var dragAccessibilityHint: String {
 		if isPlaylistActive {
-			"Drag to the left to go to the next stretch.  Drag to the right to go to the previous exercise."
+			"Drag to the left to go to the previous stretch.  Drag to the right to go to the next exercise."
 		} else {
 			"This is the current stretch phase."
 		}
@@ -115,6 +115,7 @@ struct TimerActionViewWatch: View {
 										}
                                         self.playlistIndex = playlistIndex
 										loadPlaylistItem(playlistIndex)
+                                        announceCurrentExercise()
 									} label: {
 										Image(systemName: "arrowtriangle.left.fill")
 											.foregroundStyle(.white)
@@ -155,6 +156,7 @@ struct TimerActionViewWatch: View {
 													withAnimation(.linear(duration: 0.25)) {
 														loadPlaylistItem(playlistIndex)
 													}
+                                                    announceCurrentExercise()
 												}
 											}
 										)
@@ -171,6 +173,7 @@ struct TimerActionViewWatch: View {
 										}
                                         self.playlistIndex = playlistIndex
 										loadPlaylistItem(playlistIndex)
+                                        announceCurrentExercise()
 									} label: {
 										Image(systemName: "arrowtriangle.right.fill")
 											.foregroundStyle(.white)
@@ -507,6 +510,19 @@ struct TimerActionViewWatch: View {
             managers.isTimerActive = false
             managers.isTimerPaused = false
             updateEndAngle()
+        }
+    }
+    
+    //function to announce new playlist item
+    func announceCurrentExercise() {
+        guard let name = playlistItem?.name else { return }
+        
+        var announcement = AttributedString("\(name), \(totalStretch) second stretch, \(totalReps) reps")
+        announcement.accessibilitySpeechAnnouncementPriority = .high
+        
+        //short delay so VoiceOver finishes its button tap feedback first
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            AccessibilityNotification.Announcement(announcement).post()
         }
     }
 }
