@@ -20,6 +20,6 @@ struct StretchAndReleaseApp: App {
                     UIApplication.shared.isIdleTimerDisabled = newvalue
                 }
         }
-        .modelContainer(for: PlaylistItem.self)
+        .modelContainer(for: PlaylistItem.self, isUndoEnabled: true)
     }
 }

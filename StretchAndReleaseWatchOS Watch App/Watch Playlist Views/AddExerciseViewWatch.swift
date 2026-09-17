@@ -99,7 +99,7 @@ struct AddExerciseViewWatch: View {
 					}
 				}
 			}
-			.navigationTitle("Add Stretch")
+			.navigationTitle("Add")
 			.navigationBarTitleDisplayMode(.inline)
 			.alert("Name Field Is Empty", isPresented: $isShowingEmptyNameField) {
 				Button("OK", role: .cancel) {
@@ -126,9 +126,11 @@ struct AddExerciseViewWatch: View {
 					} label: {
 						if #available(watchOS 26.0, *) {
 							Image(systemName: "chevron.left")
-								.glassEffect(.clear)
+                                .foregroundStyle(.green)
+                                .glassEffect(.clear)
 						} else {
 							Image(systemName: "chevron.left")
+                                .foregroundStyle(.green)
 						}
 					}
 					.buttonStyle(.plain)
@@ -139,12 +141,12 @@ struct AddExerciseViewWatch: View {
 						dismiss()
 					} label: {
 						if #available(watchOS 26.0, *) {
-							Image(systemName: "x.circle")
-								.foregroundColor(.red)
-								.glassEffect(.clear)
+							Image(systemName: "")
+                                .glassEffect(.clear)
+                                .foregroundStyle(.red)
 						} else {
-							Image(systemName: "chevron.left")
-								.backgroundStyle(.red)
+							Image(systemName: "x.circle")
+                                .foregroundStyle(.red)
 						}
 					}
 					.buttonStyle(.plain)

@@ -125,7 +125,7 @@ struct EditExerciseViewWatch: View {
                     }
 				}
 			}
-			.navigationTitle("Edit Stretch")
+			.navigationTitle("Edit")
 			.navigationBarTitleDisplayMode(.inline)
 			.navigationBarBackButtonHidden(true)
 			.toolbar {
@@ -150,17 +150,35 @@ struct EditExerciseViewWatch: View {
 						}
 						dismiss()
 					} label: {
-						if #available(watchOS 26.0, *) {
-							ButtonView(buttonRoles: .save, deviceType: .watch)
-								.glassEffect()
-								.dynamicTypeSize(...DynamicTypeSize.accessibility2)
-						} else {
-							ButtonView(buttonRoles: .save, deviceType: .watch)
-								.dynamicTypeSize(...DynamicTypeSize.accessibility2)
-						}
-					}
-					.accessibilityLabel("Save changes and return to set list view")
+                        if #available(watchOS 26.0, *) {
+                            Image(systemName: "chevron.left")
+                                .foregroundStyle(.green)
+                                .glassEffect(.clear)
+                        } else {
+                            Image(systemName: "chevron.left")
+                                .foregroundStyle(.green)
+                        }
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel("Save changes and return to set list view")
 				}
+                
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        dismiss()
+                    } label: {
+                        if #available(watchOS 26.0, *) {
+                            Image(systemName: "")
+                                .glassEffect(.clear)
+                                .foregroundStyle(.red)
+                        } else {
+                            Image(systemName: "x.circle")
+                                .foregroundStyle(.red)
+                        }
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel("Cancel and return to set list view")
+                }
 				
 			}
 		}

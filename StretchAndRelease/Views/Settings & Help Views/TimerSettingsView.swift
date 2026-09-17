@@ -143,10 +143,11 @@ struct SettingsView: View {
                     } label: {
                         if #available(iOS 26.0, *) {
                             Image(systemName: "chevron.left")
-                                .glassEffect(.clear)
+                                .foregroundStyle(.green)
                                 .accessibilityLabel("Save changes and return to set list view")
                         } else {
                             Image(systemName: "chevron.left")
+                                .foregroundStyle(.green)
                                 .accessibilityLabel("Save changes and return to set list view")
                         }
                     }
@@ -159,12 +160,11 @@ struct SettingsView: View {
                     } label: {
                         if #available(iOS 26.0, *) {
                             Image(systemName: "x.circle")
-                                .glassEffect(.clear)
                                 .foregroundStyle(.red)
                                 .accessibilityLabel("Cancel and return to set list view")
                         } else {
                             Image(systemName: "x.circle.fill")
-                                .foregroundStyle(Color.red)
+                                .foregroundStyle(.red)
                                 .accessibilityLabel("Cancel and return to set list view")
                         }
                     }

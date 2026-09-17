@@ -17,6 +17,6 @@ struct StretchAndReleaseWatchOS_Watch_AppApp: App {
             ContentView()
                 .environment(managers)
         }
-        .modelContainer(for: PlaylistItem.self)
+        .modelContainer(for: PlaylistItem.self, isUndoEnabled: true)
     }
 }
