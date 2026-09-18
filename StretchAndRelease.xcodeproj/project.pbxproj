@@ -60,15 +60,6 @@
 				Assets/SFX/and_rest.mp3,
 				Assets/SFX/and_stretch.mp3,
 				Assets/SFX/tick.mp3,
-				Managers/Managers.swift,
-				Managers/SoundManager.swift,
-				"Models and Settings/ButtonSettings.swift",
-				"Models and Settings/Connectivity.swift",
-				"Models and Settings/PlaylistItem.swift",
-				"Models and Settings/StretchPhase.swift",
-				"Models and Settings/View Modifiers.swift",
-				Views/ButtonView.swift,
-				"Views/Info Display Views/Arc.swift",
 				"Views/Playlist Views/PlaylistRowView.swift",
 			);
 			target = E4F1C1972DFE0AAB00114B7C /* StretchAndReleaseWatchOS Watch App */;
@@ -76,6 +67,11 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		E4AA11002FFFFFFF00AA1100 /* Shared */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Shared;
+			sourceTree = "<group>";
+		};
 		E41BF95A2DFCDD5800E16C07 /* StretchAndRelease */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
@@ -114,6 +110,7 @@
 			isa = PBXGroup;
 			children = (
 				E44D73402FDB3F4700EBE7E8 /* PhoneAddExerciseViewTypical.swift */,
+				E4AA11002FFFFFFF00AA1100 /* Shared */,
 				E41BF95A2DFCDD5800E16C07 /* StretchAndRelease */,
 				E4F1C1992DFE0AAC00114B7C /* StretchAndReleaseWatchOS Watch App */,
 				E41BF9592DFCDD5800E16C07 /* Products */,
@@ -147,6 +144,7 @@
 				E4F1C1A12DFE0AAF00114B7C /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
+				E4AA11002FFFFFFF00AA1100 /* Shared */,
 				E41BF95A2DFCDD5800E16C07 /* StretchAndRelease */,
 			);
 			name = StretchAndRelease;
@@ -169,6 +167,7 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
+				E4AA11002FFFFFFF00AA1100 /* Shared */,
 				E4F1C1992DFE0AAC00114B7C /* StretchAndReleaseWatchOS Watch App */,
 			);
 			name = "StretchAndReleaseWatchOS Watch App";

@@ -7,122 +7,73 @@
 
 import SwiftUI
 import SwiftData
-import Combine
 
 struct TimerActionViewWatch: View {
     //Environment properties
-    @Environment(\.colorScheme) var colorScheme
     @Environment(\.accessibilityDifferentiateWithoutColor) var differentiateWithoutColor
     @Environment(\.dynamicTypeSize) var dynamicTypeSize
-    @Environment(Managers.self) var managers
-    
-    // Properties stored in UserDefaults
-    @AppStorage("stretch") private var totalStretch = 10
-    @AppStorage("rest") private var totalRest = 5
-    @AppStorage("reps") private var totalReps = 3
-    
-    @AppStorage("audio") private var audio = true
-    @AppStorage("haptics") private var haptics = true
-    @AppStorage("promptVolume") private var promptVolume = 1.0
-    @AppStorage("playlist") private var isPlaylistActive = true
-    
-    // state variables used across views
-    @State private var repsCompleted: Int = 0
-    @State private var endAngle = Angle(degrees: 340)
-    @State private var timer = Timer.publish(every: 1.0, on: .main, in: .common)
-    @State private var cancellable: Cancellable? = nil
-    @State private var isRunning = false
-    
-    // state variables only used on main view
-    @Binding var timeRemaining: Int
-    @Binding var isShowingSettings: Bool
-    
-    @State private var didSettingsTriggerFromContentView = true
-    @State private var didSettingsChange = false
-    @State private var offset: CGFloat = 0
-    
+    @Environment(StretchTimer.self) private var timer
+
     //SwiftData query
     @Query(sort: \PlaylistItem.index) var playlist: [PlaylistItem]
-    
-    // playlist properties
-    @State var playlistItem: PlaylistItem?
-    @State private var playlistIndex: Int? = 0
-    @State private var isPlaylistInactive = true
-    
+
+    @State private var didSettingsTriggerFromContentView = true
+
     //local properties for display
-    var timerTextLabel: String {
-        if !managers.isTimerPaused {
-            playlistItem?.name ?? managers.stretchPhase.phaseText
-        } else {
-            "PAUSED"
-        }
-    }
-    
     var displayColor: Color {
-        if !managers.isTimerPaused {
-            managers.stretchPhase.phaseColor
-        } else {
-            Color.gray
-        }
+        timer.isPaused ? Color.gray : timer.phase.phaseColor
     }
-    
+
     var dragAccessibilityHint: String {
-        if isPlaylistActive {
+        if timer.isPlaylistActive {
             "Drag to the left to go to the previous stretch.  Drag to the right to go to the next exercise."
         } else {
             "This is the current stretch phase."
         }
     }
-    
+
     var repetitionsLabel: String {
         switch dynamicTypeSize {
-        case .xxLarge, .xxxLarge, .accessibility1, .accessibility2, .accessibility3, .accessibility4, .accessibility5: return "\(repsCompleted)/\(totalReps)"
-        default: return "Reps: \(repsCompleted)/\(totalReps)"
+        case .xxLarge, .xxxLarge, .accessibility1, .accessibility2, .accessibility3, .accessibility4, .accessibility5:
+            return timer.repsLabel
+        default:
+            return "Reps: \(timer.repsLabel)"
         }
     }
-    
+
     // variables for button view
-    var buttonRoles: ButtonRoles = .play
     var deviceType: DeviceType = .watch
-    
-    
+
     var body: some View {
         NavigationStack {
             ZStack {
                 Color.gray.opacity(0)
-                
+
                 ZStack {
                     GeometryReader { proxy in
-                        Arc(endAngle: endAngle)
+                        Arc(endAngle: timer.endAngle)
                             .stroke(displayColor, style: StrokeStyle(lineWidth: 10, lineCap: .round))
                             .rotationEffect(Angle(degrees: 90))
                             .frame(width: proxy.size.width * 0.9, height: proxy.size.height, alignment: .center)
                             .position(x: proxy.size.width / 2, y: proxy.size.height * 0.45)
                     }
-                    
+
                     //Information display in center of arc
                     VStack {
-                        Text("\(String(format: "%02d", Int(timeRemaining)))")
+                        Text("\(String(format: "%02d", timer.timeRemaining))")
                             .font(.largeTitle.monospacedDigit())
                             .kerning(2)
                             .contentTransition(.numericText())
-                            .accessibilityLabel("\(timeRemaining) seconds remaining")
+                            .accessibilityLabel("\(timer.timeRemaining) seconds remaining")
                             .padding(.bottom, 5)
-                        
+
                         //Playlist buttons and Exercise text label
                         Grid {
                             GridRow {
                                 HStack {
-                                    if isPlaylistActive {
+                                    if timer.isPlaylistActive {
                                         Button {
-                                            guard var playlistIndex else { return }
-                                            playlistIndex -= 1
-                                            if playlistIndex < 0 {
-                                                playlistIndex = playlist.count - 1
-                                            }
-                                            self.playlistIndex = playlistIndex
-                                            loadPlaylistItem(playlistIndex)
-                                            announceCurrentExercise()
+                                            timer.selectPreviousItem()
                                         } label: {
                                             Image(systemName: "arrowtriangle.left.fill")
                                                 .foregroundStyle(.white)
@@ -135,52 +86,33 @@ struct TimerActionViewWatch: View {
                                     }
                                 }
                                 .frame(width: 8)
-                                
-                                Text(timerTextLabel)
+
+                                Text(timer.displayLabel)
                                     .frame(width: 80, height: 25)
                                     .lineLimit(2)
                                     .multilineTextAlignment(.center)
                                     .minimumScaleFactor(0.5)
-                                    .offset(x: offset)
                                     .contentTransition(.opacity)
                                     .gesture(
                                         DragGesture()
                                             .onEnded { gesture in
-                                                if isPlaylistActive {
-                                                    guard var playlistIndex else { return }
+                                                guard timer.isPlaylistActive else { return }
+                                                withAnimation(.linear(duration: 0.25)) {
                                                     if gesture.translation.width < 0 {
-                                                        playlistIndex -= 1
-                                                        if playlistIndex < 0 {
-                                                            playlistIndex = playlist.count - 1
-                                                        }
+                                                        timer.selectPreviousItem()
                                                     } else if gesture.translation.width > 0 {
-                                                        playlistIndex += 1
-                                                        if playlistIndex == playlist.count {
-                                                            playlistIndex = 0
-                                                        }
+                                                        timer.selectNextItem()
                                                     }
-                                                    self.playlistIndex = playlistIndex
-                                                    withAnimation(.linear(duration: 0.25)) {
-                                                        loadPlaylistItem(playlistIndex)
-                                                    }
-                                                    announceCurrentExercise()
                                                 }
                                             }
                                     )
-                                    .accessibilityLabel(timerTextLabel)
+                                    .accessibilityLabel(timer.displayLabel)
                                     .accessibilityHint(dragAccessibilityHint)
-                                
+
                                 HStack {
-                                    if isPlaylistActive {
+                                    if timer.isPlaylistActive {
                                         Button {
-                                            guard var playlistIndex else { return }
-                                            playlistIndex += 1
-                                            if playlistIndex == playlist.count {
-                                                playlistIndex = 0
-                                            }
-                                            self.playlistIndex = playlistIndex
-                                            loadPlaylistItem(playlistIndex)
-                                            announceCurrentExercise()
+                                            timer.selectNextItem()
                                         } label: {
                                             Image(systemName: "arrowtriangle.right.fill")
                                                 .foregroundStyle(.white)
@@ -193,28 +125,27 @@ struct TimerActionViewWatch: View {
                                     }
                                 }
                                 .frame(width: 8)
-                                
                             }
                             .frame(height: 20)
                         }
                         .offset(y: -8)
-                        
+
                         Text(repetitionsLabel)
                             .font(.title3)
                             .offset(y: -5)
-                            .accessibilityLabel("Repetitions Completed \(repsCompleted) of \(totalReps)")
+                            .accessibilityLabel("Repetitions Completed \(timer.repsCompleted) of \(timer.totalReps)")
                     }
                     .font(.caption)
                     .fontWeight(.bold)
                     .foregroundStyle(displayColor)
                 }
-                .sensoryFeedback(.impact(intensity: haptics ? managers.stretchPhase.phaseIntensity : 0.0), trigger: endAngle)
+                .sensoryFeedback(.impact(intensity: timer.hapticsEnabled ? timer.phase.phaseIntensity : 0.0), trigger: timer.endAngle)
             }
             .toolbar {
                 ToolbarItemGroup(placement: .bottomBar) {
                     //resets timer
                     Button {
-                        resetTimer()
+                        timer.reset()
                     } label: {
                         ButtonView(buttonRoles: .reset, deviceType: deviceType)
                     }
@@ -222,18 +153,18 @@ struct TimerActionViewWatch: View {
                     .padding(.trailing)
                     .accessibilityInputLabels(["Reset", "Reset Timer"])
                     .accessibilityLabel("Reset Timer")
-                    
+
                     //play-pause button
                     Button {
-                        togglePlayPause()
+                        timer.togglePlayPause()
                     } label: {
-                        ButtonView(buttonRoles: !managers.isTimerActive ? .play : .pause, deviceType: deviceType)
+                        ButtonView(buttonRoles: !timer.isActive ? .play : .pause, deviceType: deviceType)
                     }
                     .buttonStyle(.plain)
                     .padding(.trailing)
                     .accessibilityInputLabels(["Start", "Pause", "Start Timer", "Pause Timer"])
                     .accessibilityLabel("Start or Pause Timer")
-                    
+
                     //Settings
                     NavigationLink {
                         TimerSettingsViewWatch(didTriggerSettingsFromContentView: $didSettingsTriggerFromContentView)
@@ -250,290 +181,20 @@ struct TimerActionViewWatch: View {
         .onAppear {
             didSettingsTriggerFromContentView = true
         }
-        .onChange(of: isPlaylistActive, initial: true) {
-            if isPlaylistActive {
-                guard var playlistIndex else { return }
-                if !playlist.isEmpty {
-                    playlistIndex = 0
-                    self.playlistIndex = playlistIndex
-                    loadPlaylistItem(playlistIndex)
-                } else {
-                    playlistItem = nil
-                    isPlaylistActive = false
-                }
-            } else {
-                playlistItem = nil
-            }
-        }
-        
-        //when user changes totalStretch in SettingsView, force timeRemaining to reset to TotalStretch
-        .onChange(of: totalStretch, initial: true) {
-            timeRemaining = totalStretch
-        }
-        
-        //this modifier runs when the timer publishes
-        .onReceive(timer) { _ in
-            switch managers.stretchPhase {
-            case .stretch: return manageStretch()
-            case .rest: return manageRest()
-            case .stop: return manageStop()
-            }
-        }
-    }
-    
-    //load playlistItem values into timer properties
-    func loadPlaylistItem(_ index: Int) {
-        guard playlist.indices.contains(index) else { return }
-        playlistItem = playlist[index]
-        if let playlistItem {
-            totalStretch = playlistItem.stretchDuration ?? 10
-            totalRest = playlistItem.restDuration ?? 5
-            totalReps = playlistItem.repsToComplete ?? 3
-        }
-    }
-    
-    //function to set end angle of arc
-    func updateEndAngle() {
-        switch managers.stretchPhase {
-        case .stretch:
-            let calculatedAngle = Double(timeRemaining) / Double(totalStretch) * 320 + 20
-            endAngle = Angle(degrees: min(calculatedAngle, 340))
-        case .rest:
-            let calculatedAngle = Double(timeRemaining) / Double(totalRest) * 320 + 20
-            endAngle = Angle(degrees: min(calculatedAngle, 340))
-        case .stop:
-            endAngle = Angle(degrees: 340)
-        }
-    }
-    
-    //function to stop timer
-    func timerFullStop() {
-        if audio {
-            SoundManager.instance.playPrompt(sound: .relax)
-        }
-        withAnimation(.easeOut(duration: 0.5)) {
-            managers.stretchPhase = .stop
-            updateEndAngle()
-        }
-        timeRemaining = totalStretch
-    }
-    
-    //function to manage stretch portion of stretch
-    func manageStretch() {
-        //if timer is paused, stop the timer and wait
-        if managers.isTimerPaused {
-            managers.isTimerActive = false
-        } else {
-            if timeRemaining > 0 {
-                timeRemaining -= 1
-                withAnimation(.easeOut(duration: 1)) {
-                    updateEndAngle()
-                }
-                if audio {
-                    SoundManager.instance.playTick(sound: .tick)
-                }
-            } else {
-                repsCompleted += 1
-                if repsCompleted < totalReps {
-                    if audio {
-                        SoundManager.instance.playPrompt(sound: .rest)
-                    }
-                    withAnimation {
-                        managers.stretchPhase = .rest
-                    }
-                } else {
-                    if !isPlaylistActive {
-                        timerFullStop()
-                    } else {
-                        if playlistIndex != playlist.count - 1 {
-                            if audio {
-                                SoundManager.instance.playPrompt(sound: .rest)
-                            }
-                            withAnimation {
-                                managers.stretchPhase = .rest
-                            }
-                        } else {
-                            timerFullStop()
-                            playlistIndex = 0
-                            loadPlaylistItem(playlistIndex ?? 0)
-                        }
-                    }
-                }
-            }
-        }
-    }
-    
-    //function to manage rest portion of stretch
-    func manageRest() {
-        if managers.isTimerPaused {
-            if timeRemaining != totalRest {
-                timeRemaining += 1
-                withAnimation(.easeOut(duration: 1)) {
-                    updateEndAngle()
-                }
-            } else {
-                managers.isTimerActive = false
-                if !isPlaylistActive {
-                    timeRemaining = totalStretch
-                    withAnimation(.easeOut(duration: 1)) {
-                        managers.stretchPhase = .stretch
-                        updateEndAngle()
-                    }
-                } else {
-                    guard var playlistIndex else { return }
-                    if repsCompleted != totalReps {
-                        timeRemaining = totalStretch
-                        managers.stretchPhase = .stretch
-                        withAnimation(.easeOut(duration: 1)) {
-                            updateEndAngle()
-                        }
-                    } else {
-                        playlistIndex += 1
-                        self.playlistIndex = playlistIndex
-                        loadPlaylistItem(playlistIndex)
-                        timeRemaining = totalStretch
-                        repsCompleted = 0
-                        repsCompleted = 0
-                        managers.stretchPhase = .stretch
-                    }
-                }
-            }
-        } else {
-            if timeRemaining != totalRest {
-                if managers.isTimerActive {
-                    timeRemaining += 1
-                    withAnimation(.easeOut(duration: 1)) {
-                        updateEndAngle()
-                    }
-                }
-            } else {
-                if !isPlaylistActive {
-                    timeRemaining = totalStretch
-                    if audio {
-                        SoundManager.instance.playPrompt(sound: .stretch)
-                    }
-                    withAnimation {
-                        managers.stretchPhase = .stretch
-                    }
-                } else {
-                    guard var playlistIndex else { return }
-                    if repsCompleted == totalReps {
-                        managers.isTimerActive = false
-                        playlistIndex += 1
-                        self.playlistIndex = playlistIndex
-                        loadPlaylistItem(playlistIndex)
-                        timeRemaining = totalStretch
-                        repsCompleted = 0
-                        if audio {
-                            SoundManager.instance.playPrompt(sound: .countdownExpanded)
-                        }
-                        DispatchQueue.main.asyncAfter(deadline: audio ? .now() + 3.0 : .now() + 0.25) {
-                            withAnimation {
-                                managers.stretchPhase = .stretch
-                                managers.isTimerActive = true
-                            }
-                        }
-                    } else {
-                        timeRemaining = totalStretch
-                        withAnimation {
-                            managers.stretchPhase = .stretch
-                        }
-                        if audio {
-                            SoundManager.instance.playPrompt(sound: .stretch)
-                        }
-                    }
-                }
-            }
-        }
-    }
-    //function to disconnect and recreate timer
-    func destroyOldTimer() {
-        cancellable?.cancel()
-        cancellable = nil
-        timer = Timer.publish(every: 1.0, on: .main, in: .common)
-    }
-    
-    //function to reset timer when button is pressed
-    func resetTimer() {
-        managers.stopTimer()
-        destroyOldTimer()
-        repsCompleted = 0
-        timeRemaining = totalStretch
-        withAnimation(.linear(duration: 0.5)) {
-            updateEndAngle()
-        }
-    }
-    
-    //function to toggle the play/pause button
-    func togglePlayPause() {
-        // timer starting from full stop
-        if managers.stretchPhase == .stop {
-            if audio {
-                SoundManager.instance.playPrompt(sound: .countdownExpanded)
-            }
-            DispatchQueue.main.asyncAfter(deadline: audio ? .now() + 3 : .now() + 0.5) {
-                withAnimation(.linear(duration: 0.25)) {
-                    managers.startTimer()
-                    cancellable = timer.connect()
-                    repsCompleted = 0
-                }
-            }
-        }
-        
-        //pause the timer
-        else if !managers.isTimerPaused {
-            managers.isTimerPaused = true
-            cancellable?.cancel()
-            cancellable = nil
-            timer = Timer.publish(every: 1.0, on: .main, in: .common)
-        }
-        
-        //unpause the timer
-        else {
-            if audio {
-                SoundManager.instance.playPrompt(sound: .countdown)
-            }
-            DispatchQueue.main.asyncAfter(deadline: audio ? .now() + 2.0 : .now() + 0.5) {
-                withAnimation(.linear(duration: 0.25)) {
-                    managers.isTimerActive = true
-                    managers.isTimerPaused = false
-                    cancellable = timer.connect()
-                }
-            }
+
+        //keep the timer's copy of the set list current
+        .onChange(of: playlist, initial: true) {
+            timer.syncPlaylist(playlist)
         }
 
-    }
-    
-    //function to manage timer stop
-    func manageStop() {
-        withAnimation(.easeOut(duration: 0.5)) {
-            managers.stretchPhase = .stop
-            managers.isTimerActive = false
-            managers.isTimerPaused = false
-            destroyOldTimer()
-            updateEndAngle()
-        }
-    }
-    
-    //function to announce new playlist item
-    func announceCurrentExercise() {
-        guard let name = playlistItem?.name else { return }
-        
-        var announcement = AttributedString("\(name), \(totalStretch) second stretch, \(totalReps) reps")
-        announcement.accessibilitySpeechAnnouncementPriority = .high
-        
-        //short delay so VoiceOver finishes its button tap feedback first
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            AccessibilityNotification.Announcement(announcement).post()
+        .onChange(of: timer.isPlaylistActive) {
+            timer.syncPlaylist(playlist)
         }
     }
 }
 
 #Preview {
-	@Previewable @State var isShowingSettings = false
-	@Previewable @State var timeRemaining = 5
-	
-	TimerActionViewWatch(timeRemaining: $timeRemaining, isShowingSettings: $isShowingSettings)
-        .environment(Managers())
-		.modelContainer(previewContainer)
+    TimerActionViewWatch()
+        .environment(StretchTimer())
+        .modelContainer(previewContainer)
 }

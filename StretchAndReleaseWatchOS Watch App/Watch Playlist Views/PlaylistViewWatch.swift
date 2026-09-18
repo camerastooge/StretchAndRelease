@@ -14,7 +14,6 @@ struct PlaylistViewWatch: View {
 	@Environment(\.accessibilityDifferentiateWithoutColor) var differentiateWithoutColor
 	@Environment(\.scenePhase) var scenePhase
 	@Environment(\.modelContext) var modelContext
-	@Environment(Managers.self) var managers
 	
 	// Properties stored in UserDefaults
 	@AppStorage("stretch") private var totalStretch = 10
@@ -151,7 +150,7 @@ extension PlaylistViewWatch {
 	@Previewable @State var selectedTab = 2
 	
 	PlaylistViewWatch()
-		.environment(Managers())
+		.environment(StretchTimer())
         .modelContainer(previewContainer)
 //        .modelContainer(for: PlaylistItem.self)
 }

@@ -14,7 +14,7 @@ struct SettingsView: View {
 	@Environment(\.dismiss) var dismiss
     @Environment(\.accessibilityDifferentiateWithoutColor) var differentiateWithoutColor
     @Environment(\.dynamicTypeSize) var sizeCategory
-    @Environment(Managers.self) var managers
+    @Environment(StretchTimer.self) private var timer
     
     // Properties stored in UserDefaults
     @AppStorage("stretch") private var totalStretch = 10
@@ -138,7 +138,7 @@ struct SettingsView: View {
                         haptics = hapticToggle
                         isPlaylistActive = playlistToggle
                         promptVolume = volumeValue
-                        managers.didSettingsChange = true
+                        timer.settings.didChange = true
                         dismiss()
                     } label: {
                         if #available(iOS 26.0, *) {
@@ -212,6 +212,6 @@ struct SettingsView: View {
 
 #Preview {
     SettingsView()
-        .environment(Managers())
+        .environment(StretchTimer())
 //        .modelContainer(previewContainer)
 }

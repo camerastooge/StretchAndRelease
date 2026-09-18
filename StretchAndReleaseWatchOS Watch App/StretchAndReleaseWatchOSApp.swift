@@ -10,12 +10,12 @@ import SwiftData
 
 @main
 struct StretchAndReleaseWatchOS_Watch_AppApp: App {
-    @State private var managers = Managers()
-    
+    @State private var timer = StretchTimer()
+
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .environment(managers)
+                .environment(timer)
         }
         .modelContainer(for: PlaylistItem.self, isUndoEnabled: true)
     }

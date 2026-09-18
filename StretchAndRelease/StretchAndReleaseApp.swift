@@ -10,14 +10,14 @@ import SwiftData
 
 @main
 struct StretchAndReleaseApp: App {
-    @State private var managers = Managers()
-    
+    @State private var timer = StretchTimer()
+
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .environment(managers)
-                .onChange(of: managers.isTimerActive) { _, newvalue in
-                    UIApplication.shared.isIdleTimerDisabled = newvalue
+                .environment(timer)
+                .onChange(of: timer.isActive) { _, newValue in
+                    UIApplication.shared.isIdleTimerDisabled = newValue
                 }
         }
         .modelContainer(for: PlaylistItem.self, isUndoEnabled: true)

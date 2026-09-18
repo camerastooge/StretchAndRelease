@@ -14,7 +14,7 @@ struct TimerSettingsViewWatch: View {
 	@Environment(\.accessibilityDifferentiateWithoutColor) var differentiateWithoutColor
 	@Environment(\.dismiss) var dismiss
 	@Environment(\.scenePhase) var scenePhase
-	@Environment(Managers.self) var managers
+	@Environment(StretchTimer.self) private var timer
     
     // Properties stored in UserDefaults
     @AppStorage("stretch") private var totalStretch = 10
@@ -90,7 +90,7 @@ struct TimerSettingsViewWatch: View {
                     haptics = hapticToggle
                     isPlaylistActive = playlistToggle
                     promptVolume = volumeValue
-					managers.didSettingsChange = true
+					timer.settings.didChange = true
 					dismiss()
 				} label: {
 					if #available(watchOS 26.0, *) {
@@ -331,6 +331,6 @@ struct RepsPickerView: View {
 	@Previewable @State var didTriggerSettingsFromContentView = false
     
     TimerSettingsViewWatch(didTriggerSettingsFromContentView: $didTriggerSettingsFromContentView)
-        .environment(Managers())
+        .environment(StretchTimer())
 		.modelContainer(previewContainer)
 }

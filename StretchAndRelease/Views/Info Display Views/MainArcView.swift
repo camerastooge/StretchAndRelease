@@ -12,70 +12,51 @@ struct MainArcView: View {
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.accessibilityDifferentiateWithoutColor) var differentiateWithoutColor
     @Environment(\.dynamicTypeSize) var sizeCategory
-    @Environment(Managers.self) private var managers
-    
-    //Properties from AppStorage
-    
-    @AppStorage("haptics") private var haptics = true
-    
-    //Properties from parent view
-    @Binding var endAngle: Angle
-    @Binding var timeRemaining: Int
-    @Binding var totalReps: Int
-    @Binding var repsCompleted: Int
-    
-    var timerTextLabel: String
-    
-    
+    @Environment(StretchTimer.self) private var timer
+
     var body: some View {
         ZStack {
-                if !differentiateWithoutColor {
-                    Arc(endAngle: endAngle)
-                        .stroke(managers.stretchPhase.phaseColor, style: StrokeStyle(lineWidth: 25, lineCap: .round))
-                        .rotationEffect(Angle(degrees: 90))
-                        .shadow(color: colorScheme == .dark ? .gray.opacity(0) : .black.opacity(0.35), radius: 5, x: 8, y: 5)
-                        .padding(.bottom)
-                } else {
-                    Arc(endAngle: endAngle)
-                        .stroke(.black, style: StrokeStyle(lineWidth: 25, lineCap: .round))
-                        .rotationEffect(Angle(degrees: 90))
-                        .padding(.bottom)
-                }
-                
-                VStack {
-                    Spacer()
-                    Text("\(String(format: "%02d", Int(timeRemaining)))")
-                        .kerning(2)
-                        .contentTransition(.numericText())
-                        .accessibilityLabel("\(timeRemaining) seconds remaining")
-                    Text(timerTextLabel)
-                        .scaleEffect(0.75)
-                        .multilineTextAlignment(.center)
-                        .contentTransition(.opacity)
-                        .accessibilityLabel(!managers.isTimerPaused ? timerTextLabel : "WORKOUT PAUSED")
-                    Text("Reps: \(repsCompleted)/\(totalReps)")
-                        .accessibilityLabel("Repetitions Completed \(repsCompleted) of \(totalReps)")
-                    Spacer()
-                }
-                .font(.largeTitle)
-                .foregroundStyle(differentiateWithoutColor ? .black : managers.isTimerPaused ? .gray : managers.stretchPhase.phaseColor)
-                .fontWeight(.bold)
-                .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
-                .sensoryFeedback(.impact(intensity: managers.stretchPhase.phaseIntensity), trigger: endAngle) { oldValue, newValue in
-                    return haptics
-                }
-                .padding(.bottom)
+            if !differentiateWithoutColor {
+                Arc(endAngle: timer.endAngle)
+                    .stroke(timer.phase.phaseColor, style: StrokeStyle(lineWidth: 25, lineCap: .round))
+                    .rotationEffect(Angle(degrees: 90))
+                    .shadow(color: colorScheme == .dark ? .gray.opacity(0) : .black.opacity(0.35), radius: 5, x: 8, y: 5)
+                    .padding(.bottom)
+            } else {
+                Arc(endAngle: timer.endAngle)
+                    .stroke(.black, style: StrokeStyle(lineWidth: 25, lineCap: .round))
+                    .rotationEffect(Angle(degrees: 90))
+                    .padding(.bottom)
             }
+
+            VStack {
+                Spacer()
+                Text("\(String(format: "%02d", timer.timeRemaining))")
+                    .kerning(2)
+                    .contentTransition(.numericText())
+                    .accessibilityLabel("\(timer.timeRemaining) seconds remaining")
+                Text(timer.displayLabel)
+                    .scaleEffect(0.75)
+                    .multilineTextAlignment(.center)
+                    .contentTransition(.opacity)
+                    .accessibilityLabel(!timer.isPaused ? timer.displayLabel : "WORKOUT PAUSED")
+                Text("Reps: \(timer.repsLabel)")
+                    .accessibilityLabel("Repetitions Completed \(timer.repsCompleted) of \(timer.totalReps)")
+                Spacer()
+            }
+            .font(.largeTitle)
+            .foregroundStyle(differentiateWithoutColor ? .black : timer.isPaused ? .gray : timer.phase.phaseColor)
+            .fontWeight(.bold)
+            .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+            .sensoryFeedback(.impact(intensity: timer.phase.phaseIntensity), trigger: timer.endAngle) { _, _ in
+                timer.hapticsEnabled
+            }
+            .padding(.bottom)
+        }
     }
 }
 
 #Preview {
-    @Previewable @State var endAngle = Angle(degrees: 340.0)
-    @Previewable @State var timeRemaining = 8
-    @Previewable @State var totalReps = 5
-    @Previewable @State var repsCompleted = 2
-    @Previewable @State var timerTextLabel = "TEST"
-    
-    MainArcView(endAngle: $endAngle, timeRemaining: $timeRemaining, totalReps: $totalReps, repsCompleted: $repsCompleted, timerTextLabel: timerTextLabel)
-        .environment(Managers())
+    MainArcView()
+        .environment(StretchTimer())
 }
