@@ -30,8 +30,12 @@ struct TimerDisplayView: View {
     @State private var timeRemaining: Int = 0
     @State private var repsCompleted: Int = 0
     @State private var endAngle = Angle(degrees: 340)
+    
+    // timer state variables
     @State private var timer = Timer.publish(every: 1.0, on: .main, in: .common)
     @State private var cancellable: Cancellable? = nil
+    @State private var startTask: Task<Void, Never>?
+    @State private var pendingTransition: Task<Void, Never>?
     
     //SwiftData query
     @Query(sort: \PlaylistItem.index) var playlist: [PlaylistItem]
@@ -144,6 +148,7 @@ struct TimerDisplayView: View {
                         } label: {
                             if #available(iOS 26.0, *) {
                                 ButtonView(buttonRoles: !managers.isTimerActive ? .play : .pause, deviceType: deviceType)
+                                    .glassEffect()
                             } else {
                                 ButtonView(buttonRoles: !managers.isTimerActive ? .play : .pause, deviceType: deviceType)
                             }
@@ -181,7 +186,7 @@ struct TimerDisplayView: View {
                 .gradientBackground()
                 .ignoresSafeArea()
         }
-
+        
         
         //this modifier runs when the timer publishes
         .onReceive(timer) { _ in
@@ -222,14 +227,7 @@ struct TimerDisplayView: View {
         }
         
         .onDisappear {
-            withAnimation(.linear(duration: 0.25)) {
-                managers.stretchPhase = .stop
-                updateEndAngle()
-            }
-            managers.isTimerActive = false
-            managers.isTimerPaused = false
-            timeRemaining = totalStretch
-            repsCompleted = 0
+            resetTimer()
         }
     }
     
@@ -251,18 +249,12 @@ struct TimerDisplayView: View {
         switch managers.stretchPhase {
         case .stretch:
             let calculatedAngle = Double(timeRemaining) / Double(totalStretch) * 320 + 20
-            withAnimation(.default) {
-                endAngle = Angle(degrees: min(calculatedAngle, 340))
-            }
+            endAngle = Angle(degrees: min(calculatedAngle, 340))
         case .rest:
             let calculatedAngle = Double(timeRemaining) / Double(totalRest) * 320 + 20
-            withAnimation(.default) {
-                endAngle = Angle(degrees: min(calculatedAngle, 340))
-            }
+            endAngle = Angle(degrees: min(calculatedAngle, 340))
         case .stop:
-            withAnimation(.default) {
-                endAngle = Angle(degrees: 340)
-            }
+            endAngle = Angle(degrees: 340)
         }
     }
     
@@ -355,7 +347,6 @@ struct TimerDisplayView: View {
                         loadPlaylistItem(playlistIndex)
                         timeRemaining = totalStretch
                         repsCompleted = 0
-                        repsCompleted = 0
                         withAnimation(.default) {
                             managers.stretchPhase = .stretch
                         }
@@ -391,7 +382,10 @@ struct TimerDisplayView: View {
                         if audio {
                             SoundManager.instance.playPrompt(sound: .countdownExpanded)
                         }
-                        DispatchQueue.main.asyncAfter(deadline: audio ? .now() + 3.0 : .now() + 0.25) {
+                        pendingTransition?.cancel()
+                        pendingTransition = Task { @MainActor in
+                            try? await Task.sleep(for: audio ? .seconds(3) : .milliseconds(500))
+                            guard !Task.isCancelled else { return }
                             withAnimation(.default) {
                                 managers.stretchPhase = .stretch
                                 managers.isTimerActive = true
@@ -410,8 +404,15 @@ struct TimerDisplayView: View {
             }
         }
     }
+    
+    //function to connect to timer
+    func startTicking() {
+        guard cancellable == nil else { return }
+        cancellable = timer.connect()
+    }
+    
     //function to disconnect and recreate timer
-    func destroyOldTimer() {
+    func stopTicking() {
         cancellable?.cancel()
         cancellable = nil
         timer = Timer.publish(every: 1.0, on: .main, in: .common)
@@ -419,8 +420,10 @@ struct TimerDisplayView: View {
     
     //function to reset timer when button is pressed
     func resetTimer() {
+        startTask?.cancel()
+        startTask = nil
         managers.stopTimer()
-        destroyOldTimer()
+        stopTicking()
         repsCompleted = 0
         timeRemaining = totalStretch
         withAnimation(.linear(duration: 0.5)) {
@@ -432,16 +435,21 @@ struct TimerDisplayView: View {
     func togglePlayPause() {
         //engage from full stop
         if managers.stretchPhase == .stop {
+            guard startTask == nil else { return }
+            
             if audio {
                 SoundManager.instance.playPrompt(sound: .countdownExpanded)
             }
             
-            DispatchQueue.main.asyncAfter(deadline: audio ? .now() + 3 : .now() + 0.5) {
+            startTask = Task { @MainActor in
+                try? await Task.sleep(for: audio ? .seconds(3) : .milliseconds(500))
+                guard !Task.isCancelled else { return }
                 withAnimation(.linear(duration: 0.25)) {
                     managers.startTimer()
-                    cancellable = timer.connect()
                     repsCompleted = 0
                 }
+                startTicking()
+                startTask = nil
             }
         }
         
@@ -455,7 +463,11 @@ struct TimerDisplayView: View {
             if audio {
                 SoundManager.instance.playPrompt(sound: .countdown)
             }
-            DispatchQueue.main.asyncAfter(deadline: audio ? .now() + 2.0 : .now() + 0.5) {
+            pendingTransition?.cancel()
+            pendingTransition = nil
+            pendingTransition = Task { @MainActor in
+                try? await Task.sleep(for: audio ? .seconds(2) : .milliseconds(500))
+                guard !Task.isCancelled else { return }
                 withAnimation(.linear(duration: 0.25)) {
                     managers.isTimerActive = true
                     managers.isTimerPaused = false
@@ -466,11 +478,14 @@ struct TimerDisplayView: View {
     
     //function to manage timer stop
     func manageStop() {
+        pendingTransition?.cancel()
+        pendingTransition = nil
+        
         withAnimation(.easeOut(duration: 0.5)) {
             managers.stretchPhase = .stop
             managers.isTimerActive = false
             managers.isTimerPaused = false
-            destroyOldTimer()
+            stopTicking()
             updateEndAngle()
         }
     }
@@ -496,3 +511,4 @@ struct TimerDisplayView: View {
         .environment(Managers())
         .modelContainer(previewContainer)
 }
+ 
