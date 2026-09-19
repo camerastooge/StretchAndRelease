@@ -62,9 +62,18 @@ final class StretchTimer {
 
     // MARK: - Convenience passthroughs
 
-    var totalStretch: Int { settings.stretchDuration }
-    var totalRest: Int { settings.restDuration }
-    var totalReps: Int { settings.repsToComplete }
+    var totalStretch: Int {
+        if isPlaylistActive, let value = currentItem?.stretchDuration { return value }
+        return settings.stretchDuration
+    }
+    var totalRest: Int {
+        if isPlaylistActive, let value = currentItem?.restDuration { return value }
+        return settings.restDuration
+    }
+    var totalReps: Int {
+        if isPlaylistActive, let value = currentItem?.repsToComplete { return value }
+        return settings.repsToComplete
+    }
     var isPlaylistActive: Bool { settings.isPlaylistActive }
     var audioEnabled: Bool { settings.audioEnabled }
     var hapticsEnabled: Bool { settings.hapticsEnabled }
@@ -200,11 +209,6 @@ final class StretchTimer {
         withAnimation(.default) {
             currentItem = playlist[index]
         }
-
-        guard let item = currentItem else { return }
-        settings.stretchDuration = item.stretchDuration ?? 10
-        settings.restDuration = item.restDuration ?? 5
-        settings.repsToComplete = item.repsToComplete ?? 3
 
         if phase == .stop {
             timeRemaining = totalStretch
