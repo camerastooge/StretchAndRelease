@@ -70,37 +70,101 @@ private final class AudioSessionController: @unchecked Sendable {
     }
 }
 
+/// Owns the `AVAudioPlayer`s.
+///
+/// Everything here is confined to `queue` and every entry point is `async`, so no
+/// caller ever waits for the audio stack. That matters much more than it looks:
+/// `AVAudioPlayer.play()` is effectively free on iOS, but on watchOS it has to
+/// negotiate with the audio server and, if the route is Bluetooth or the speaker
+/// has gone idle, can take hundreds of milliseconds. The timer calls `playTick`
+/// once a second from the main actor, so anything that blocks the caller lands
+/// squarely in the middle of the arc animation and drops frames.
+private final class PlaybackEngine: NSObject, @unchecked Sendable {
+
+    private let queue = DispatchQueue(label: "com.LucasBarker.StretchAndRelease.playback", qos: .userInitiated)
+    private let session = AudioSessionController()
+
+    // Queue-confined. Nothing outside `queue` may touch these.
+    private var tickPlayer: AVAudioPlayer?
+    private var preparedTick: String?
+    private var promptPlayer: AVAudioPlayer?
+
+    func activateSession() {
+        session.activate()
+    }
+
+    func prepareTick(url: URL, key: String) {
+        queue.async { self.loadTick(url: url, key: key) }
+    }
+
+    func playTick(url: URL, key: String, volume: Double) {
+        queue.async {
+            // Honour the requested sound rather than replaying whatever was prepared last.
+            self.loadTick(url: url, key: key)
+
+            guard let player = self.tickPlayer else { return }
+            player.volume = Float(volume)
+            player.currentTime = 0
+            player.play()
+        }
+    }
+
+    func playPrompt(url: URL, volume: Double) {
+        session.setDucking(true)
+
+        queue.async {
+            do {
+                let player = try AVAudioPlayer(contentsOf: url)
+                player.volume = Float(volume)
+                player.delegate = self
+                player.prepareToPlay()
+                player.play()
+                self.promptPlayer = player
+            } catch {
+                print("Prompt playback error: \(error.localizedDescription)")
+                self.session.setDucking(false)
+            }
+        }
+    }
+
+    /// Must be called on `queue`.
+    private func loadTick(url: URL, key: String) {
+        guard preparedTick != key else { return }
+
+        do {
+            let player = try AVAudioPlayer(contentsOf: url)
+            player.prepareToPlay()
+            tickPlayer = player
+            preparedTick = key
+        } catch {
+            print("Tick sound prep error: \(error.localizedDescription)")
+            tickPlayer = nil
+            preparedTick = nil
+        }
+    }
+}
+
+extension PlaybackEngine: AVAudioPlayerDelegate {
+    nonisolated func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
+        queue.async {
+            guard player === self.promptPlayer else { return }
+            self.promptPlayer = nil
+            self.session.setDucking(false)
+        }
+    }
+}
+
 @Observable
-class SoundManager: NSObject {
+final class SoundManager {
 
     static let instance = SoundManager()
 
+    /// Read and written from the main actor by the settings screens and by
+    /// `StretchTimer.settingsDidChange()`. Snapshotted at each call below, so the
+    /// playback queue never reads it.
     var volume: Double = 1.0
 
-    var player: AVAudioPlayer?
-    var tickPlayer: AVAudioPlayer?
-
-    @ObservationIgnored private let session = AudioSessionController()
-    @ObservationIgnored private var preparedTick: SoundOption?
-    /// AVAudioPlayer's init(contentsOf:) and prepareToPlay() can implicitly activate the
-    /// audio session, which trips the same main-thread warning as AudioSessionController's
-    /// calls. Run them here, then hop back to the caller's thread to assign properties.
-    @ObservationIgnored private let playbackQueue = DispatchQueue(label: "com.LucasBarker.StretchAndRelease.playback")
-
-    /// `DispatchQueue.sync` onto an idle serial queue can run the block inline on the
-    /// calling thread instead of hopping to the queue's own thread, which silently defeats
-    /// the point when the caller is main. `.async` is never inlined, so pairing it with a
-    /// semaphore guarantees `work` actually runs off whatever thread called this.
-    private func runOffMainThread<T>(_ work: @escaping () throws -> T) throws -> T {
-        let semaphore = DispatchSemaphore(value: 0)
-        var result: Result<T, Error>!
-        playbackQueue.async {
-            result = Result(catching: work)
-            semaphore.signal()
-        }
-        semaphore.wait()
-        return try result.get()
-    }
+    @ObservationIgnored private let engine = PlaybackEngine()
 
     enum SoundOption: String {
         case relax = "and_relax"
@@ -111,70 +175,37 @@ class SoundManager: NSObject {
         case countdownExpanded = "321_stretch"
     }
 
-    private override init() {
-        super.init()
-        session.activate()
+    private init() {
+        engine.activateSession()
+    }
+
+    private func url(for sound: SoundOption) -> URL? {
+        Bundle.main.url(forResource: sound.rawValue, withExtension: "mp3")
     }
 
     // MARK: - Ticks
 
+    /// Warms the tick player. Returns immediately; the decode happens on the
+    /// playback queue.
     func prepareTick(sound: SoundOption) {
-        guard let url = Bundle.main.url(forResource: sound.rawValue, withExtension: "mp3") else { return }
-        do {
-            let newPlayer = try runOffMainThread {
-                let newPlayer = try AVAudioPlayer(contentsOf: url)
-                newPlayer.prepareToPlay()
-                return newPlayer
-            }
-            tickPlayer = newPlayer
-            preparedTick = sound
-        } catch {
-            print("Tick sound prep error: \(error.localizedDescription)")
-        }
+        guard let url = url(for: sound) else { return }
+        engine.prepareTick(url: url, key: sound.rawValue)
     }
 
+    /// Fire and forget. Called once per second from `StretchTimer.tick()` on the
+    /// main actor, so it must never wait on the audio stack.
     func playTick(sound: SoundOption) {
-        // Honour the requested sound rather than replaying whatever was prepared last.
-        if preparedTick != sound {
-            prepareTick(sound: sound)
-        }
-
-        guard let tickPlayer = tickPlayer else { return }
-        try? runOffMainThread {
-            tickPlayer.currentTime = 0.0
-            tickPlayer.volume = Float(self.volume)
-            tickPlayer.play()
-        }
+        guard let url = url(for: sound) else { return }
+        engine.playTick(url: url, key: sound.rawValue, volume: volume)
     }
 
     // MARK: - Prompts
 
+    /// Fire and forget, for the same reason as `playTick`. Building and priming an
+    /// `AVAudioPlayer` is the expensive half of this, and it now happens entirely
+    /// off the caller's thread.
     func playPrompt(sound: SoundOption) {
-        guard let url = Bundle.main.url(forResource: sound.rawValue, withExtension: "mp3") else { return }
-
-        session.setDucking(true)
-
-        do {
-            let newPlayer = try runOffMainThread {
-                let newPlayer = try AVAudioPlayer(contentsOf: url)
-                newPlayer.volume = Float(self.volume)
-                newPlayer.delegate = self
-                newPlayer.prepareToPlay()
-                newPlayer.play()
-                return newPlayer
-            }
-            player = newPlayer
-        } catch {
-            print("Error: \(error.localizedDescription)")
-            session.setDucking(false)
-        }
-    }
-}
-
-extension SoundManager: AVAudioPlayerDelegate {
-    func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
-        guard player === self.player else { return }
-        self.player = nil
-        session.setDucking(false)
+        guard let url = url(for: sound) else { return }
+        engine.playPrompt(url: url, volume: volume)
     }
 }

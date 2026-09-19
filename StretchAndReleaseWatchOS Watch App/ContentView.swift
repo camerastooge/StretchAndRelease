@@ -18,11 +18,14 @@ struct ContentView: View {
 	//Connectivity class for communication with phone
 	@State private var connectivity = Connectivity()
 
+	//Keeps the app awake while the timer is counting
+	@State private var runtimeSession = StretchSession()
+
 	var body: some View {
 		NavigationStack {
 			TabView {
 				Tab {
-					TimerActionViewWatch()
+					TimerDisplayViewWatch()
 				}
 				Tab {
 					PlaylistViewWatch()
@@ -59,6 +62,16 @@ struct ContentView: View {
 			//prep audio tick sound
 			SoundManager.instance.prepareTick(sound: .tick)
 			SoundManager.instance.volume = timer.settings.promptVolume
+
+			//hold an extended runtime session for the length of a run, so the
+			//watch doesn't suspend the app (and stall the ticker) on wrist-down
+			timer.onRunningChanged = { [runtimeSession] isRunning in
+				if isRunning {
+					runtimeSession.start()
+				} else {
+					runtimeSession.stop()
+				}
+			}
 		}
 		._statusBarHidden()
 	}

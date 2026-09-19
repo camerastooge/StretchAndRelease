@@ -8,7 +8,7 @@
 import SwiftUI
 import SwiftData
 
-struct TimerActionViewWatch: View {
+struct TimerDisplayViewWatch: View {
     //Environment properties
     @Environment(\.accessibilityDifferentiateWithoutColor) var differentiateWithoutColor
     @Environment(\.dynamicTypeSize) var dynamicTypeSize
@@ -22,14 +22,6 @@ struct TimerActionViewWatch: View {
     //local properties for display
     var displayColor: Color {
         timer.isPaused ? Color.gray : timer.phase.phaseColor
-    }
-
-    var dragAccessibilityHint: String {
-        if timer.isPlaylistActive {
-            "Drag to the left to go to the previous stretch.  Drag to the right to go to the next exercise."
-        } else {
-            "This is the current stretch phase."
-        }
     }
 
     var repetitionsLabel: String {
@@ -79,6 +71,7 @@ struct TimerActionViewWatch: View {
                                                 .foregroundStyle(.white)
                                         }
                                         .buttonStyle(.plain)
+                                        .disabled(timer.phase != .stop)
                                         .accessibilityLabel("Previous stretch")
                                         .accessibilityInputLabels(["previous", "previous stretch"])
                                     } else {
@@ -104,10 +97,11 @@ struct TimerActionViewWatch: View {
                                                         timer.selectNextItem()
                                                     }
                                                 }
-                                            }
+                                            },
+                                        isEnabled: timer.phase == .stop
                                     )
                                     .accessibilityLabel(timer.displayLabel)
-                                    .accessibilityHint(dragAccessibilityHint)
+                                    .accessibilityHint("This is the current stretch phase.")
 
                                 HStack {
                                     if timer.isPlaylistActive {
@@ -118,6 +112,7 @@ struct TimerActionViewWatch: View {
                                                 .foregroundStyle(.white)
                                         }
                                         .buttonStyle(.plain)
+                                        .disabled(timer.phase != .stop)
                                         .accessibilityLabel("Go to the next stretch")
                                         .accessibilityInputLabels(["next", "next stretch"])
                                     } else {
@@ -139,7 +134,9 @@ struct TimerActionViewWatch: View {
                     .fontWeight(.bold)
                     .foregroundStyle(displayColor)
                 }
-                .sensoryFeedback(.impact(intensity: timer.hapticsEnabled ? timer.phase.phaseIntensity : 0.0), trigger: timer.endAngle)
+                .sensoryFeedback(.impact(intensity: timer.phase.phaseIntensity), trigger: timer.endAngle) { _, _ in
+                    timer.hapticsEnabled
+                }
             }
             .toolbar {
                 ToolbarItemGroup(placement: .bottomBar) {
@@ -173,9 +170,13 @@ struct TimerActionViewWatch: View {
                         ButtonView(buttonRoles: .settings, deviceType: deviceType)
                     }
                     .buttonStyle(.plain)
+                    .disabled(timer.isActive)
                     .accessibilityLabel("show settings")
                     .accessibilityInputLabels(["settings"])
                 }
+            }
+            .onDisappear {
+                timer.reset()
             }
         }
         .onAppear {
@@ -194,7 +195,7 @@ struct TimerActionViewWatch: View {
 }
 
 #Preview {
-    TimerActionViewWatch()
+    TimerDisplayViewWatch()
         .environment(StretchTimer())
         .modelContainer(previewContainer)
 }

@@ -141,7 +141,7 @@ struct AddExerciseViewWatch: View {
 						dismiss()
 					} label: {
 						if #available(watchOS 26.0, *) {
-							Image(systemName: "")
+							Image(systemName: "x.circle")
                                 .glassEffect(.clear)
                                 .foregroundStyle(.red)
 						} else {
@@ -159,5 +159,6 @@ struct AddExerciseViewWatch: View {
 
 #Preview {
     AddExerciseViewWatch()
-        .modelContainer(previewContainer)
+//        .modelContainer(previewContainer)
+        .modelContainer(for: PlaylistItem.self)
 }

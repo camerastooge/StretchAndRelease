@@ -67,11 +67,6 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		E4AA11002FFFFFFF00AA1100 /* Shared */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = Shared;
-			sourceTree = "<group>";
-		};
 		E41BF95A2DFCDD5800E16C07 /* StretchAndRelease */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
@@ -79,6 +74,11 @@
 				E4F1C1AD2DFE0B3700114B7C /* Exceptions for "StretchAndRelease" folder in "StretchAndReleaseWatchOS Watch App" target */,
 			);
 			path = StretchAndRelease;
+			sourceTree = "<group>";
+		};
+		E4AA11002FFFFFFF00AA1100 /* Shared */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Shared;
 			sourceTree = "<group>";
 		};
 		E4F1C1992DFE0AAC00114B7C /* StretchAndReleaseWatchOS Watch App */ = {
@@ -144,8 +144,8 @@
 				E4F1C1A12DFE0AAF00114B7C /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				E4AA11002FFFFFFF00AA1100 /* Shared */,
 				E41BF95A2DFCDD5800E16C07 /* StretchAndRelease */,
+				E4AA11002FFFFFFF00AA1100 /* Shared */,
 			);
 			name = StretchAndRelease;
 			packageProductDependencies = (

@@ -44,9 +44,11 @@ final class StretchTimer {
 
     // MARK: - Platform hooks
 
-    /// Called with `true` when a run begins and `false` when it stops. Unused for now:
-    /// it is where the watch app can hang `StretchSession.start()` / `.stop()`.
-    var onRunningChanged: ((Bool) -> Void)?
+    /// Called with `true` when a run begins and `false` when it stops. The watch app
+    /// hangs `StretchSession.start()` / `.stop()` off this in `ContentView.onAppear`;
+    /// iOS leaves it nil. Ignored by observation: it is a hook, not display state, and
+    /// assigning it should not invalidate any view.
+    @ObservationIgnored var onRunningChanged: ((Bool) -> Void)?
 
     // MARK: - Private
 
