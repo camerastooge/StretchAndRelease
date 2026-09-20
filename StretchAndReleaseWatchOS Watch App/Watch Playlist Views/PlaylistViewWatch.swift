@@ -52,12 +52,11 @@ struct PlaylistViewWatch: View {
                                             } label: {
                                                 Text(exercise.name ?? "Exercise")
                                                     .fontWeight(.bold)
-                                                    .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                                                        Button {
+                                                    .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                                                        Button(role: .destructive) {
                                                             modelContext.delete(exercise)
                                                         } label: {
                                                             Label("Delete", systemImage: "trash")
-                                                                .tint(.red)
                                                                 .accessibilityLabel("Delete \(exercise.name ?? "exercise")")
                                                                 .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
                                                         }

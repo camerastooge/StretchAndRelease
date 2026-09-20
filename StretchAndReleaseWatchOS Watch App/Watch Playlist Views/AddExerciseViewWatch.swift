@@ -112,7 +112,14 @@ struct AddExerciseViewWatch: View {
 				ToolbarItem(placement: .topBarLeading) {
 					Button {
 						if !name.isEmpty {
-							let item = PlaylistItem(index: playlist.isEmpty ? 0 : playlist.count + 1, name: name, stretchDuration: stretch, restDuration: rest, repsToComplete: reps)
+                            let nextIndex = (playlist.compactMap(\.index).max() ?? -1) + 1
+                            let item = PlaylistItem(
+                                index: nextIndex,
+                                name: name,
+                                stretchDuration: stretch,
+                                restDuration: rest,
+                                repsToComplete: reps
+                            )
 							modelContext.insert(item)
 							do {
 							 try modelContext.save()
