@@ -43,6 +43,9 @@ struct PlaylistView: View {
     ]
     
     @State private var isShowingActive = false
+
+    //The manager SwiftData actually registers against.
+    private var undoManager: UndoManager? { modelContext.undoManager }
     
     var body: some View {
         NavigationStack {
@@ -63,8 +66,8 @@ struct PlaylistView: View {
                                 .accessibilityLabel("Edit \(exercise.name ?? "exercise")")
                                 .listRowBackground(Color.clear)
                                 .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                                    Button {
-                                        modelContext.delete(exercise)
+                                    Button(role: .destructive) {
+                                        delete(exercise)
                                     } label: {
                                         Label("Delete", systemImage: "trash")
                                             .tint(.red)
@@ -180,6 +183,17 @@ struct PlaylistView: View {
 }
 
 extension PlaylistView {
+    private func delete(_ exercise: PlaylistItem) {
+        //Capture the name BEFORE deleting -- reading a property off a deleted
+        //model is unreliable once the context has tombstoned it.
+        let name = exercise.name ?? "Exercise"
+
+        modelContext.delete(exercise)
+
+        //Must come AFTER the mutation -- it names the group SwiftData just opened
+        undoManager?.setActionName("Delete \(name)")
+    }
+    
     private func move(from source: IndexSet, to destination: Int) {
         //creates mutable version of the playlist array
         var mutableList = playlist
@@ -191,7 +205,10 @@ extension PlaylistView {
         for(index, item) in mutableList.enumerated() {
             item.index = index
         }
+        
+        undoManager?.setActionName("Reorder Playlist")
     }
+    
 }
 
 struct playlistHeaderView: View {
