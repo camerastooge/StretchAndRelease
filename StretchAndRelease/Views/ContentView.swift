@@ -45,7 +45,7 @@ struct ContentView: View {
                         Text("Also watch this space")
                     } else {
                         
-                        PlaylistView()
+                        PhonePlaylistViewPortrait()
                             .navigationBarBackButtonHidden()
                     }
                 }

@@ -108,20 +108,15 @@ struct TimerDisplayViewPhoneLandscape: View {
                 VStack {
                     Spacer()
                     
-                    //START - PAUSE BUTTON
+                    //RESET BUTTON
                     Button {
-                        timer.togglePlayPause()
+                        timer.reset()
                     } label: {
-                        if #available(iOS 26.0, *) {
-                            ButtonView(buttonRoles: !timer.isActive ? .play : .pause, deviceType: deviceType)
-                                .glassEffect()
-                        } else {
-                            ButtonView(buttonRoles: !timer.isActive ? .play : .pause, deviceType: deviceType)
-                        }
+                        ButtonView(buttonRoles: .reset, deviceType: .phone)
                     }
-                    .buttonStyle(.plain)
-                    .accessibilityLabel(!timer.isActive ? "Start Timer" : "Pause Timer")
-                    .accessibilityInputLabels(["Start", "Start Timer", "Pause", "Pause Timer"])
+                    .accessibilityLabel("Reset Timer")
+                    .accessibilityHint("This button reset the timer.")
+                    .accessibilityInputLabels(["Reset", "Reset Timer"])
                 }
             }
             }
