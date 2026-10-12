@@ -11,6 +11,8 @@ import SwiftData
 struct ContentView: View {
     //Environment properties
     @Environment(\.dynamicTypeSize) var sizeCategory
+    @Environment(\.horizontalSizeClass) var horizontalSizeClass
+    @Environment(\.verticalSizeClass) var verticalSizeClass
     @Environment(StretchTimer.self) private var timer
 
     //State properties
@@ -26,17 +28,26 @@ struct ContentView: View {
         default: "Stretch & Release"
         }
     }
-
+    
     var body: some View {
         NavigationStack {
             TabView() {
                 Tab("Timer", systemImage: "timer") {
-                    TimerDisplayView()
+                    if horizontalSizeClass == .regular && verticalSizeClass == .compact {
+                        Text("Watch this space")
+                    } else {
+                        TimerDisplayViewPhonePortrait()
+                    }
                 }
 
                 Tab("Set list", systemImage: "list.bullet") {
-                    PlaylistView()
-                        .navigationBarBackButtonHidden()
+                    if horizontalSizeClass == .regular && verticalSizeClass == .compact {
+                        Text("Also watch this space")
+                    } else {
+                        
+                        PlaylistView()
+                            .navigationBarBackButtonHidden()
+                    }
                 }
             }
             .navigationTitle(navigationBarTitleString)
