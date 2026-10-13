@@ -13,6 +13,8 @@ struct PlaylistView: View {
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.accessibilityDifferentiateWithoutColor) var differentiateWithoutColor
     @Environment(\.dynamicTypeSize) var sizeCategory
+    @Environment(\.horizontalSizeClass) var horizontalSizeClass
+    @Environment(\.verticalSizeClass) var verticalSizeClass
     @Environment(\.dismiss) var dismiss
     @Environment(\.modelContext) var modelContext
     
@@ -43,7 +45,16 @@ struct PlaylistView: View {
     ]
     
     @State private var isShowingActive = false
-
+    
+    //variable for determining landscape vs portrait view
+    var isDeviceLandscape: Bool {
+        if horizontalSizeClass == .regular && verticalSizeClass == .compact {
+            return true
+        } else {
+            return false
+        }
+    }
+    
     //The manager SwiftData actually registers against.
     private var undoManager: UndoManager? { modelContext.undoManager }
     
@@ -82,42 +93,44 @@ struct PlaylistView: View {
                     .listStyle(.plain)
                     .scrollContentBackground(.hidden)
                     .safeAreaPadding(.leading, 15.0)
-                    .safeAreaInset(edge: .bottom) {
-                        NavigationLink {
-                            AddExerciseView()
-                                .navigationBarBackButtonHidden()
-                        } label: {
-                            if #available(iOS 26.0, *) {
-                                Text("ADD")
-                                    .frame(width: 200, height: 65)
-                                    .font(.largeTitle)
-                                    .fontWeight(.bold)
-                                    .shadow(color: .gray, radius: 0.2, x: 0.5, y: 1)
-                                    .foregroundStyle(differentiateWithoutColor ? .black : .white)
-                                    .background(differentiateWithoutColor ? .clear : .green)
-                                    .clipShape(.capsule)
-                                    .padding(.bottom, 5)
-                                    .glassEffect()
-                                    .dynamicTypeSize(...DynamicTypeSize.accessibility2)
-                                
-                            } else {
-                                Text("ADD")
-                                    .frame(width: 200, height: 65)
-                                    .font(.largeTitle)
-                                    .fontWeight(.bold)
-                                    .shadow(color: .gray, radius: 0.2, x: 0.5, y: 1)
-                                    .foregroundStyle(differentiateWithoutColor ? .black : .white)
-                                    .background(differentiateWithoutColor ? .clear : .green)
-                                    .clipShape(.capsule)
-                                    .padding(.bottom, 5)
-                                    .dynamicTypeSize(...DynamicTypeSize.accessibility2)
-                                
-                            }
-                        }
-                        .buttonStyle(.plain)
-                        .accessibilityLabel("Add exercise")
-                        .accessibilityHint("Add an exercise to the playlist")
-                    }
+//                    .safeAreaInset(edge: .bottom) {
+//                        if !isDeviceLandscape {
+//                            NavigationLink {
+//                                AddExerciseView()
+//                                    .navigationBarBackButtonHidden()
+//                            } label: {
+//                                if #available(iOS 26.0, *) {
+//                                    Text("ADD")
+//                                        .frame(width: 200, height: 65)
+//                                        .font(.largeTitle)
+//                                        .fontWeight(.bold)
+//                                        .shadow(color: .gray, radius: 0.2, x: 0.5, y: 1)
+//                                        .foregroundStyle(differentiateWithoutColor ? .black : .white)
+//                                        .background(differentiateWithoutColor ? .clear : .green)
+//                                        .clipShape(.capsule)
+//                                        .padding(.bottom, 5)
+//                                        .glassEffect()
+//                                        .dynamicTypeSize(...DynamicTypeSize.accessibility2)
+//                                    
+//                                } else {
+//                                    Text("ADD")
+//                                        .frame(width: 200, height: 65)
+//                                        .font(.largeTitle)
+//                                        .fontWeight(.bold)
+//                                        .shadow(color: .gray, radius: 0.2, x: 0.5, y: 1)
+//                                        .foregroundStyle(differentiateWithoutColor ? .black : .white)
+//                                        .background(differentiateWithoutColor ? .clear : .green)
+//                                        .clipShape(.capsule)
+//                                        .padding(.bottom, 5)
+//                                        .dynamicTypeSize(...DynamicTypeSize.accessibility2)
+//                                    
+//                                }
+//                            }
+//                            .buttonStyle(.plain)
+//                            .accessibilityLabel("Add exercise")
+//                            .accessibilityHint("Add an exercise to the playlist")
+//                        }
+//                    }
                 } else {
                     ContentUnavailableView {
                         Label("Playlist is Empty", systemImage: "plus.circle")
@@ -129,43 +142,44 @@ struct PlaylistView: View {
                             .foregroundStyle(colorScheme == .dark ? .white : .black)
                     }
                     .safeAreaInset(edge: .bottom) {
-                        NavigationLink {
-                            AddExerciseView()
-                                .navigationBarBackButtonHidden()
-                        } label: {
-                            if #available(iOS 26.0, *) {
-                                Text("ADD")
-                                    .frame(width: 200, height: 65)
-                                    .font(.largeTitle)
-                                    .fontWeight(.bold)
-                                    .shadow(color: .gray, radius: 0.2, x: 0.5, y: 1)
-                                    .foregroundStyle(.white)
-                                    .background(.green)
-                                    .clipShape(.capsule)
-                                    .padding(.bottom, 5)
-                                    .glassEffect()
-                                    .dynamicTypeSize(...DynamicTypeSize.accessibility2)
-                                
-                            } else {
-                                Text("ADD")
-                                    .frame(width: 200, height: 65)
-                                    .font(.largeTitle)
-                                    .fontWeight(.bold)
-                                    .shadow(color: .gray, radius: 0.2, x: 0.5, y: 1)
-                                    .foregroundStyle(.white)
-                                    .background(.green)
-                                    .clipShape(.capsule)
-                                    .padding(.bottom, 5)
-                                    .dynamicTypeSize(...DynamicTypeSize.accessibility2)
-                                
+                        if !isDeviceLandscape {
+                            NavigationLink {
+                                AddExerciseView()
+                                    .navigationBarBackButtonHidden()
+                            } label: {
+                                if #available(iOS 26.0, *) {
+                                    Text("ADD")
+                                        .frame(width: 200, height: 65)
+                                        .font(.largeTitle)
+                                        .fontWeight(.bold)
+                                        .shadow(color: .gray, radius: 0.2, x: 0.5, y: 1)
+                                        .foregroundStyle(.white)
+                                        .background(.green)
+                                        .clipShape(.capsule)
+                                        .padding(.bottom, 5)
+                                        .glassEffect()
+                                        .dynamicTypeSize(...DynamicTypeSize.accessibility2)
+                                    
+                                } else {
+                                    Text("ADD")
+                                        .frame(width: 200, height: 65)
+                                        .font(.largeTitle)
+                                        .fontWeight(.bold)
+                                        .shadow(color: .gray, radius: 0.2, x: 0.5, y: 1)
+                                        .foregroundStyle(.white)
+                                        .background(.green)
+                                        .clipShape(.capsule)
+                                        .padding(.bottom, 5)
+                                        .dynamicTypeSize(...DynamicTypeSize.accessibility2)
+                                    
+                                }
                             }
+                            .buttonStyle(.plain)
+                            .accessibilityLabel("Add exercise")
+                            .accessibilityHint("Add an exercise to the playlist")
                         }
-                        .buttonStyle(.plain)
-                        .accessibilityLabel("Add exercise")
-                        .accessibilityHint("Add an exercise to the playlist")
                     }
                 }
-
             }
             .navigationTitle("Playlist")
             .navigationBarTitleDisplayMode(.inline)
@@ -175,6 +189,25 @@ struct PlaylistView: View {
                 } else {
                     if !isPlaylistActive {
                         isPlaylistInactive = true
+                    }
+                }
+            }
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    NavigationLink {
+                        AddExerciseView()
+                            .navigationBarBackButtonHidden()
+                    } label: {
+                        if #available(iOS 26.0, *) {
+                            Image(systemName: "plus.circle.fill")
+                                .foregroundStyle(.green)
+                                .glassEffect()
+                                .accessibilityLabel("Add exercise")
+                        } else {
+                            Image(systemName: "plus.circle.fill")
+                                .foregroundStyle(.green)
+                                .accessibilityLabel("Add exercise")
+                        }
                     }
                 }
             }

@@ -29,25 +29,29 @@ struct ContentView: View {
         }
     }
     
+    //variable for determining landscape vs portrait view
+    var isDeviceLandscape: Bool {
+        if horizontalSizeClass == .regular && verticalSizeClass == .compact {
+            return true
+        } else {
+            return false
+        }
+    }
+    
     var body: some View {
         NavigationStack {
             TabView() {
                 Tab("Timer", systemImage: "timer") {
-                    if horizontalSizeClass == .regular && verticalSizeClass == .compact {
-                        Text("Watch this space")
+                    if isDeviceLandscape {
+                        TimerDisplayViewLandscape()
                     } else {
-                        TimerDisplayViewPhonePortrait()
+                        TimerDisplayViewPortrait()
                     }
                 }
 
                 Tab("Set list", systemImage: "list.bullet") {
-                    if horizontalSizeClass == .regular && verticalSizeClass == .compact {
-                        Text("Also watch this space")
-                    } else {
-                        
-                        PhonePlaylistViewPortrait()
-                            .navigationBarBackButtonHidden()
-                    }
+                    PlaylistView()
+                        .navigationBarBackButtonHidden()
                 }
             }
             .navigationTitle(navigationBarTitleString)

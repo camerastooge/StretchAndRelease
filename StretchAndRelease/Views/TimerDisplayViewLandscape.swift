@@ -8,7 +8,7 @@
 import SwiftUI
 import SwiftData
 
-struct TimerDisplayViewPhoneLandscape: View {
+struct TimerDisplayViewLandscape: View {
     //Envirionment properties
     @Environment(\.accessibilityDifferentiateWithoutColor) var differentiateWithoutColor
     @Environment(StretchTimer.self) private var timer
@@ -143,7 +143,7 @@ struct TimerDisplayViewPhoneLandscape: View {
 }
 
 #Preview {
-    TimerDisplayViewPhoneLandscape()
+    TimerDisplayViewLandscape()
         .environment(StretchTimer())
         .modelContainer(previewContainer)
 }
