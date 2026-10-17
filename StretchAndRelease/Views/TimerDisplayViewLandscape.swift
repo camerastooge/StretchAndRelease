@@ -77,9 +77,8 @@ struct TimerDisplayViewLandscape: View {
                             y: proxy.size.height * 0.5
                         )
                         .frame(
-                            width: proxy.size.width * 0.49
+                            width: proxy.size.width * 0.46
                         )
-                        .padding(.vertical)
                 }
                 
             if timer.isPlaylistActive {
@@ -125,6 +124,7 @@ struct TimerDisplayViewLandscape: View {
                 .gradientBackground()
                 .ignoresSafeArea()
         }
+        .safeAreaPadding([.top, .bottom])
         
 
         //keep the timer's copy of the set list current

@@ -54,6 +54,7 @@ struct ContentView: View {
                         .navigationBarBackButtonHidden()
                 }
             }
+            .labelStyle(.iconOnly)
             .navigationTitle(navigationBarTitleString)
             .toolbar {
                 ToolbarItem {
