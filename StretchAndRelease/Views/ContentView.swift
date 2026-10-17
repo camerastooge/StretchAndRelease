@@ -42,7 +42,7 @@ struct ContentView: View {
         NavigationStack {
             TabView() {
                 Tab("Timer", systemImage: "timer") {
-                    if isDeviceLandscape {
+                    if horizontalSizeClass == .compact {
                         TimerDisplayViewLandscape()
                     } else {
                         TimerDisplayViewPortrait()
@@ -94,6 +94,7 @@ struct ContentView: View {
                 }
             }
         }
+        .safeAreaPadding(.horizontal)
         .sheet(isPresented: $isShowingHelpView) {
             MainHelpScreenView()
                 .presentationDetents([.large])

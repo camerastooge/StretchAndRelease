@@ -71,13 +71,13 @@ struct TimerDisplayViewLandscape: View {
                 
                 
                 GeometryReader { proxy in
-                    MainArcView()
+                    MainArcViewLandscape()
                         .position(
                             x: proxy.size.width / 2,
                             y: proxy.size.height * 0.5
                         )
                         .frame(
-                            width: proxy.size.width * 0.46
+                            width: proxy.size.width * 0.9
                         )
                 }
                 
