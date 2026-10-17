@@ -29,20 +29,11 @@ struct ContentView: View {
         }
     }
     
-    //variable for determining landscape vs portrait view
-    var isDeviceLandscape: Bool {
-        if horizontalSizeClass == .regular && verticalSizeClass == .compact {
-            return true
-        } else {
-            return false
-        }
-    }
-    
     var body: some View {
         NavigationStack {
             TabView() {
                 Tab("Timer", systemImage: "timer") {
-                    if horizontalSizeClass == .compact {
+                    if verticalSizeClass == .compact {
                         TimerDisplayViewLandscape()
                     } else {
                         TimerDisplayViewPortrait()
