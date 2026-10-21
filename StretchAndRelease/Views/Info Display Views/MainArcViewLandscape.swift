@@ -14,28 +14,9 @@ struct MainArcViewLandscape: View {
     @Environment(\.dynamicTypeSize) var sizeCategory
     @Environment(StretchTimer.self) private var timer
     
-    private var fraction: Double = 1.0
-    
     var body: some View {
         GeometryReader { proxy in
-            var timerBarWidth: Double = proxy.frame(in: .local).width * fraction
-            
             VStack(alignment: .leading) {
-                //                if !differentiateWithoutColor {
-                //                    Arc(endAngle: timer.endAngle)
-                //                        .stroke(timer.phase.phaseColor, style: StrokeStyle(lineWidth: 25, lineCap: .round))
-                //                        .rotationEffect(Angle(degrees: 90))
-                //                        .shadow(color: colorScheme == .dark ? .gray.opacity(0) : .black.opacity(0.35), radius: 5, x: 8, y: 5)
-                //                        .padding(.bottom)
-                //                        .position(x: proxy.size.width / 2)
-                //                        .offset(y: proxy.size.height * 0.55)
-                //                } else {
-                //                    Arc(endAngle: timer.endAngle)
-                //                        .stroke(.black, style: StrokeStyle(lineWidth: 25, lineCap: .round))
-                //                        .rotationEffect(Angle(degrees: 90))
-                //                        .padding(.bottom)
-                //                        .position(x: proxy.size.width / 2)
-                //                }
                 //Text information display
                 VStack {
                     Text("\(String(format: "%02d", timer.timeRemaining))")
@@ -63,12 +44,21 @@ struct MainArcViewLandscape: View {
                 )
                 
                 //Progress bar
-                Capsule()
-                    .frame(width: timerBarWidth, height: 25, alignment: .leading)
-                    .foregroundStyle(timer.phase.phaseColor)
-                
+                if !differentiateWithoutColor {
+                    Capsule()
+                        .fill(timer.phase.phaseColor)
+                        .frame(width: max(25, proxy.size.width * timer.fraction), height: 25)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .shadow(color: colorScheme == .dark ? .clear : .black.opacity(0.35), radius: 5, x: 8, y: 5)
+                        .offset(y: proxy.frame(in: .local).maxY * -0.08)
+                } else {
+                    Capsule()
+                        .fill(.black)
+                        .frame(width: max(25, proxy.size.width * timer.fraction), height: 25)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .offset(y: proxy.frame(in: .local).maxY * -0.1)
+                }
             }
-            .padding(.bottom)
         }
     }
 }

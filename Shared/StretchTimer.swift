@@ -35,6 +35,9 @@ final class StretchTimer {
     /// The arc's sweep. Kept as an angle rather than a 0...1 progress value so the
     /// existing `withAnimation` timings and `Arc.animatableData` behave exactly as before.
     private(set) var endAngle = Angle(degrees: 340)
+    
+    // Fraction to set the length of the progress bar for landscape views
+    private(set) var fraction: Double = 1.0
 
     // MARK: - Playlist
 
@@ -159,6 +162,7 @@ final class StretchTimer {
         repsCompleted = 0
         withAnimation(.easeOut(duration: 0.5)) {
             updateEndAngle()
+            updateFraction()
         }
     }
 
@@ -214,6 +218,7 @@ final class StretchTimer {
             timeRemaining = totalStretch
             withAnimation(.easeOut(duration: 0.5)) {
                 updateEndAngle()
+                updateFraction()
             }
         }
     }
@@ -256,6 +261,7 @@ final class StretchTimer {
             timeRemaining -= 1
             withAnimation(.easeOut(duration: 1)) {
                 updateEndAngle()
+                updateFraction()
             }
             if audioEnabled { SoundManager.instance.playTick(sound: .tick) }
             return
@@ -298,6 +304,7 @@ final class StretchTimer {
                 timeRemaining += 1
                 withAnimation(.easeOut(duration: 1)) {
                     updateEndAngle()
+                    updateFraction()
                 }
                 return
             }
@@ -309,6 +316,7 @@ final class StretchTimer {
                 withAnimation(.easeOut(duration: 1)) {
                     phase = .stretch
                     updateEndAngle()
+                    updateFraction()
                 }
                 return
             }
@@ -316,7 +324,10 @@ final class StretchTimer {
             if repsCompleted != totalReps {
                 timeRemaining = totalStretch
                 withAnimation(.default) { phase = .stretch }
-                withAnimation(.easeOut(duration: 1)) { updateEndAngle() }
+                withAnimation(.easeOut(duration: 1)) {
+                    updateEndAngle()
+                    updateFraction()
+                }
             } else {
                 moveToNextExerciseInRun()
                 withAnimation(.default) { phase = .stretch }
@@ -329,6 +340,7 @@ final class StretchTimer {
                 timeRemaining += 1
                 withAnimation(.easeOut(duration: 1)) {
                     updateEndAngle()
+                    updateFraction()
                 }
             }
             return
@@ -387,6 +399,7 @@ final class StretchTimer {
             isActive = false
             isPaused = false
             updateEndAngle()
+            updateFraction()
         }
         timeRemaining = totalStretch
         onRunningChanged?(false)
@@ -400,6 +413,14 @@ final class StretchTimer {
             endAngle = arcAngle(remaining: timeRemaining, total: totalRest)
         case .stop:
             endAngle = Angle(degrees: 340)
+        }
+    }
+    
+    private func updateFraction() {
+        switch phase {
+        case .stretch: fraction = Double(timeRemaining) / Double(totalStretch)
+        case .rest: fraction = Double(timeRemaining) / Double(totalRest)
+        case .stop: fraction = 1.0
         }
     }
 
