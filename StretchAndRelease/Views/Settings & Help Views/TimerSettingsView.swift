@@ -14,6 +14,8 @@ struct SettingsView: View {
 	@Environment(\.dismiss) var dismiss
     @Environment(\.accessibilityDifferentiateWithoutColor) var differentiateWithoutColor
     @Environment(\.dynamicTypeSize) var sizeCategory
+    @Environment(\.horizontalSizeClass) var horizontalSizeClass
+    @Environment(\.verticalSizeClass) var verticalSizeClass
     @Environment(StretchTimer.self) private var timer
     
     // Properties stored in UserDefaults
@@ -46,9 +48,25 @@ struct SettingsView: View {
     
     
     var isScrollDisabled: Bool {
-        switch sizeCategory {
-        case .accessibility3, .accessibility4, .accessibility5: return false
-        default: return true
+        var isTypeSizeAccessible: Bool {
+            switch sizeCategory {
+            case .accessibility3, .accessibility4, .accessibility5:  return true
+            default: return false
+            }
+        }
+        
+        var isDeviceLandscape: Bool {
+            if verticalSizeClass == .compact {
+                return true
+            } else {
+                return false
+            }
+        }
+        
+        if isTypeSizeAccessible || isDeviceLandscape {
+            return false
+        } else {
+            return true
         }
     }
     
@@ -77,6 +95,10 @@ struct SettingsView: View {
         }
     }
     
+    private var volumeIndicatorIcon: Image {
+        
+    }
+    
     var body: some View {
         NavigationStack {
             ScrollView {
@@ -84,15 +106,15 @@ struct SettingsView: View {
                     if !sizeCategory.isAccessibilitySize {
                         PhoneTimerSettingsTypicalView(stretch: $stretch, rest: $rest, reps: $reps, isEditing: $isEditing)
                             .scrollDisabled(true)
-                            .containerRelativeFrame(.vertical) { height, _ in
-                                height * 0.55
-                            }
+//                            .containerRelativeFrame(.vertical) { height, _ in
+//                                height * 0.55
+//                            }
                     } else {
                         PhoneTimerSettingsAccessibleView(stretch: $stretch, rest: $rest, reps: $reps, isEditing: $isEditing)
                             .scrollDisabled(false)
-                            .containerRelativeFrame(.vertical) { height, _ in
-                                height * 0.55
-                            }
+//                            .containerRelativeFrame(.vertical) { height, _ in
+//                                height * 0.55
+//                            }
                     }
                 }
                             
