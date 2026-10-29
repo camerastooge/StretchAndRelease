@@ -17,7 +17,7 @@ struct ProgressBar: Shape {
     
     func path(in rect: CGRect) -> Path {
         var path = Path()
-        var timerBarMaxWidth: Double = rect.maxX
+        let timerBarMaxWidth: Double = rect.maxX
         
         path.move(to: CGPoint(x: rect.minX, y: rect.midY))
         path.addLine(to: CGPoint(x: timerBarMaxWidth * fraction, y: rect.midY))

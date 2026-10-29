@@ -95,10 +95,6 @@ struct SettingsView: View {
         }
     }
     
-    private var volumeIndicatorIcon: Image {
-        
-    }
-    
     var body: some View {
         NavigationStack {
             ScrollView {

@@ -95,24 +95,30 @@ struct PlaylistView: View {
                         .scrollContentBackground(.hidden)
                         .safeAreaPadding(.leading, 15.0)
                         
-                        NavigationLink {
-                            AddExerciseView()
-                                .navigationBarBackButtonHidden()
-                        } label: {
-                            if #available(iOS 26.0, *) {
-                                Image(systemName: "plus.circle.fill")
-                                    .font(.largeTitle)
-                                    .foregroundStyle(.green)
-                                    .glassEffect()
-                                    .accessibilityLabel("Add exercise")
-                            } else {
-                                Image(systemName: "plus.circle.fill")
-                                    .font(.largeTitle)
-                                    .foregroundStyle(.green)
-                                    .accessibilityLabel("Add exercise")
+                        HStack {
+                            NavigationLink {
+                                AddExerciseView()
+                                    .navigationBarBackButtonHidden()
+                            } label: {
+                                if #available(iOS 26.0, *) {
+                                    Image(systemName: "plus.circle.fill")
+                                        .font(.largeTitle)
+                                        .foregroundStyle(.green)
+                                        .glassEffect()
+                                        .accessibilityLabel("Add exercise")
+                                } else {
+                                    Image(systemName: "plus.circle.fill")
+                                        .font(.largeTitle)
+                                        .foregroundStyle(.green)
+                                        .accessibilityLabel("Add exercise")
+                                }
                             }
+                            .buttonStyle(.plain)
+                            
+                            Spacer()
                         }
-                        .buttonStyle(.plain)
+                        .padding(.horizontal, 25)
+                        .padding(.bottom, 25)
                     }
                 } else {
                     VStack {
